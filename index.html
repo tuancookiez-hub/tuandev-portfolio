@@ -30,9 +30,15 @@
       audio.loop = true;
       audio.volume = 0.35;
       window._bgAudio = audio;
+      var started = false;
       document.addEventListener('click', function() {
-        audio.play();
+        if (!started) { audio.play(); started = true; }
       }, { once: true });
+      document.addEventListener('visibilitychange', function() {
+        if (!started) return;
+        if (document.hidden) audio.pause();
+        else if (!audio.muted) audio.play();
+      });
     })();
   </script>
 
