@@ -23,65 +23,19 @@
   <script type="module" crossorigin src="./assets/index-Cxo0TDFR.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B8HEXiM_.css">
 
-  <!-- Landing overlay styles -->
-  <style>
-    #landing-overlay {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      cursor: pointer;
-      transition: opacity 1.5s ease-out;
-    }
-    #landing-overlay.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
-    #landing-overlay .enter-text {
-      font-family: 'Cormorant', serif;
-      font-size: clamp(1.2rem, 3vw, 2rem);
-      font-weight: 400;
-      color: #E6E1D8;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      user-select: none;
-      animation: pulse 2.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
-  </style>
-</head>
-<body>
-  <!-- Landing overlay -->
-  <div id="landing-overlay">
-    <span class="enter-text">Click to Enter</span>
-  </div>
-
-  <div id="root"></div>
-
-  <!-- Music & overlay logic -->
+  <!-- Music autoload on first user interaction -->
   <script>
     (function() {
-      var overlay = document.getElementById('landing-overlay');
       var audio = new Audio('./bg-music.mp3');
       audio.loop = true;
       audio.volume = 0.35;
-
-      overlay.addEventListener('click', function() {
+      document.addEventListener('click', function() {
         audio.play();
-        overlay.classList.add('fade-out');
-        setTimeout(function() {
-          overlay.remove();
-        }, 1500);
-      });
+      }, { once: true });
     })();
   </script>
+</head>
+<body>
+  <div id="root"></div>
 </body>
 </html>
