@@ -1,30 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/jpeg" href="./eye-diagram.jpg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tuan Dev — Portfolio</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tuan Dev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400;1,600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=VT323&display=swap" rel="stylesheet" />
+  <!-- Image Preloads -->
+  <link rel="preload" as="image" href="./eye-anime.png">
+  <link rel="preload" as="image" href="./hero-anime.png">
+  <link rel="preload" as="image" href="./hero-scholar.png">
+  <link rel="preload" as="image" href="./project-nous.jpg">
+  <link rel="preload" as="image" href="./eye-gold.jpg">
+  <link rel="preload" as="image" href="./globe-warm.jpg">
+  <link rel="preload" as="image" href="./hero-anime.jpg">
+  <link rel="preload" as="image" href="./hero-figure.jpg">
+  <link rel="preload" as="image" href="./hero-statue.jpg">
+  <link rel="preload" as="image" href="./nike-warm.jpg">
 
-    <!-- Image Preloads -->
-    <link rel="preload" as="image" href="./eye-diagram.jpg" />
-    <link rel="preload" as="image" href="./statue-geometry.jpg" />
-    <link rel="preload" as="image" href="./silhouette-geometry.jpg" />
-    <link rel="preload" as="image" href="./project-nous-branding.jpg" />
-    <link rel="preload" as="image" href="./system-diagram.jpg" />
-    <link rel="preload" as="image" href="./eye-closeup.jpg" />
-    <link rel="preload" as="image" href="./angel-statue.jpg" />
-    <link rel="preload" as="image" href="./globe.jpg" />
-    <link rel="preload" as="image" href="./qr-pattern.jpg" />
-    <script type="module" crossorigin src="./assets/index-DASXF8mA.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DMBfhLB_.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+  <script type="module" crossorigin src="./assets/index-Cxo0TDFR.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-B8HEXiM_.css">
+
+  <!-- Landing overlay styles -->
+  <style>
+    #landing-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      cursor: pointer;
+      transition: opacity 1.5s ease-out;
+    }
+    #landing-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #landing-overlay .enter-text {
+      font-family: 'Cormorant', serif;
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 400;
+      color: #E6E1D8;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      user-select: none;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Landing overlay -->
+  <div id="landing-overlay">
+    <span class="enter-text">Click to Enter</span>
+  </div>
+
+  <div id="root"></div>
+
+  <!-- Music & overlay logic -->
+  <script>
+    (function() {
+      var overlay = document.getElementById('landing-overlay');
+      var audio = new Audio('./bg-music.mp3');
+      audio.loop = true;
+      audio.volume = 0.35;
+
+      overlay.addEventListener('click', function() {
+        audio.play();
+        overlay.classList.add('fade-out');
+        setTimeout(function() {
+          overlay.remove();
+        }, 1500);
+      });
+    })();
+  </script>
+</body>
 </html>
