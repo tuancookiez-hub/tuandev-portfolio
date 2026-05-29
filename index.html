@@ -34,8 +34,97 @@
       }, { once: true });
     })();
   </script>
+
+  <!-- Mobile responsive overrides -->
+  <style>
+    @media (max-width: 767px) {
+      /* Hide sidebar by default on mobile */
+      aside[class*="fixed"] {
+        transform: translateX(-100%) !important;
+        width: 280px !important;
+        max-width: 85vw !important;
+        transition: transform 0.3s ease !important;
+        z-index: 9999 !important;
+      }
+      /* Remove sidebar margin from main content */
+      main[class*="ml-"] {
+        margin-left: 0 !important;
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+      }
+      /* Hamburger button */
+      #mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 10000;
+        width: 40px;
+        height: 40px;
+        background: rgba(13,13,13,0.9);
+        border: 1px solid rgba(230,225,216,0.15);
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #E6E1D8;
+        font-size: 20px;
+        line-height: 1;
+        backdrop-filter: blur(8px);
+      }
+      #mobile-toggle::before { content: "☰"; }
+      /* Sidebar open state */
+      #sidebar-check:checked ~ #root aside[class*="fixed"] {
+        transform: translateX(0) !important;
+      }
+      /* Overlay behind open sidebar */
+      #sidebar-check:checked ~ #root .mobile-overlay {
+        display: block;
+      }
+      .mobile-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 9998;
+      }
+      #sidebar-check:checked ~ #mobile-toggle::before { content: "✕"; }
+    }
+    @media (min-width: 768px) {
+      #mobile-toggle { display: none; }
+      .mobile-overlay { display: none; }
+    }
+  </style>
 </head>
 <body>
+  <input type="checkbox" id="sidebar-check" style="display:none">
+  <label for="sidebar-check" id="mobile-toggle"></label>
   <div id="root"></div>
+  <script>
+    (function() {
+      function init() {
+        var root = document.getElementById('root');
+        if (!root) return;
+        var overlay = document.createElement('div');
+        overlay.className = 'mobile-overlay';
+        root.appendChild(overlay);
+        overlay.addEventListener('click', function() {
+          document.getElementById('sidebar-check').checked = false;
+        });
+        root.addEventListener('click', function(e) {
+          var link = e.target.closest('a[href^="#"]');
+          if (link && window.innerWidth < 768) {
+            document.getElementById('sidebar-check').checked = false;
+          }
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
+      } else {
+        setTimeout(init, 100);
+      }
+    })();
+  </script>
 </body>
 </html>
