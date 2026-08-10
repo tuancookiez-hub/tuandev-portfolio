@@ -1,215 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tuan Dev — Portfolio</title>
-
-  <!-- Open Graph / Social Preview -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://tuancookiez-hub.github.io/tuandev-portfolio/">
-  <meta property="og:title" content="Tuan Dev — Portfolio">
-  <meta property="og:description" content="Computer Engineer — Malaysia. Perception. Reasoning. Action.">
-  <meta property="og:image" content="https://tuancookiez-hub.github.io/tuandev-portfolio/eye-anime.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Tuan Dev — Portfolio">
-  <meta name="twitter:description" content="Computer Engineer — Malaysia">
-  <meta name="twitter:image" content="https://tuancookiez-hub.github.io/tuandev-portfolio/eye-anime.png">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,600;1,400;1,600&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Image Preloads -->
-  <link rel="preload" as="image" href="./eye-anime.png">
-  <link rel="preload" as="image" href="./hero-anime.png">
-  <link rel="preload" as="image" href="./hero-scholar.png">
-  <link rel="preload" as="image" href="./project-nous.jpg">
-  <link rel="preload" as="image" href="./eye-gold.jpg">
-  <link rel="preload" as="image" href="./globe-warm.jpg">
-  <link rel="preload" as="image" href="./hero-anime.jpg">
-  <link rel="preload" as="image" href="./hero-figure.jpg">
-  <link rel="preload" as="image" href="./hero-statue.jpg">
-  <link rel="preload" as="image" href="./nike-warm.jpg">
-
-  <script type="module" crossorigin src="./assets/index-Cxo0TDFR.js?v=5"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-B8HEXiM_.css?v=4"></script>
-
-  <!-- Music removed -->
-
-  <!-- Mobile responsive overrides -->
-  <style>
-    @media (max-width: 767px) {
-      /* Hide sidebar by default on mobile */
-      aside[class*="fixed"] {
-        transform: translateX(-100%) !important;
-        width: 280px !important;
-        max-width: 85vw !important;
-        transition: transform 0.3s ease !important;
-        z-index: 9999 !important;
-      }
-      /* Remove sidebar margin from main content */
-      main[class*="ml-"] {
-        margin-left: 0 !important;
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
-      }
-      /* Hamburger button */
-      #mobile-toggle {
-        display: block;
-        position: fixed;
-        top: 16px;
-        left: 16px;
-        z-index: 10000;
-        width: 40px;
-        height: 40px;
-        background: rgba(13,13,13,0.9);
-        border: 1px solid rgba(230,225,216,0.15);
-        border-radius: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #E6E1D8;
-        font-size: 20px;
-        line-height: 1;
-        backdrop-filter: blur(8px);
-      }
-      #mobile-toggle::before { content: "☰"; }
-      /* Sidebar open state */
-      #sidebar-check:checked ~ #root aside[class*="fixed"] {
-        transform: translateX(0) !important;
-      }
-      /* Overlay behind open sidebar */
-      #sidebar-check:checked ~ #root .mobile-overlay {
-        display: block;
-      }
-      .mobile-overlay {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.6);
-        z-index: 9998;
-      }
-      #sidebar-check:checked ~ #mobile-toggle::before { content: "✕"; }
-    }
-    /* Editorial card (Facade of Jade + HyAtlas collapsed) — stack on mobile */
-    @media (max-width: 767px) {
-      .cf-collapsed {
-        grid-template-columns: 1fr !important;
-        min-height: 0 !important;
-      }
-      .cf-image-col {
-        aspect-ratio: 16 / 10 !important;
-        min-height: 200px !important;
-        max-height: 240px !important;
-      }
-      .cf-text-col {
-        padding: 24px 20px !important;
-      }
-      .cf-title {
-        font-size: 26px !important;
-        gap: 10px !important;
-      }
-      .cf-ornament {
-        font-size: 14px !important;
-      }
-      .cf-description {
-        font-size: 15px !important;
-        line-height: 1.5 !important;
-        margin-bottom: 14px !important;
-      }
-      .cf-tags {
-        font-size: 9px !important;
-        margin-bottom: 10px !important;
-        letter-spacing: 0.15em !important;
-      }
-      .cf-expanded-content {
-        padding: 22px 20px 28px 20px !important;
-      }
-      .cf-expanded-body {
-        font-size: 15px !important;
-        line-height: 1.55 !important;
-        margin-bottom: 18px !important;
-      }
-      .cf-bullets {
-        font-size: 10px !important;
-        line-height: 1.75 !important;
-        margin-bottom: 18px !important;
-      }
-    }
-    @media (min-width: 768px) {
-      #mobile-toggle { display: none; }
-      .mobile-overlay { display: none; }
-    }
-
-    /* Click to expand glow animation */
-    @keyframes glow-pulse {
-      0%, 100% { color: #E6E10B; text-shadow: 0 0 8px rgba(230,225,11,0.6), 0 0 20px rgba(230,225,11,0.3); }
-      50% { color: #f0eb30; text-shadow: 0 0 15px rgba(230,225,11,0.9), 0 0 35px rgba(230,225,11,0.5), 0 0 50px rgba(230,225,11,0.2); }
-    }
-    .glow-cta {
-      animation: glow-pulse 2s ease-in-out infinite;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-    }
-    /* Philosophy section removed */
-    section.relative.py-32 { display: none !important; }
-  </style>
-</head>
-<body>
-  <input type="checkbox" id="sidebar-check" style="display:none">
-  <label for="sidebar-check" id="mobile-toggle"></label>
-  <div id="root"></div>
-  <script>
-    (function() {
-      function init() {
-        var root = document.getElementById('root');
-        if (!root) return;
-        var overlay = document.createElement('div');
-        overlay.className = 'mobile-overlay';
-        root.appendChild(overlay);
-        overlay.addEventListener('click', function() {
-          document.getElementById('sidebar-check').checked = false;
-        });
-        root.addEventListener('click', function(e) {
-          var link = e.target.closest('a[href^="#"]');
-          if (link && window.innerWidth < 768) {
-            document.getElementById('sidebar-check').checked = false;
-          }
-        });
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 100); });
-      } else {
-        setTimeout(init, 100);
-      }
-    })();
-  </script>
-  <script>
-    (function() {
-      function applyGlow() {
-        var spans = document.querySelectorAll('span');
-        for (var i = 0; i < spans.length; i++) {
-          if (spans[i].textContent.indexOf('Click to expand') !== -1 && !spans[i].classList.contains('glow-cta')) {
-            spans[i].classList.add('glow-cta');
-          }
-        }
-      }
-      var observer = new MutationObserver(applyGlow);
-      var root = document.getElementById('root');
-      if (root) {
-        observer.observe(root, { childList: true, subtree: true });
-        setTimeout(applyGlow, 500);
-      }
-    })();
-  </script>
-
-  <!-- Tilt hover effect (project cards + click-to-enter landing) -->
-  <script src="./assets/tilt.js?v=5"></script>
-  <!-- Project content injection (replaces card text/images at runtime) -->
-  <script src="./assets/projects.js?v=28"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tuan Dev Portfolio — one quiet world with four realities. Hospitality is live; Systems, Creative, and Robotics are under construction." />
+    <meta name="theme-color" content="#e9ebee" />
+    <title>Tuan Dev — Portfolio</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tuancookiez-hub.github.io/tuandev-portfolio/" />
+    <meta property="og:title" content="Tuan Dev — Portfolio" />
+    <meta property="og:description" content="One quiet world with four realities. Hospitality is live; Systems, Creative, and Robotics are under construction." />
+    <meta property="og:image" content="https://tuancookiez-hub.github.io/tuandev-portfolio/preview-social.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Tuan Dev — Portfolio" />
+    <meta name="twitter:image" content="https://tuancookiez-hub.github.io/tuandev-portfolio/preview-social.png" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23e9ebee'/%3E%3Cpath d='M8 0 16 8 8 16 0 8Z' fill='%231b1e22'/%3E%3C/svg%3E"
+    />
+    <script type="module" crossorigin src="./assets/index-BBKPQ4Cc.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BzjwhWYR.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
