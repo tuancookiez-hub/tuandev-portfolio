@@ -190,15 +190,12 @@ export default function RaymarchedBlackHole() {
           const linear = Math.min(1, Math.max(0, (raw - stops[a]) / span));
           const mix = linear * linear * (3 - 2 * linear);
           const open = Math.min(1, Math.max(0, (linear - 0.34) / 0.66));
-          // The exploded overview holds softly: motion eases in from 34% and
-          // reaches full separation well before the interval ends, so the
-          // composition dwells centered without a dead scroll zone.
-          const inspect = Math.min(1, Math.max(0, (linear - 0.5) / 0.5));
+          // The exploded overview is a normal magnetic stop: the catch at the
+          // stop holds it, and any further scroll starts moving toward the
+          // lens immediately. No dead scroll zone.
           const blend = a === 0
             ? open * open * (3 - 2 * open)
-            : a === 1
-              ? inspect * inspect * (3 - 2 * inspect)
-              : mix;
+            : mix;
           bh.segment = a;
           bh.blend = blend;
           root.dataset.segment = String(a);
