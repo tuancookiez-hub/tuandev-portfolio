@@ -1,182 +1,359 @@
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
+import type { ReactNode } from "react";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 
-/* Systems world — a design-directions gallery.
-   Each mockup is a distinct front-end interface style, built in code (no chart
-   library, no screenshots — crisp at any size). Shown like hospitality's concept
-   directions: here's the range of what I can build for data-heavy interfaces. */
+/* Systems world — inspection interfaces.
+   The story: one mock power plant, built two ways — a light field console
+   and a dark monitoring wall. Every chart is hand-built SVG: no chart
+   library, no screenshots, mock data only. Design follows high-performance
+   HMI practice — severity is never colour alone (shape + label back it),
+   colour is reserved for alarms, every panel carries a timestamp. */
 
-type Dir = {
-  number: string;
-  style: string;
-  title: string;
-  line: string;
-  text: string;
-  accent: string;
-};
+type Box = { w: number; h: number; l: number; r: number; t: number; b: number; min: number; max: number };
 
-const directions: Dir[] = [
-  {
-    number: "01",
-    style: "Dark ops",
-    title: "Control-room monitoring",
-    line: "Dense, dark, measurable at a glance.",
-    text: "A monitoring surface for systems that run around the clock. Tight stat tiles, a live line, and high contrast so the numbers lead. Works when the data has to feel serious.",
-    accent: "#0d1b2a",
-  },
-  {
-    number: "02",
-    style: "Light SaaS",
-    title: "A clean product dashboard",
-    line: "Pale slate, soft cards, quiet confidence.",
-    text: "The everyday analog to the dark control room. Enough structure to feel like a real product, light enough to not feel corporate. A default for client-facing tools.",
-    accent: "#eef2f5",
-  },
-  {
-    number: "03",
-    style: "Memory inspector",
-    title: "Inspectable agent memory",
-    line: "What the system knows, made visible.",
-    text: "A view into the layers a memory system keeps — what it recalls, how it's scored, where it's stored. Built to make an invisible process inspectable.",
-    accent: "#10243a",
-  },
-  {
-    number: "04",
-    style: "Workflow board",
-    title: "Operational queue",
-    line: "Columns, lanes, throughput.",
-    text: "A board for moving work through stages. Cards, columns, status — the pattern for any pipeline you want to watch without a wall of tables.",
-    accent: "#355070",
-  },
-  {
-    number: "05",
-    style: "Router console",
-    title: "Provider routing & cost",
-    line: "One door, many models, costs you can see.",
-    text: "A console that pools providers, routes each call, and shows what it costs. Built for answering one question: which model is actually worth it.",
-    accent: "#1d4a6b",
-  },
+const sx = (i: number, n: number, o: Box) => o.l + (i / (n - 1)) * (o.w - o.l - o.r);
+const sy = (v: number, o: Box) => o.h - o.b - ((v - o.min) / (o.max - o.min)) * (o.h - o.t - o.b);
+const line = (v: number[], o: Box) =>
+  v.map((n, i) => `${i ? "L" : "M"}${sx(i, v.length, o).toFixed(1)} ${sy(n, o).toFixed(1)}`).join("");
+
+/* Mock plant — one shared dataset so both faces show the same numbers. */
+const output = [612, 648, 703, 741, 780, 802, 826, 851, 873, 888, 904, 897, 891];
+const target = 812;
+const load = [46, 42, 39, 38, 40, 52, 68, 81, 86, 89, 91, 92, 93.8, 92, 90, 88, 86, 82, 73, 63, 55, 50, 47, 44];
+const zones = [
+  { z: "Zone B", n: 12 },
+  { z: "Zone D", n: 7 },
+  { z: "Zone A", n: 5 },
+  { z: "Zone C", n: 3 },
+  { z: "Zone E", n: 1 },
 ];
+const equip = [
+  { id: "GT-04", name: "Gas turbine", z: "B", date: "12 Aug", v: [61, 63, 66, 64, 68, 72, 71], sev: "watch" },
+  { id: "GB-02", name: "Gearbox", z: "D", date: "09 Aug", v: [55, 54, 56, 58, 57, 60, 61], sev: "watch" },
+  { id: "CP-11", name: "Cooling pump", z: "A", date: "14 Aug", v: [80, 79, 81, 82, 81, 83, 84], sev: "ok" },
+  { id: "TR-07", name: "Transformer", z: "C", date: "02 Aug", v: [70, 71, 69, 72, 71, 73, 72], sev: "ok" },
+  { id: "CT-EX", name: "Cable tray 7", z: "B", date: "Today", v: [40, 38, 36, 30, 26, 22, 18], sev: "fail" },
+];
+const trays = [
+  "oooooooooooo",
+  "ooooowooooow",
+  "oowooooohooo",
+  "oooooooooooo",
+  "ooooowoooooo",
+  "oowooooowooo",
+  "oowowoohcccc",
+  "oooooooooooo",
+  "woooooooowoo",
+];
+const events = [
+  { tier: "Urgent", code: "TRAY-07", msg: "78.4 °C — over the 75 °C limit", at: "14:26" },
+  { tier: "High", code: "GT-04", msg: "vibration 7.2 mm/s, trending up", at: "13:40" },
+  { tier: "High", code: "GB-02", msg: "oil temp +4 °C vs baseline", at: "12:15" },
+  { tier: "Advisory", code: "CP-11", msg: "PM window opens Fri 06:00", at: "11:58" },
+  { tier: "Advisory", code: "TR-07", msg: "weekly thermography due", at: "09:30" },
+];
+const sevs: Record<string, string> = { ok: "● OK", watch: "▲ WATCH", fail: "✕ FAIL" };
 
-export default function SystemsWorld({ onClose }: { onClose?: () => void }) {
-  const ctx = useActiveWorld();
-
+function Rise({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  const still = useReducedMotion();
+  if (still) return <div className="sys-rise">{children}</div>;
   return (
-    <motion.div className="sys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <button type="button" className="world-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
-        <i aria-hidden="true">←</i> Surface
-      </button>
-
-      <div className="sys-utility">
-        <span>Front-end design directions for systems</span>
-        <span>Kuala Lumpur · Remote</span>
-      </div>
-
-      <main id="sys-top">
-        <section className="sys-hero">
-          <div className="sys-hero-copy">
-            <p>02 · Systems</p>
-            <h1>The range of what<br />I build for data.</h1>
-            <span>Dashboards, consoles, and workflow interfaces — each direction a different way to make data feel clear. Built in code, no chart library, no stock screens.</span>
-          </div>
-          <div className="sys-hero-dash" aria-hidden="true">
-            <div className="sys-dash-top"><i />Design directions</div>
-            <div className="sys-dash-stats">
-              <b><small>Styles</small>05</b>
-              <b><small>Code built</small>100%</b>
-              <b><small>Libs</small>0</b>
-            </div>
-            <svg viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true">
-              <path d="M4 66C40 60 52 40 78 44s46 4 64-6 40-16 68-8 38 8 66-2 20-6 20-6" fill="none" stroke="#477da2" strokeWidth="2" />
-            </svg>
-          </div>
-        </section>
-
-        <section className="sys-list" data-sync="work">
-          <div className="sys-list-head">
-            <p>What I can build</p>
-            <h2>Five ways to make<br />data feel clear.</h2>
-            <span>Each one is a complete interface direction, not a fill-in-the-blank template. Pick a mood for your product and I build that surface for your data.</span>
-          </div>
-
-          {directions.map((d) => (
-            <article key={d.number} className="sys-card">
-              <div className="sys-card-dash" data-dir={d.style} aria-hidden="true">
-                <div className="sys-dash-top"><i />{d.title}</div>
-                <div className="sys-dash-body">
-                  {d.style === "Dark ops" && <DarkOpsMock />}
-                  {d.style === "Light SaaS" && <SaaSMock />}
-                  {d.style === "Memory inspector" && <MemoryMock />}
-                  {d.style === "Workflow board" && <KanbanMock />}
-                  {d.style === "Router console" && <RouterMock />}
-                </div>
-              </div>
-              <div className="sys-card-copy">
-                <span className="sys-card-num">{d.number}</span>
-                <p className="sys-card-tag">{d.style}</p>
-                <h3>{d.title}</h3>
-                <p className="sys-card-summary">{d.line}</p>
-                <p className="sys-card-text">{d.text}</p>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="sys-contact" id="sys-contact">
-          <span>Have a product that needs a face?</span>
-          <h2>Tell me what it does,<br />I'll shape the surface.</h2>
-          <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
-        </section>
-      </main>
-
-      <footer className="sys-footer">
-        <b>TUAN DEV · SYSTEMS</b><span>Kuala Lumpur · Malaysia</span><span>GitHub · Contact</span>
-      </footer>
+    <motion.div
+      className="sys-rise"
+      initial={{ opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
     </motion.div>
   );
 }
 
-/* ── Mockup pieces ───────────────────────────── */
-
-function Stat({ k, v }: { k: string; v: string }) {
-  return <b className="sys-stat"><small>{k}</small>{v}</b>;
-}
-
-function DarkOpsMock() {
+function Draw({ d, stroke, width = 2 }: { d: string; stroke: string; width?: number }) {
+  const still = useReducedMotion();
   return (
-    <>
-      <div className="sys-rows">
-        <Stat k="Uptime" v="99.98%" />
-        <Stat k="P95" v="212ms" />
-        <Stat k="Nodes" v="14" />
-      </div>
-      <svg viewBox="0 0 260 70" preserveAspectRatio="none"><path d="M4 58C26 50 34 30 54 34s30 10 48 0 36-14 58-4 28 8 52-6 10-2 10-2" fill="none" stroke="#5eead4" strokeWidth="2" strokeLinecap="round" /></svg>
-    </>
+    <motion.path
+      d={d}
+      fill="none"
+      strokeWidth={width}
+      strokeLinecap="round"
+      style={{ stroke }}
+      initial={still ? undefined : { pathLength: 0 }}
+      whileInView={{ pathLength: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+    />
   );
 }
 
-function SaaSMock() {
+function Spark({ v, tone }: { v: number[]; tone: string }) {
+  const o: Box = { w: 62, h: 16, l: 1, r: 1, t: 2, b: 2, min: Math.min(...v), max: Math.max(...v) };
   return (
-    <>
-      <div className="sys-rows sys-rows-w">
-        <Stat k="Active" v="1,284" />
-        <Stat k="MRR" v="$48k" />
-        <Stat k="Churn" v="1.2%" />
+    <svg viewBox={`0 0 ${o.w} ${o.h}`} aria-hidden="true">
+      <Draw d={line(v, o)} stroke={tone} width={1.5} />
+    </svg>
+  );
+}
+
+function Kpi({ k, v, unit, delta, tone, spark, main }: { k: string; v: string; unit?: string; delta?: string; tone?: string; spark?: number[]; main?: boolean }) {
+  return (
+    <div className="sys-kpi" data-main={main ? "" : undefined}>
+      <small>{k}</small>
+      <b>
+        {v}
+        {unit && <em>{unit}</em>}
+      </b>
+      {(delta || spark) && (
+        <span>
+          {delta && <i data-tone={tone ?? "good"}>{delta}</i>}
+          {spark && <Spark v={spark} tone={tone === "bad" ? "var(--d-bad)" : tone === "warn" ? "var(--d-warn)" : "var(--d-accent)"} />}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function Head({ title, sub, at }: { title: string; sub: string; at?: string }) {
+  return (
+    <div className="sys-chart-h">
+      <b>{title}</b>
+      <span>{sub}{at ? ` · ${at}` : ""}</span>
+    </div>
+  );
+}
+
+function Trend() {
+  const o: Box = { w: 560, h: 176, l: 38, r: 44, t: 12, b: 22, min: 580, max: 950 };
+  const grid = [600, 700, 800, 900];
+  const xs = [0, 3, 6, 9, 12].map((i) => sx(i, output.length, o));
+  return (
+    <div className="sys-chart">
+      <Head title="Output above the 812 MWe target since 09:40" sub="Unit output · MWe · 06:00–18:00" at="mock" />
+      <svg viewBox={`0 0 ${o.w} ${o.h}`} role="img" aria-label="Unit output holding above the 812 megawatt target">
+        <defs>
+          <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" style={{ stopColor: "var(--d-accent)" }} stopOpacity=".22" />
+            <stop offset="100%" style={{ stopColor: "var(--d-accent)" }} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {grid.map((g) => (
+          <g key={g}>
+            <line x1={o.l} x2={o.w - o.r} y1={sy(g, o)} y2={sy(g, o)} style={{ stroke: "var(--d-line)" }} strokeWidth="1" />
+            <text x={o.l - 7} y={sy(g, o) + 3} textAnchor="end" className="ax">{g}</text>
+          </g>
+        ))}
+        <line x1={o.l} x2={o.w - o.r} y1={sy(target, o)} y2={sy(target, o)} style={{ stroke: "var(--d-warn)" }} strokeWidth="1.25" strokeDasharray="5 4" />
+        <text x={o.w - o.r + 5} y={sy(target, o) + 3} className="ax ax-w">TGT</text>
+        <path d={`${line(output, o)} L${sx(output.length - 1, output.length, o)} ${o.h - o.b} L${o.l} ${o.h - o.b} Z`} fill="url(#gA)" stroke="none" />
+        <Draw d={line(output, o)} stroke="var(--d-accent)" width={2.25} />
+        <circle cx={sx(output.length - 1, output.length, o)} cy={sy(output[output.length - 1], o)} r="3.5" style={{ fill: "var(--d-accent)" }} />
+        <text x={sx(output.length - 1, output.length, o) - 2} y={sy(output[output.length - 1], o) - 8} textAnchor="end" className="ax ax-v">{output[output.length - 1]}</text>
+        {xs.map((x, i) => (
+          <text key={i} x={x} y={o.h - 6} textAnchor="middle" className="ax">{["06", "09", "12", "15", "18"][i]}</text>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function Zones() {
+  const max = Math.max(...zones.map((z) => z.n));
+  return (
+    <div className="sys-chart">
+      <Head title="Zone B carries 43% of open findings" sub="Findings by zone · 28 open" at="mock" />
+      <div className="sys-zone">
+        {zones.map((z) => (
+          <span key={z.z}>
+            <i>{z.z}</i>
+            <em><b style={{ width: `${(z.n / max) * 100}%`, background: z.z === "Zone B" ? "var(--d-bad)" : "var(--d-accent)" }} /></em>
+            <u>{z.n}</u>
+          </span>
+        ))}
       </div>
-      <svg viewBox="0 0 260 70" preserveAspectRatio="none"><path d="M4 64C28 56 44 46 64 48s26-8 44-14 34 2 56-8 26-6 52 2 14-4 14-4" fill="none" stroke="#477da2" strokeWidth="2" strokeLinecap="round" /></svg>
-    </>
+    </div>
+  );
+}
+
+function Gauge() {
+  const C = 2 * Math.PI * 56;
+  const seg = [
+    { n: 214, c: "var(--d-accent)" },
+    { n: 23, c: "var(--d-warn)" },
+    { n: 5, c: "var(--d-bad)" },
+  ];
+  let at = 0;
+  return (
+    <div className="sys-chart">
+      <Head title="Cable fitness 88% — 5 runs due" sub="Cable network · 242 runs" at="mock" />
+      <div className="sys-ring">
+        <svg viewBox="0 0 150 150" role="img" aria-label="Cable network 88 percent fit">
+          <circle cx="75" cy="75" r="56" fill="none" style={{ stroke: "var(--d-tile)" }} strokeWidth="14" />
+          {seg.map((s) => {
+            const len = (s.n / 242) * C - 2;
+            const off = at;
+            at += (s.n / 242) * C;
+            return <circle key={s.n} cx="75" cy="75" r="56" fill="none" strokeWidth="14" style={{ stroke: s.c }} strokeDasharray={`${Math.max(len, 1)} ${C}`} strokeDashoffset={-off} transform="rotate(-90 75 75)" />;
+          })}
+          <text x="75" y="74" textAnchor="middle" className="ring-v">88%</text>
+          <text x="75" y="90" textAnchor="middle" className="ring-k">FIT</text>
+        </svg>
+        <div className="sys-ring-l">
+          {[["Pass", "214 runs", "var(--d-accent)"], ["Watch", "23 runs", "var(--d-warn)"], ["Replace", "5 runs", "var(--d-bad)"]].map(([k, v, c]) => (
+            <span key={k}><i style={{ background: c }} />{k}<em>{v}</em></span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Equip() {
+  return (
+    <div className="sys-chart">
+      <Head title="Two assets on watch, one failing" sub="Equipment · last test · health" at="mock" />
+      <div className="sys-tab">
+        <span className="sys-tab-h"><i>ID</i><i>Asset</i><i>Zone</i><i>Tested</i><i>Health</i><i>Status</i></span>
+        {equip.map((e) => (
+          <span key={e.id} className="sys-tab-r">
+            <i>{e.id}</i>
+            <i>{e.name}</i>
+            <i>{e.z}</i>
+            <i>{e.date}</i>
+            <i><Spark v={e.v} tone={e.sev === "fail" ? "var(--d-bad)" : e.sev === "watch" ? "var(--d-warn)" : "var(--d-accent)"} /></i>
+            <i><em className="sys-sev" data-sev={e.sev}>{sevs[e.sev]}</em></i>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LightConsole() {
+  return (
+    <div className="sys-face-dash">
+      <div className="sys-kpis sp12">
+        <Kpi k="Output" v="904" unit="MWe" delta="▲ 3.1% vs yday" spark={output.slice(-8)} main />
+        <Kpi k="Health score" v="92" unit="/100" delta="▲ +1 pt this wk" spark={[84, 85, 87, 86, 89, 90, 92]} />
+        <Kpi k="Open findings" v="28" delta="▼ 6 this wk" spark={[40, 37, 36, 33, 31, 30, 28]} />
+        <Kpi k="Cable fitness" v="88" unit="%" tone="warn" delta="5 runs due" spark={[91, 91, 90, 90, 89, 88, 88]} />
+      </div>
+      <div className="sp7"><Trend /></div>
+      <div className="sp5"><Zones /></div>
+      <div className="sp5"><Gauge /></div>
+      <div className="sp7"><Equip /></div>
+    </div>
+  );
+}
+
+function Heat() {
+  const bands: Record<string, string> = { o: "var(--h-ok)", w: "var(--h-warm)", h: "var(--h-hot)", c: "var(--h-crit)" };
+  const at = [0, 3, 6, 9, 12].map((i) => (i / 11) * 100);
+  return (
+    <div className="sys-chart">
+      <Head title="Tray 7 over its 75 °C limit since 14:00" sub="Cable tray temps · °C · 06:00–18:00" at="mock" />
+      <div className="sys-heat">
+        {trays.map((row, ti) => (
+          <span key={ti} className="sys-heat-r">
+            <i>T{ti + 1}</i>
+            <em>
+              {[...row].map((cell, ci) => (
+                <b key={ci} style={{ background: bands[cell] }} data-band={cell} />
+              ))}
+            </em>
+          </span>
+        ))}
+        <span className="sys-heat-x">
+          <i />
+          {at.map((p, i) => (
+            <u key={i} style={{ left: `${p}%` }}>{["06", "09", "12", "15", "18"][i]}</u>
+          ))}
+        </span>
+      </div>
+      <div className="sys-heat-l">
+        {[["<55", "o"], ["55–65", "w"], ["65–75", "h"], [">75", "c"]].map(([k, b]) => (
+          <span key={k}><b style={{ background: bands[b] }} />{k} °C</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Load() {
+  const o: Box = { w: 760, h: 176, l: 34, r: 46, t: 14, b: 22, min: 0, max: 100 };
+  const xs = [0, 6, 12, 18, 23].map((i) => sx(i, load.length, o));
+  return (
+    <div className="sys-chart">
+      <Head title="Peak 93.8% at 13:00 — 1.2 pts under the alarm line" sub="Plant load · % of nameplate · 24 h" at="mock" />
+      <svg viewBox={`0 0 ${o.w} ${o.h}`} role="img" aria-label="24 hour plant load peaking at 93.8 percent">
+        <defs>
+          <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" style={{ stopColor: "var(--d-accent)" }} stopOpacity=".3" />
+            <stop offset="100%" style={{ stopColor: "var(--d-accent)" }} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0, 25, 50, 75, 100].map((g) => (
+          <g key={g}>
+            <line x1={o.l} x2={o.w - o.r} y1={sy(g, o)} y2={sy(g, o)} style={{ stroke: "var(--d-line)" }} strokeWidth="1" />
+            <text x={o.l - 7} y={sy(g, o) + 3} textAnchor="end" className="ax">{g}</text>
+          </g>
+        ))}
+        <line x1={o.l} x2={o.w - o.r} y1={sy(95, o)} y2={sy(95, o)} style={{ stroke: "var(--d-bad)" }} strokeWidth="1.25" strokeDasharray="5 4" />
+        <text x={o.w - o.r + 5} y={sy(95, o) + 3} className="ax ax-b">95%</text>
+        <path d={`${line(load, o)} L${sx(load.length - 1, load.length, o)} ${o.h - o.b} L${o.l} ${o.h - o.b} Z`} fill="url(#gB)" stroke="none" />
+        <Draw d={line(load, o)} stroke="var(--d-accent)" width={2.25} />
+        <circle cx={sx(12, load.length, o)} cy={sy(load[12], o)} r="3.5" style={{ fill: "var(--d-accent)" }} />
+        <text x={sx(12, load.length, o) - 2} y={sy(load[12], o) - 9} textAnchor="end" className="ax ax-v">peak 93.8</text>
+        {xs.map((x, i) => (
+          <text key={i} x={x} y={o.h - 6} textAnchor="middle" className="ax">{["00", "06", "12", "18", "24"][i]}</text>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function Log() {
+  const glyphs: Record<string, string> = { Urgent: "▲", High: "●", Advisory: "■" };
+  return (
+    <div className="sys-chart">
+      <Head title="3 active alarms — 1 urgent" sub="Event log · UTC+8" at="14:26" />
+      <div className="sys-log">
+        {events.map((e) => (
+          <span key={`${e.code}${e.at}`} className="sys-log-r" data-tier={e.tier}>
+            <i>{glyphs[e.tier]} {e.tier.slice(0, 3).toUpperCase()}</i>
+            <em><b>{e.code}</b>{e.msg}</em>
+            <u>{e.at}</u>
+          </span>
+        ))}
+      </div>
+      <p className="sys-log-n">Shape and label carry the tier; colour only reinforces it.</p>
+    </div>
+  );
+}
+
+function DarkWall() {
+  return (
+    <div className="sys-face-dash">
+      <div className="sys-kpis sp12">
+        <Kpi k="Uptime" v="99.98" unit="%" delta="▲ 30-day" spark={[99.9, 99.95, 99.97, 99.96, 99.98, 99.99, 99.98]} main />
+        <Kpi k="Load" v="92.4" unit="%" delta="▲ vs yday" spark={load.slice(-8).map((n) => Math.round(n))} />
+        <Kpi k="Active alarms" v="3" tone="warn" delta="1 urgent · 2 high" spark={[5, 4, 4, 3, 4, 3, 3]} />
+        <Kpi k="Trays online" v="41" unit="/42" delta="T7 degraded" tone="bad" spark={[42, 42, 42, 42, 41, 41, 41]} />
+      </div>
+      <div className="sp7"><Heat /></div>
+      <div className="sp5"><Log /></div>
+      <div className="sp12"><Load /></div>
+    </div>
   );
 }
 
 function MemoryMock() {
   return (
-    <>
-      <div className="sys-mem">
-        {["L1 profile", "L3 fact", "L5 working"].map((tag, i) => (
-          <span key={tag}><i style={{ background: ["#7cc47a", "#477da2", "#f2a33a"][i] }} />{tag}<em>{[".94", ".82", ".68"][i]}</em></span>
-        ))}
-      </div>
-    </>
+    <div className="sys-mem">
+      {[["L1 profile", ".94", "#7cc47a"], ["L3 fact", ".82", "#477da2"], ["L5 working", ".68", "#f2a33a"]].map(([tag, score, hue]) => (
+        <span key={tag}><i style={{ background: hue }} />{tag}<em>{score}</em></span>
+      ))}
+    </div>
   );
 }
 
@@ -192,9 +369,7 @@ function KanbanMock() {
         <div key={col.tag} className="sys-kan-col">
           <span className="sys-kan-tag">{col.tag}</span>
           {col.items.map((label, ri) => (
-            <span key={ri} className="sys-kan-card" style={{ height: `${22 + col.hs[ri] * 12}px` }}>
-              <i />{label}
-            </span>
+            <span key={ri} className="sys-kan-card" style={{ height: `${22 + col.hs[ri] * 12}px` }}><i />{label}</span>
           ))}
           <span className="sys-kan-ghost" />
         </div>
@@ -218,5 +393,149 @@ function RouterMock() {
         </div>
       ))}
     </div>
+  );
+}
+
+const more = [
+  {
+    number: "03",
+    style: "Memory inspector",
+    title: "Inspectable agent memory",
+    line: "What the system knows, made visible.",
+    text: "A view into the layers a memory system keeps — what it recalls, how it's scored, where it's stored. Built to make an invisible process inspectable.",
+  },
+  {
+    number: "04",
+    style: "Workflow board",
+    title: "Operational queue",
+    line: "Columns, lanes, throughput.",
+    text: "A board for moving work through stages. Cards, columns, status — the pattern for any pipeline you want to watch without a wall of tables.",
+  },
+  {
+    number: "05",
+    style: "Router console",
+    title: "Provider routing & cost",
+    line: "One door, many models, costs you can see.",
+    text: "A console that pools providers, routes each call, and shows what it costs. Built for answering one question: which model is actually worth it.",
+  },
+];
+
+export default function SystemsWorld({ onClose }: { onClose?: () => void }) {
+  const ctx = useActiveWorld();
+
+  return (
+    <motion.div className="sys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+      <button type="button" className="world-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
+        <i aria-hidden="true">←</i> Surface
+      </button>
+
+      <div className="sys-utility">
+        <span>Inspection dashboards · Monitoring walls · Consoles</span>
+        <span>Kuala Lumpur · Remote</span>
+      </div>
+
+      <main id="sys-top">
+        <section className="sys-hero">
+          <div className="sys-hero-copy">
+            <p>02 · Systems — Inspection & monitoring</p>
+            <h1>Where serious<br />software lives.</h1>
+            <span>Dashboards for inspection systems — power plants, equipment, cable networks. Every graph on this page is drawn in code: zero chart libraries, zero screenshots, mock data only. Light enough to load fast, precise enough to act on.</span>
+          </div>
+          <div className="sys-hero-dash" aria-hidden="true">
+            <div className="sys-dash-top"><i />Plant overview · Mock feed<em>14:32</em></div>
+            <div className="sys-hero-kpis">
+              <Kpi k="Output" v="904" unit="MWe" delta="▲ 3.1%" spark={output.slice(-8)} main />
+              <Kpi k="Findings" v="28" delta="▼ 6 this wk" spark={[40, 37, 36, 33, 31, 30, 28]} />
+              <Kpi k="Cable fitness" v="88" unit="%" tone="warn" delta="5 due" spark={[91, 91, 90, 90, 89, 88, 88]} />
+            </div>
+            <svg viewBox="0 0 300 84" preserveAspectRatio="none">
+              {[600, 700, 800, 900].map((g) => (
+                <line key={g} x1="0" x2="300" y1={84 - ((g - 580) / 370) * 84} y2={84 - ((g - 580) / 370) * 84} stroke="rgba(16,36,58,.09)" strokeWidth="1" />
+              ))}
+              <line x1="0" x2="300" y1={84 - ((812 - 580) / 370) * 84} y2={84 - ((812 - 580) / 370) * 84} stroke="#c98a12" strokeWidth="1" strokeDasharray="4 4" />
+              <Draw d={line(output, { w: 300, h: 84, l: 0, r: 0, t: 4, b: 0, min: 580, max: 950 })} stroke="#477da2" width={2} />
+            </svg>
+          </div>
+        </section>
+
+        <section className="sys-faces" data-sync="work">
+          <div className="sys-list-head">
+            <p>One plant, two faces</p>
+            <h2>Light for the field,<br />loud for the wall.</h2>
+            <span>An inspection programme needs both: a light, fast console technicians open on a tablet, and a dense monitoring wall for the control room. Same mock plant, same numbers, two deliberately different builds.</span>
+          </div>
+
+          <Rise>
+            <article className="sys-face" data-face="light">
+              <div className="sys-face-copy">
+                <span className="sys-card-num">A</span>
+                <p className="sys-card-tag">Face A · Light</p>
+                <h3>Field inspection console</h3>
+                <p className="sys-card-summary">Pale, quiet, quick to scan.</p>
+                <p className="sys-card-text">Stat tiles with trend and delta, output against target, findings by zone, cable fitness, and the equipment list with severity chips. Colour never carries meaning alone — shape and label always back it up. This is the build I'd hand to field staff and clients.</p>
+              </div>
+              <div className="sys-face-panel">
+                <div className="sys-dash-top"><i />Field console · Unit 2<em>Mock · 14:32</em></div>
+                <LightConsole />
+              </div>
+            </article>
+          </Rise>
+
+          <Rise>
+            <article className="sys-face" data-face="dark">
+              <div className="sys-face-copy">
+                <span className="sys-card-num">B</span>
+                <p className="sys-card-tag">Face B · Dark</p>
+                <h3>Control-room monitoring wall</h3>
+                <p className="sys-card-summary">Dense, alert-first, readable at distance.</p>
+                <p className="sys-card-text">A thermal heatmap across cable trays, the 24-hour load curve against its alarm line, and a tiered event log — urgent, high, advisory. High-performance HMI practice: muted surfaces, colour reserved for alarms, every state explained in words.</p>
+              </div>
+              <div className="sys-face-panel">
+                <div className="sys-dash-top"><i />Monitoring wall · Unit 2<em>Mock · 14:32:05</em></div>
+                <DarkWall />
+              </div>
+            </article>
+          </Rise>
+        </section>
+
+        <section className="sys-list" data-sync="more">
+          <div className="sys-list-head">
+            <p>More directions</p>
+            <h2>Systems is bigger<br />than inspection.</h2>
+            <span>Three more directions from the toolbox — agent memory, workflow boards, model routing. Each a complete interface style, built the same way: in code.</span>
+          </div>
+
+          {more.map((d) => (
+            <article key={d.number} className="sys-card">
+              <div className="sys-card-dash" data-dir={d.style} aria-hidden="true">
+                <div className="sys-dash-top"><i />{d.title}</div>
+                <div className="sys-dash-body">
+                  {d.style === "Memory inspector" && <MemoryMock />}
+                  {d.style === "Workflow board" && <KanbanMock />}
+                  {d.style === "Router console" && <RouterMock />}
+                </div>
+              </div>
+              <div className="sys-card-copy">
+                <span className="sys-card-num">{d.number}</span>
+                <p className="sys-card-tag">{d.style}</p>
+                <h3>{d.title}</h3>
+                <p className="sys-card-summary">{d.line}</p>
+                <p className="sys-card-text">{d.text}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <section className="sys-contact" id="sys-contact">
+          <span>Have a system that needs a face?</span>
+          <h2>Tell me what it watches,<br />I'll build the wall.</h2>
+          <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
+        </section>
+      </main>
+
+      <footer className="sys-footer">
+        <b>TUAN DEV · SYSTEMS</b><span>Kuala Lumpur · Malaysia</span><span>GitHub · Contact</span>
+      </footer>
+    </motion.div>
   );
 }

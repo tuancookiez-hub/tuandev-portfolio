@@ -18,7 +18,7 @@ export const WORLDS: readonly World[] = [
     id: "systems",
     number: "02",
     label: "Systems",
-    line: "HyAtlas, my API console, the tracker. Tools I needed.",
+    line: "Inspection dashboards for plants, equipment, cable runs.",
   },
   {
     id: "creative",

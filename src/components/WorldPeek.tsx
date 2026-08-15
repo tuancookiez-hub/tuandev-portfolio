@@ -13,8 +13,8 @@ function SystemsPreview() {
     <span className="peek peek-systems">
       <span className="peek-side"><b>T</b><i /><i /><i /><i /></span>
       <span className="peek-dashboard">
-        <small>Overview · Tuan Systems</small>
-        <span className="peek-stats"><b>HyAtlas<small>Memory</small></b><b>Console<small>API</small></b><b>Tracker<small>Live</small></b></span>
+        <small>Plant overview · Mock feed · 14:32</small>
+        <span className="peek-stats"><b>904 MWe<small>Output</small></b><b>28<small>Findings</small></b><b>88%<small>Cables</small></b></span>
         <svg viewBox="0 0 180 52" aria-hidden="true"><path d="M2 47C24 39 39 44 56 26s35 4 53-8 31-6 45-15 21 1 25-2" fill="none" stroke="currentColor" strokeWidth="3" /></svg>
       </span>
     </span>
