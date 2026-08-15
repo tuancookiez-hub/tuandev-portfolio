@@ -18,10 +18,30 @@ const deck = [
 
 const names = ["Approach", "Exploded overview", ...deck.map((item) => item.label), "Finale"];
 
+const videos = [
+  {
+    title: "Seedance / Proxifai",
+    note: "My Seedance submission for the Proxifai hackathon.",
+    duration: "0:47",
+    src: "./assets/creative/adventure.mp4",
+    poster: "./assets/creative/adventure-poster.webp",
+    format: "vertical",
+  },
+  {
+    title: "Pain / FLUX 3",
+    note: "My medieval submission for the Nous FLUX 3 hackathon.",
+    duration: "1:54",
+    src: "./assets/creative/pain.mp4",
+    poster: "./assets/creative/pain-poster.webp",
+    format: "wide",
+  },
+] as const;
+
 export default function CreativeWorld() {
   const ctx = useActiveWorld();
   const [step, setStep] = useState(0);
   const [narrow, setNarrow] = useState(false);
+  const [reel, setReel] = useState<number | null>(null);
   const lenis = useRef<Lenis | null>(null);
 
   useEffect(() => {
@@ -31,6 +51,22 @@ export default function CreativeWorld() {
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
   }, []);
+
+  useEffect(() => {
+    if (reel === null) return;
+    const overflow = document.body.style.overflow;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setReel(null);
+    };
+    document.body.style.overflow = "hidden";
+    lenis.current?.stop();
+    window.addEventListener("keydown", close);
+    return () => {
+      window.removeEventListener("keydown", close);
+      document.body.style.overflow = overflow;
+      lenis.current?.start();
+    };
+  }, [reel]);
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -187,11 +223,40 @@ export default function CreativeWorld() {
           <span className="creative-mask"><span className="creative-mask-line" data-show={done} style={{ transitionDelay: ".14s" }}><em>to meet me here.</em></span></span>
         </h2>
         <span className="creative-body">Mind Palace, HyAtlas, the API console, a peptide tracker. Two media pipelines that already make things, even if they do not have a pretty screen yet. I start with a question and build until I can see the answer.</span>
+        <div className="creative-reels">
+          <small>Two hackathon submissions</small>
+          <div>
+            {videos.map((video, i) => (
+              <button key={video.title} type="button" className="creative-reel" data-format={video.format} onClick={() => setReel(i)} aria-label={`Play ${video.title}`}>
+                <img src={video.poster} alt="" loading="lazy" />
+                <span><b>{video.title}</b><em>{video.duration}</em></span>
+              </button>
+            ))}
+          </div>
+        </div>
         <a href="mailto:tuancookiez@gmail.com">
           <span className="cta-full">Write to Tuan ↗</span>
           <span className="cta-short">Say hello ↗</span>
         </a>
       </div>
+
+      {reel !== null && (
+        <div className="creative-player" role="dialog" aria-modal="true" aria-labelledby="creative-player-title" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setReel(null);
+        }}>
+          <section className="creative-player-shell">
+            <button type="button" className="creative-player-close" onClick={() => setReel(null)}>Close ×</button>
+            <div className="creative-player-copy">
+              <small>Hackathon edit {String(reel + 1).padStart(2, "0")}</small>
+              <h3 id="creative-player-title">{videos[reel].title}</h3>
+              <span>{videos[reel].note}</span>
+            </div>
+            <video key={videos[reel].src} controls autoPlay playsInline preload="metadata" poster={videos[reel].poster} data-format={videos[reel].format}>
+              <source src={videos[reel].src} type="video/mp4" />
+            </video>
+          </section>
+        </div>
+      )}
 
       <nav className="creative-depth" aria-label={`Creative journey: ${names[step]}`}>
         {stops.map((_, dot) => (

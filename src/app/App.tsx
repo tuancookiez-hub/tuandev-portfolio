@@ -4,6 +4,7 @@ import WorldSelector from "../components/WorldSelector";
 import HospitalityPortal from "../components/HospitalityPortal";
 import HospitalityWorld from "../worlds/HospitalityWorld";
 import CreativeWorld from "../worlds/CreativeWorld";
+import SystemsWorld from "../worlds/SystemsWorld";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 
 function Shell() {
@@ -20,6 +21,10 @@ function Shell() {
     return <HospitalityPortal />;
   }
 
+  if (direct === "systems") {
+    return <SystemsWorld />;
+  }
+
   return (
     <div className="portal-stage">
       <div className="landing" aria-hidden={state.entered !== null} data-entered={state.entered !== null} data-cover={String(state.entered === "hospitality")}>
@@ -29,6 +34,7 @@ function Shell() {
         </main>
       </div>
       {state.entered === "creative" && <CreativeWorld />}
+      {state.entered === "systems" && <SystemsWorld />}
       <HospitalityPortal />
     </div>
   );

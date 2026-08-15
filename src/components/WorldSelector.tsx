@@ -51,7 +51,7 @@ export default function WorldSelector() {
       </div>
       <div className="gateway-status" aria-hidden="true">
         <span>{state.active === null ? "I'm Tuan. These are the things I make." : WORLDS.find((world) => world.id === state.active)?.line}</span>
-        <b>{state.active === null ? "Hover a world" : state.active === "hospitality" || state.active === "creative" ? "Open this one ↗" : "Still building this"}</b>
+        <b>{state.active === null ? "Hover a world" : state.active === "hospitality" || state.active === "creative" || state.active === "systems" ? "Open this one ↗" : "Still building this"}</b>
       </div>
     </section>
   );

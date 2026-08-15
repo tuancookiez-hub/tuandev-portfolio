@@ -14,7 +14,7 @@ export default function WorldPanel({ world, index }: Props) {
   const intent = useRef<ReturnType<typeof setTimeout> | null>(null);
   const active = state.active === world.id;
   const muted = state.active !== null && !active;
-  const available = world.id === "hospitality" || world.id === "creative";
+  const available = world.id === "hospitality" || world.id === "creative" || world.id === "systems";
   const disabled = !available;
   const entered = state.entered !== null;
 
