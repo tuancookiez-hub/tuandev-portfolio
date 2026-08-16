@@ -18,11 +18,12 @@ function current(): Omit<Sync, "type"> | null {
   }) ?? sections.at(-1);
   if (section === undefined) return null;
 
-  // Calculate how far through this section we are (0 to 1)
   const box = section.getBoundingClientRect();
   const sectionTop = box.top + window.scrollY;
-  const sectionHeight = Math.max(1, box.height);
-  const progressInSection = Math.min(1, Math.max(0, (window.scrollY - sectionTop + window.innerHeight * 0.42) / sectionHeight));
+  const journey = section.dataset.sync === "journey";
+  const sectionHeight = Math.max(1, box.height - (journey ? window.innerHeight : 0));
+  const offset = journey ? 0 : window.innerHeight * 0.42;
+  const progressInSection = Math.min(1, Math.max(0, (window.scrollY - sectionTop + offset) / sectionHeight));
 
   return {
     section: section.dataset.sync ?? "",
@@ -39,8 +40,9 @@ export function usePreviewReceiver(enabled: boolean) {
       const section = document.querySelector<HTMLElement>(`[data-sync="${CSS.escape(event.data.section)}"]`);
       if (section === null) return;
 
-      // Map to the same section in the iframe, proportionally through it
-      const target = section.offsetTop + (event.data.progress * section.offsetHeight);
+      const journey = section.dataset.sync === "journey";
+      const range = Math.max(1, section.offsetHeight - (journey ? window.innerHeight : 0));
+      const target = section.offsetTop + (event.data.progress * range);
       window.scrollTo({ top: target, behavior: "auto" });
     };
 

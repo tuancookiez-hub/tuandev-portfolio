@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { useRef, useState } from "react";
 import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 
@@ -54,22 +54,6 @@ const events = [
   { tier: "Advisory", code: "TR-07", msg: "weekly thermography due", at: "09:30" },
 ];
 const sevs: Record<string, string> = { ok: "● OK", watch: "▲ WATCH", fail: "✕ FAIL" };
-
-function Rise({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
-  const still = useReducedMotion();
-  if (still) return <div className="sys-rise">{children}</div>;
-  return (
-    <motion.div
-      className="sys-rise"
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 function Draw({ d, stroke, width = 2 }: { d: string; stroke: string; width?: number }) {
   const still = useReducedMotion();
@@ -401,29 +385,46 @@ const more = [
   {
     number: "03",
     style: "Memory inspector",
-    title: "Inspectable agent memory",
-    line: "What the system knows, made visible.",
-    text: "A view into the layers a memory system keeps — what it recalls, how it's scored, where it's stored. Built to make an invisible process inspectable.",
+    title: "Agent memory",
+    line: "See what was kept and why.",
+    text: "I built HyAtlas because an agent that forgets is hard to work with. This view exposes the stored fact, score, and layer.",
   },
   {
     number: "04",
     style: "Workflow board",
-    title: "Operational queue",
-    line: "Columns, lanes, throughput.",
-    text: "A board for moving work through stages. Cards, columns, status — the pattern for any pipeline you want to watch without a wall of tables.",
+    title: "Work queue",
+    line: "See where the work is stuck.",
+    text: "I use boards when a pipeline has owners, handoffs, and waiting states. The interface should show the next action without opening a table.",
   },
   {
     number: "05",
     style: "Router console",
-    title: "Provider routing & cost",
-    line: "One door, many models, costs you can see.",
-    text: "A console that pools providers, routes each call, and shows what it costs. Built for answering one question: which model is actually worth it.",
+    title: "Model routing",
+    line: "See which provider handled the call.",
+    text: "My AIClient2API console makes providers, latency, routing, and cost inspectable. I want the trade-off visible before I choose a model.",
   },
 ];
 
 export default function SystemsWorld({ onClose, embed = false }: { onClose?: () => void; embed?: boolean }) {
   const ctx = useActiveWorld();
+  const stage = useRef<HTMLElement>(null);
+  const reduced = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: stage, offset: ["start start", "end end"] });
+  const wash = useTransform(scrollYProgress, [0, .28, .52, .72, 1], ["#c8cdcc", "#c8cdcc", "#667b89", "#142636", "#0b1622"]);
+  const simple = useTransform(scrollYProgress, [0, .12, .24, 1], [1, 1, 0, 0]);
+  const light = useTransform(scrollYProgress, [0, .1, .25, .42, .56, 1], [0, 0, 1, 1, 0, 0]);
+  const dark = useTransform(scrollYProgress, [0, .42, .57, .72, .84, 1], [0, 0, 1, 1, 0, 0]);
+  const branches = useTransform(scrollYProgress, [0, .72, .86, 1], [0, 0, 1, 1]);
+  const simpleY = useTransform(scrollYProgress, [0, .24, 1], [0, -36, -36]);
+  const lightY = useTransform(scrollYProgress, [0, .1, .25, .56, 1], [50, 50, 0, -40, -40]);
+  const darkY = useTransform(scrollYProgress, [0, .42, .57, .84, 1], [60, 60, 0, -44, -44]);
+  const branchY = useTransform(scrollYProgress, [0, .72, .86, 1], [70, 70, 0, 0]);
+  const [progress, setProgress] = useState(0);
   usePreviewReceiver(embed);
+
+  useMotionValueEvent(scrollYProgress, "change", (value) => setProgress(value));
+  const name = progress < .22 ? "signal" : progress < .5 ? "field" : progress < .78 ? "control" : "branches";
+  const theme = progress < .5 ? "light" : "dark";
 
   return (
     <motion.div className="sys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
@@ -438,104 +439,88 @@ export default function SystemsWorld({ onClose, embed = false }: { onClose?: () 
         <span>Kuala Lumpur · Remote</span>
       </div>
 
-      <main id="sys-top">
-        <section className="sys-hero" data-sync="hero">
-          <div className="sys-hero-copy">
-            <p>02 · Systems — Inspection & monitoring</p>
-            <h1>Where serious<br />software lives.</h1>
-            <span>Dashboards for inspection systems — power plants, equipment, cable networks. Every graph on this page is drawn in code: zero chart libraries, zero screenshots, mock data only. Light enough to load fast, precise enough to act on.</span>
-          </div>
-          <div className="sys-hero-dash" aria-hidden="true">
-            <div className="sys-dash-top"><i />Plant overview · Mock feed<em>14:32</em></div>
-            <div className="sys-hero-kpis">
-              <Kpi k="Output" v="904" unit="MWe" delta="▲ 3.1%" spark={output.slice(-8)} main />
-              <Kpi k="Findings" v="28" delta="▼ 6 this wk" spark={[40, 37, 36, 33, 31, 30, 28]} />
-              <Kpi k="Cable fitness" v="88" unit="%" tone="warn" delta="5 due" spark={[91, 91, 90, 90, 89, 88, 88]} />
-            </div>
-            <svg viewBox="0 0 300 84" preserveAspectRatio="none">
-              {[600, 700, 800, 900].map((g) => (
-                <line key={g} x1="0" x2="300" y1={84 - ((g - 580) / 370) * 84} y2={84 - ((g - 580) / 370) * 84} stroke="rgba(16,36,58,.09)" strokeWidth="1" />
-              ))}
-              <line x1="0" x2="300" y1={84 - ((812 - 580) / 370) * 84} y2={84 - ((812 - 580) / 370) * 84} stroke="#c98a12" strokeWidth="1" strokeDasharray="4 4" />
-              <Draw d={line(output, { w: 300, h: 84, l: 0, r: 0, t: 4, b: 0, min: 580, max: 950 })} stroke="#477da2" width={2} />
-            </svg>
-          </div>
-        </section>
+      <motion.main id="sys-top" className="sys-main" style={reduced ? undefined : { backgroundColor: wash }}>
+        <section
+          ref={stage}
+          className="sys-story"
+          data-sync="journey"
+          data-stage={name}
+          data-theme={theme}
+          data-progress={progress.toFixed(3)}
+        >
+          <div className="sys-story-sticky">
+            <div className="sys-atmosphere" aria-hidden="true" />
+            <div className="sys-story-progress" aria-hidden="true"><i style={{ transform: `scaleX(${progress})` }} /></div>
 
-        <section className="sys-faces" data-sync="work">
-          <div className="sys-list-head">
-            <p>One plant, two faces</p>
-            <h2>Light for the field,<br />loud for the wall.</h2>
-            <span>An inspection programme needs both: a light, fast console technicians open on a tablet, and a dense monitoring wall for the control room. Same mock plant, same numbers, two deliberately different builds.</span>
-          </div>
+            <motion.div className="sys-scene sys-scene-simple" style={reduced ? undefined : { opacity: simple, y: simpleY }}>
+              <div className="sys-scene-copy">
+                <p>02 · Systems</p>
+                <h1>Start with<br />one signal.</h1>
+                <span>I begin with the decision someone has to make. Scroll and the interface adds only what that decision needs.</span>
+              </div>
+              <div className="sys-signal" aria-hidden="true">
+                <div className="sys-dash-top"><i />Unit 2 · Mock feed<em>14:32</em></div>
+                <small>OUTPUT</small><b>904<em>MWe</em></b>
+                <svg viewBox="0 0 300 84" preserveAspectRatio="none">
+                  <line x1="0" x2="300" y1="54" y2="54" stroke="rgba(16,36,58,.12)" strokeWidth="1" />
+                  <Draw d={line(output, { w: 300, h: 84, l: 0, r: 0, t: 4, b: 0, min: 580, max: 950 })} stroke="#477da2" width={2} />
+                </svg>
+                <span>Above target since 09:40</span>
+              </div>
+            </motion.div>
 
-          <Rise>
-            <article className="sys-face" data-face="light">
-              <div className="sys-face-copy">
-                <span className="sys-card-num">A</span>
-                <p className="sys-card-tag">Face A · Light</p>
-                <h3>Field inspection console</h3>
-                <p className="sys-card-summary">Pale, quiet, quick to scan.</p>
-                <p className="sys-card-text">Stat tiles with trend and delta, output against target, findings by zone, cable fitness, and the equipment list with severity chips. Colour never carries meaning alone — shape and label always back it up. This is the build I'd hand to field staff and clients.</p>
+            <motion.div className="sys-scene sys-scene-console" style={reduced ? undefined : { opacity: light, y: lightY }}>
+              <div className="sys-scene-head">
+                <div><p>Field console</p><h2>Add detail for the person doing the check.</h2></div>
+                <span>Trend, target, zone, cable fitness, and equipment status. Labels and shapes carry severity; colour supports them.</span>
               </div>
               <div className="sys-face-panel">
                 <div className="sys-dash-top"><i />Field console · Unit 2<em>Mock · 14:32</em></div>
                 <LightConsole />
               </div>
-            </article>
-          </Rise>
+            </motion.div>
 
-          <Rise>
-            <article className="sys-face" data-face="dark">
-              <div className="sys-face-copy">
-                <span className="sys-card-num">B</span>
-                <p className="sys-card-tag">Face B · Dark</p>
-                <h3>Control-room monitoring wall</h3>
-                <p className="sys-card-summary">Dense, alert-first, readable at distance.</p>
-                <p className="sys-card-text">A thermal heatmap across cable trays, the 24-hour load curve against its alarm line, and a tiered event log — urgent, high, advisory. High-performance HMI practice: muted surfaces, colour reserved for alarms, every state explained in words.</p>
+            <motion.div className="sys-scene sys-scene-wall" style={reduced ? undefined : { opacity: dark, y: darkY }}>
+              <div className="sys-scene-head">
+                <div><p>Control room</p><h2>The same data changes when the risk changes.</h2></div>
+                <span>Tray heat, load against the alarm line, and the event log move forward. The background gets quieter so alarms stay legible.</span>
               </div>
               <div className="sys-face-panel">
                 <div className="sys-dash-top"><i />Monitoring wall · Unit 2<em>Mock · 14:32:05</em></div>
                 <DarkWall />
               </div>
-            </article>
-          </Rise>
-        </section>
+            </motion.div>
 
-        <section className="sys-list" data-sync="more">
-          <div className="sys-list-head">
-            <p>More directions</p>
-            <h2>Systems is bigger<br />than inspection.</h2>
-            <span>Three more directions from the toolbox — agent memory, workflow boards, model routing. Each a complete interface style, built the same way: in code.</span>
+            <motion.div className="sys-scene sys-scene-branches" style={reduced ? undefined : { opacity: branches, y: branchY }}>
+              <div className="sys-scene-head">
+                <div><p>Other systems</p><h2>Different work needs a different surface.</h2></div>
+                <span>These are coded interface studies for tools I am building. They are not screenshots or finished products.</span>
+              </div>
+              <div className="sys-branch-grid">
+                {more.map((item) => (
+                  <article key={item.number} className="sys-branch" data-dir={item.style}>
+                    <div className="sys-dash-top"><i />{item.style}</div>
+                    <div className="sys-dash-body">
+                      {item.style === "Memory inspector" && <MemoryMock />}
+                      {item.style === "Workflow board" && <KanbanMock />}
+                      {item.style === "Router console" && <RouterMock />}
+                    </div>
+                    <small>{item.number}</small><h3>{item.title}</h3><b>{item.line}</b><p>{item.text}</p>
+                  </article>
+                ))}
+              </div>
+            </motion.div>
+
+            <div className="sys-story-step"><b>{name}</b><span>scroll to unfold</span></div>
           </div>
-
-          {more.map((d) => (
-            <article key={d.number} className="sys-card">
-              <div className="sys-card-dash" data-dir={d.style} aria-hidden="true">
-                <div className="sys-dash-top"><i />{d.title}</div>
-                <div className="sys-dash-body">
-                  {d.style === "Memory inspector" && <MemoryMock />}
-                  {d.style === "Workflow board" && <KanbanMock />}
-                  {d.style === "Router console" && <RouterMock />}
-                </div>
-              </div>
-              <div className="sys-card-copy">
-                <span className="sys-card-num">{d.number}</span>
-                <p className="sys-card-tag">{d.style}</p>
-                <h3>{d.title}</h3>
-                <p className="sys-card-summary">{d.line}</p>
-                <p className="sys-card-text">{d.text}</p>
-              </div>
-            </article>
-          ))}
         </section>
 
         <section className="sys-contact" id="sys-contact" data-sync="contact">
-          <span>Have a system that needs a face?</span>
-          <h2>Tell me what it watches,<br />I'll build the wall.</h2>
+          <span>I build the interface around the work.</span>
+          <h2>Show me the system.<br />I'll make it readable.</h2>
           <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
         </section>
-      </main>
+      </motion.main>
 
       <footer className="sys-footer" data-sync="footer">
         <b>TUAN DEV · SYSTEMS</b><span>Kuala Lumpur · Malaysia</span><span>GitHub · Contact</span>

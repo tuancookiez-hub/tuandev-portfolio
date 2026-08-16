@@ -35,6 +35,187 @@
 .sys > .world-return { position: fixed; z-index: 130; }
 .sys > .device-preview,
 .sys > .device-preview-restore { position: fixed; z-index: 80; }
+.sys-main {
+  isolation: isolate;
+  overflow: clip;
+}
+.sys-story {
+  position: relative;
+  min-height: 520svh;
+  color: var(--sys-ink);
+}
+.sys-story-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.sys-atmosphere {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 18% 32%, rgba(94, 234, 212, .13), transparent 32%),
+    radial-gradient(ellipse at 78% 66%, rgba(71, 125, 162, .25), transparent 38%),
+    repeating-linear-gradient(112deg, transparent 0 68px, rgba(159, 208, 240, .045) 69px 70px, transparent 71px 136px);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 92%, transparent);
+  transition: opacity 500ms ease;
+}
+.sys-story[data-theme="dark"] .sys-atmosphere { opacity: 1; }
+.sys-story-progress {
+  position: absolute;
+  z-index: 6;
+  top: 32px;
+  left: clamp(22px, 7vw, 108px);
+  right: clamp(22px, 7vw, 108px);
+  height: 1px;
+  background: rgba(16, 36, 58, .15);
+}
+.sys-story-progress i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #5eead4;
+  transform-origin: left center;
+}
+.sys-scene {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(20px, 3vw, 36px);
+  padding: clamp(118px, 11vw, 154px) clamp(22px, 7vw, 108px) clamp(42px, 5vw, 68px);
+  pointer-events: none;
+}
+.sys-scene-simple {
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .78fr);
+  align-items: center;
+  gap: clamp(36px, 7vw, 110px);
+}
+.sys-scene-copy > p,
+.sys-scene-head p {
+  color: var(--sys-blue);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+.sys-scene-copy h1 {
+  margin: 20px 0 25px;
+  color: var(--sys-ink);
+  font: clamp(54px, 7vw, 108px)/.88 Georgia, serif;
+  letter-spacing: -.065em;
+}
+.sys-scene-copy > span {
+  display: block;
+  max-width: 48ch;
+  color: var(--sys-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.sys-signal {
+  padding: clamp(20px, 3vw, 34px);
+  border: 1px solid rgba(16, 36, 58, .11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 30px 70px rgba(16, 36, 58, .16);
+}
+.sys-signal > small {
+  display: block;
+  margin-top: 28px;
+  color: var(--d-soft);
+  font: 9px var(--font-mono);
+  letter-spacing: .14em;
+}
+.sys-signal > b {
+  display: block;
+  margin-top: 8px;
+  color: var(--sys-ink);
+  font: 700 clamp(52px, 6vw, 86px)/.9 Georgia, serif;
+}
+.sys-signal > b em { margin-left: 8px; color: var(--d-soft); font: 11px var(--font-mono); font-style: normal; }
+.sys-signal > svg { display: block; width: 100%; height: 92px; margin-top: 22px; overflow: visible; }
+.sys-signal > span { color: var(--sys-blue-deep); font: 10px var(--font-mono); }
+.sys-scene-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(240px, .55fr);
+  align-items: end;
+  gap: clamp(24px, 5vw, 76px);
+}
+.sys-scene-head h2 {
+  margin-top: 10px;
+  color: var(--sys-ink);
+  font: clamp(36px, 4.5vw, 68px)/.98 Georgia, serif;
+  letter-spacing: -.05em;
+}
+.sys-scene-head > span { color: var(--sys-soft); font-size: 12px; line-height: 1.7; }
+.sys-scene-console .sys-face-panel { max-height: calc(100svh - 250px); overflow: auto; }
+.sys-scene-wall {
+  --d-ink: #dceaf4;
+  --d-soft: #8fb0c7;
+  --d-line: rgba(159, 208, 240, .16);
+  --d-tile: rgba(255, 255, 255, .05);
+  --d-chart: rgba(255, 255, 255, .03);
+  --d-accent: #5eead4;
+  --d-good: #5eead4;
+  --d-warn: #f2a33a;
+  --d-bad: #ff6b5e;
+  --h-ok: #17435f;
+  --h-warm: #2e7d96;
+  --h-hot: #e8a13d;
+  --h-crit: #ff5d4d;
+}
+.sys-scene-wall .sys-scene-head h2 { color: #f5f8fa; }
+.sys-scene-wall .sys-scene-head > span { color: #a9c9db; }
+.sys-scene-wall .sys-face-panel {
+  max-height: calc(100svh - 250px);
+  overflow: auto;
+  color: #dceaf4;
+  border-color: rgba(94, 234, 212, .14);
+  background: rgba(11, 22, 34, .94);
+  box-shadow: 0 26px 64px rgba(4, 12, 22, .45);
+}
+.sys-scene-wall .sys-dash-top { color: #a9c9db; border-color: rgba(159, 208, 240, .16); }
+.sys-scene-wall .sys-dash-top i { background: #5eead4; }
+.sys-scene-branches .sys-scene-head h2 { color: #f5f8fa; }
+.sys-scene-branches .sys-scene-head > span { color: #a9c9db; }
+.sys-branch-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.sys-branch {
+  min-width: 0;
+  padding: 18px;
+  color: #dceaf4;
+  border: 1px solid rgba(159, 208, 240, .16);
+  border-radius: 13px;
+  background: rgba(9, 24, 38, .88);
+  box-shadow: 0 22px 54px rgba(4, 12, 22, .25);
+}
+.sys-branch[data-dir="Workflow board"] { color: #10243a; background: rgba(238, 242, 245, .94); }
+.sys-branch[data-dir="Workflow board"] .sys-dash-top { border-color: rgba(16, 36, 58, .12); }
+.sys-branch .sys-dash-body { min-height: 138px; padding: 18px 0; }
+.sys-branch > small { color: #5eead4; font: 9px var(--font-mono); }
+.sys-branch[data-dir="Workflow board"] > small { color: var(--sys-blue); }
+.sys-branch h3 { margin-top: 8px; font: 30px/1 Georgia, serif; letter-spacing: -.035em; }
+.sys-branch > b { display: block; margin-top: 10px; font-size: 12px; }
+.sys-branch > p { margin-top: 9px; color: #8fb0c7; font-size: 11px; line-height: 1.55; }
+.sys-branch[data-dir="Workflow board"] > p { color: var(--sys-soft); }
+.sys-story-step {
+  position: absolute;
+  z-index: 6;
+  right: clamp(22px, 7vw, 108px);
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(16, 36, 58, .7);
+  font: 8px var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.sys-story[data-theme="dark"] .sys-story-step { color: rgba(220, 234, 244, .72); }
+.sys-story-step b { color: inherit; }
 .sys > .sys-return {
   color: #f5f8fa;
   border-color: rgba(255,255,255,.3);
@@ -626,12 +807,12 @@ text.ax-v {
 }
 
 @media (min-width: 1181px) {
-  .sys:has(> .device-preview) .sys-faces,
-  .sys:has(> .device-preview) .sys-list,
+  .sys:has(> .device-preview) .sys-scene,
   .sys:has(> .device-preview) .sys-contact,
   .sys:has(> .device-preview) .sys-footer {
     padding-right: clamp(330px, 27vw, 410px);
   }
+  .sys:has(> .device-preview) .sys-story-progress { right: clamp(330px, 27vw, 410px); }
 }
 
 @media (max-width: 1180px) {
@@ -646,6 +827,11 @@ text.ax-v {
 }
 
 @media (max-width: 920px) {
+  .sys-scene-simple { grid-template-columns: 1fr; gap: 26px; }
+  .sys-scene-head { grid-template-columns: 1fr; gap: 12px; }
+  .sys-branch-grid { grid-template-columns: 1fr; }
+  .sys-scene-branches { overflow-y: auto; align-content: start; }
+  .sys-branch .sys-dash-body { min-height: 100px; }
   .sys-hero { grid-template-columns: 1fr; padding: 100px 24px; }
   .sys-hero-dash { max-width: 520px; }
   .sys-list-head { grid-template-columns: 1fr; gap: 16px; }
@@ -658,6 +844,22 @@ text.ax-v {
 }
 
 @media (max-width: 620px) {
+  .sys-story { min-height: 470svh; }
+  .sys-scene { padding: 94px 18px 42px; }
+  .sys-scene-copy h1 { font-size: 48px; }
+  .sys-scene-copy > span { font-size: 12px; }
+  .sys-signal { padding: 16px; }
+  .sys-signal > b { font-size: 48px; }
+  .sys-scene-head h2 { font-size: 34px; }
+  .sys-scene-head > span { font-size: 10px; }
+  .sys-scene-console .sys-face-panel,
+  .sys-scene-wall .sys-face-panel { max-height: calc(100svh - 220px); padding: 10px; }
+  .sys-scene-branches .sys-scene-head { position: sticky; z-index: 2; top: 0; padding: 4px 0 12px; }
+  .sys-branch { padding: 13px; }
+  .sys-branch .sys-dash-body { display: none; }
+  .sys-branch h3 { font-size: 24px; }
+  .sys-story-progress { top: 18px; left: 18px; right: 18px; }
+  .sys-story-step { right: 18px; bottom: 14px; }
   .sys-utility { min-height: 28px; padding: 0 14px; }
   .sys-utility span:nth-child(2) { display: none; }
   .sys > .sys-return { top: 42px; }
@@ -681,4 +883,11 @@ text.ax-v {
 
 @media (prefers-reduced-motion: reduce) {
   .sys *, .sys *::before, .sys *::after { transition: none !important; animation: none !important; }
+  .sys-story { min-height: auto; padding: 72px 0; background: #c8cdcc; }
+  .sys-story-sticky { position: relative; height: auto; overflow: visible; }
+  .sys-atmosphere, .sys-story-progress, .sys-story-step { display: none; }
+  .sys-scene { position: relative; inset: auto; opacity: 1 !important; transform: none !important; margin-bottom: 56px; }
+  .sys-scene-wall, .sys-scene-branches { background: #0b1622; }
+  .sys-scene-console .sys-face-panel,
+  .sys-scene-wall .sys-face-panel { max-height: none; overflow: visible; }
 }

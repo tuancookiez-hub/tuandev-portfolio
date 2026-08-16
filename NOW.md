@@ -1,11 +1,10 @@
 # NOW — Portfolio
 
-- GitHub Pages is live from `gh-pages 9efd217`; the latest Systems source style commit is `main 9a62381` (live-preview feature: `31b121f`).
-- Systems now includes a real same-origin 390px mobile iframe on wide desktop, synchronized across utility, hero, work, more, contact, and footer sections.
-- `?world=systems&embed=1` renders the same responsive page without a nested preview or return control.
-- The phone uses Systems blue/slate chrome, minimizes/restores, reserves a clear content lane above 1180px, and stays hidden at narrower widths.
-- The return control now reads `Main menu`, uses the Systems palette with restrained 8px corners, stays clear of mobile hero copy, and works from both gateway entry and direct Systems URLs.
-- Shared device scale math now fits the iframe to the clipped screen width; Hospitality passed normal and short-height regression probes.
-- Verified locally and publicly: TypeScript/build clean, true 390px iframe, synchronized `more` section, no nested phone, no bezel bleed, zero overflow, and zero console/page errors.
-- Live bundle: `index-Uo0lUzRa.js`; live stylesheet: `index-jnVtAX7L.css`; Pages status: built.
-- Next move: visual review on the live site, then continue with the next portfolio world.
+- Systems is rebuilt locally as one reversible scroll journey: simple signal → field console → dark control room → memory/workflow/routing branches.
+- Motion owns the scrubbed stage transitions; structure freezes when scrolling stops and reverse scroll restores the earlier state.
+- The dark stage uses an original CSS atmosphere rather than copied React Bits/OGL code or a new dependency.
+- Systems copy received the AI-text reduction pass: shorter first-person lines and named HyAtlas / AIClient2API work.
+- The synchronized 390px preview now maps sticky-journey progress correctly; parent and iframe match across all four stages in both directions.
+- Main menu remains 8px radius. Desktop and 390px probes show zero horizontal overflow, clear headings, visible active panels, and no console/page errors.
+- `bunx tsc --noEmit`, `bun run build`, journey probe, and parent/iframe sync probe all pass locally.
+- Work is uncommitted and not deployed. Next move: Tuna reviews the local Systems journey, then requests revisions or commit/deploy.
