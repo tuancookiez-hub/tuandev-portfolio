@@ -6,6 +6,6 @@
 - Systems copy uses short first-person language and names HyAtlas and AIClient2API directly.
 - The synchronized 390px preview maps sticky-journey progress correctly; parent and iframe match across all four stages in both directions.
 - Main menu remains 8px radius. Desktop and 390px public probes show zero horizontal overflow and zero console/page errors.
-- Live deployment: `gh-pages 3f423a1`; source feature commit: `main 06012c3`.
-- Live bundles: `index-Z6dnFBOn.js` and `index-DxXGMp2u.css`; GitHub Pages status: built.
-- Next move: Tuna reviews the live Systems journey and requests any visual or pacing refinements.
+- Live deployment: `gh-pages c980369`; source: `main 47c551c` (grid + unfurl).
+- Live bundles: `index-ClsBfKN6.js` and `index-BvRDWUBL.css`; GitHub Pages status: built.
+- Next move: Tuna reviews the live Systems journey. Pasqua.it is a new hospitality/storytelling reference, not applied yet.
