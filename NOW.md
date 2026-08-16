@@ -1,11 +1,8 @@
 # NOW — Portfolio
 
-- Systems is live as one reversible scroll journey: simple signal → field console → dark control room → memory/workflow/routing branches.
-- Motion owns the scrubbed stage transitions; reverse scroll restores the earlier composition and theme.
-- The dark stage uses an original CSS atmosphere rather than copied React Bits/OGL code or a new dependency.
-- Systems copy uses short first-person language and names HyAtlas and AIClient2API directly.
-- The synchronized 390px preview maps sticky-journey progress correctly; parent and iframe match across all four stages in both directions.
-- Main menu remains 8px radius. Desktop and 390px public probes show zero horizontal overflow and zero console/page errors.
-- Live deployment: `gh-pages c980369`; source: `main 47c551c` (grid + unfurl).
-- Live bundles: `index-ClsBfKN6.js` and `index-BvRDWUBL.css`; GitHub Pages status: built.
-- Next move: Tuna reviews the live Systems journey. Pasqua.it is a new hospitality/storytelling reference, not applied yet.
+- Systems rebuilt as a three-phase professional dashboard: editorial hero stat (99.97%) → animated routing charts (AIClient2API latency/tokens/cost with hover tooltips) → flowing glass-cards finale (Kokonut glass + Bklit chart grammar).
+- Adopted real resources via lean extract: Bklit clip-reveal/tooltip/formatter (3 self-contained files), Kokonut glass/shimmer aesthetics via custom CSS. No full Bklit/Kokonut engine.
+- Clean scroll crossfade between phases, gated pointer-events per data-stage. Zero overflow, no console errors, desktop + 390px mobile verified.
+- Committed locally to `main` (unpushed): `507584c` (mobile fix) + `7f52443` (three-phase rebuild).
+- pdfcn (shadcn-labs) noted as next-layer idea: showcase inspection-report → generated PDF via Takumi/Forme in the Systems finale. Not yet integrated (heavy WASM/Next deps).
+- Next move: Tuna reviews the rebuilt Systems phases; then decide on pdfcn PDF-report showcase integration and deploy.
