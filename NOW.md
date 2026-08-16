@@ -1,11 +1,11 @@
 # NOW — Portfolio
 
-- GitHub Pages is live from `gh-pages 9c40fbc`; the Systems hover-background source commit is `main f963b19`.
-- Systems uses the gateway hover canvas throughout: `#c8cdcc` steel-gray with a two-layer `#205dab` technical grid at 36px.
-- No card image was added to the world background; white dashboard panels and the dark monitoring wall remain solid.
-- The inspection-dashboard redesign remains live: light field console, dark control-room wall, plus memory, workflow, and router directions.
-- Verified with `bunx tsc --noEmit`, `bun run build`, and public Playwright probes at 1440×900 and 390×844.
-- Public probes confirm the exact computed background/grid, 7 charts, zero console errors, and zero horizontal overflow at both widths.
-- Secondary text contrast is 4.56:1 and primary text contrast is 9.78:1 against the new canvas.
-- Live bundle: `index-X4ucHrWN.js`; live stylesheet: `index-u1kcrR8c.css`.
-- Next move: continue with the next portfolio world or refine Systems after visual review.
+- GitHub Pages is live from `gh-pages 8a05483`; the Systems live-preview source feature is `main 31b121f`.
+- Systems now includes a real same-origin 390px mobile iframe on wide desktop, synchronized across utility, hero, work, more, contact, and footer sections.
+- `?world=systems&embed=1` renders the same responsive page without a nested preview or return control.
+- The phone uses Systems blue/slate chrome, minimizes/restores, reserves a clear content lane above 1180px, and stays hidden at narrower widths.
+- The return control now reads `Main menu`, uses the Systems palette, stays clear of mobile hero copy, and works from both gateway entry and direct Systems URLs.
+- Shared device scale math now fits the iframe to the clipped screen width; Hospitality passed normal and short-height regression probes.
+- Verified locally and publicly: TypeScript/build clean, true 390px iframe, synchronized `more` section, no nested phone, no bezel bleed, zero overflow, and zero console/page errors.
+- Live bundle: `index-B4L29H95.js`; live stylesheet: `index-CD2mXXDC.css`; Pages status: built.
+- Next move: visual review on the live site, then continue with the next portfolio world.
