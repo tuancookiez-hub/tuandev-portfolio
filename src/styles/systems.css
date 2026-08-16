@@ -38,14 +38,32 @@
 .sys-main {
   isolation: isolate;
   overflow: clip;
+  --sys-paper: #c8cdcc;
+  --sys-teal: #14b8a6;
+  --sys-blue: #477da2;
+  --sys-amber: #c98a12;
+  --sys-violet: #8b5cf6;
+  min-height: 100dvh;
+  color: var(--sys-ink);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+/* Technical grid — an isolated layer above the wash, faded out by scroll */
+.sys-grid-bg {
+  position: fixed !important;
+  inset: 0;
+  z-index: 0 !important;
+  pointer-events: none;
+}
+.sys-grid-pattern {
+  position: absolute;
+  inset: 0;
   --sys-grid: rgba(32, 93, 171, .09);
-  background-color: var(--sys-paper);
   background-image:
     linear-gradient(var(--sys-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--sys-grid) 1px, transparent 1px);
   background-size: 36px 36px;
 }
-.sys-main[data-theme="dark"] { --sys-grid: rgba(159, 208, 240, .07); }
+.sys[data-theme="dark"] .sys-grid-pattern { --sys-grid: rgba(159, 208, 240, .06); }
 .sys-story {
   position: relative;
   min-height: 520svh;
@@ -813,6 +831,131 @@ text.ax-v {
   text-transform: uppercase;
 }
 
+/* ── New three-phase Systems arc ────────────────────────── */
+
+.sys-story { z-index: 1; }
+
+.sys-story[data-stage="hero"] .sys-phase-charts,
+.sys-story[data-stage="hero"] .sys-phase-finale,
+.sys-story[data-stage="charts"] .sys-phase-hero,
+.sys-story[data-stage="charts"] .sys-phase-finale,
+.sys-story[data-stage="finale"] .sys-phase-hero,
+.sys-story[data-stage="finale"] .sys-phase-charts {
+  pointer-events: none;
+}
+
+/* Phase 1 — hero stat */
+.sys-phase {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  padding: clamp(90px, 10vw, 140px) clamp(22px, 7vw, 108px) clamp(48px, 5vw, 72px);
+}
+.sys-phase-hero { z-index: 2; justify-items: center; text-align: center; }
+.sys-hero-eyebrow {
+  color: var(--sys-blue);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+.sys-hero-value {
+  margin: 22px 0 10px;
+  color: var(--sys-ink);
+  font: 700 clamp(72px, 14vw, 200px)/.9 Georgia, serif;
+  letter-spacing: -.06em;
+}
+.sys-hero-label {
+  color: var(--sys-blue-deep);
+  font: 9px var(--font-mono);
+  letter-spacing: .16em;
+  overscroll-behavior: contain;
+}
+.sys-hero-sub {
+  max-width: 46ch;
+  margin-top: 18px;
+  color: var(--sys-soft);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* Phase 2 — charts */
+.sys-phase-charts {
+  z-index: 2;
+  align-content: center;
+}
+.sys-phase-head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(240px, .5fr); align-items: end; gap: clamp(22px, 4vw, 60px); }
+.sys-phase-head p,
+.sys-phase-head > span {
+  color: var(--sys-blue);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.sys-phase-head h2 { margin-top: 8px; color: var(--sys-ink); font: clamp(30px, 3.6vw, 54px)/1 Georgia, serif; letter-spacing: -.04em; }
+.sys-phase-head > span { justify-self: start; color: var(--sys-soft); font-size: 9px; font-weight: 500; letter-spacing: .06em; text-transform: none; }
+.sys-trio {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+.sys-chart.card {
+  padding: 16px;
+  border: 1px solid var(--sys-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 18px 46px rgba(16, 36, 58, .1);
+}
+.sys[data-theme="dark"] .sys-chart.card {
+  background: rgba(9, 24, 38, .7);
+  border-color: rgba(159, 208, 240, .14);
+}
+.sys-chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.sys-chart-label { font: 800 9px var(--font-mono); letter-spacing: .12em; }
+.sys-chart-live { color: var(--sys-soft); font: 8px var(--font-mono); letter-spacing: .08em; }
+.sys-chart-svg { display: block; width: 100%; height: auto; overflow: visible; touch-action: none; }
+.sys-chart-foot { display: flex; justify-content: space-between; margin-top: 8px; color: var(--sys-soft); font: 8px var(--font-mono); }
+
+/* Phase 3 — flowing finale */
+.sys-phase-finale {
+  z-index: 2;
+  align-content: center;
+  gap: 20px;
+  background: #020617;
+}
+.sys-finale-head { text-align: center; }
+.sys-finale-head p { color: var(--sys-teal); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+.sys-finale-head h2 { margin: 10px 0 8px; color: #f5f8fa; font: clamp(34px, 4.4vw, 64px)/1 Georgia, serif; letter-spacing: -.04em; }
+.sys-finale-head > span { color: #a9c9db; font-size: 11px; line-height: 1.7; }
+.sys-bento {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 1080px;
+  margin: 10px auto 0;
+}
+.sys-glass-card {
+  position: relative;
+  min-height: 132px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 22px 54px rgba(3, 8, 18, .38);
+  color: #eaf3f9;
+}
+.sys-glass-card[data-tone="wide"] { grid-column: span 3; }
+.sys-glass-dot { position: absolute; top: 16px; right: 16px; width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
+.sys-card-num { font: 700 clamp(28px, 3.4vw, 48px)/1 Georgia, serif; letter-spacing: -.03em; }
+.sys-card-label { margin-top: 8px; color: #a9c9db; font: 9px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.sys-heatmap { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; margin-top: 14px; }
+.sys-heat-cell { height: 26px; border-radius: 4px; }
+
 @media (min-width: 1181px) {
   .sys:has(> .device-preview) .sys-scene,
   .sys:has(> .device-preview) .sys-contact,
@@ -834,6 +977,11 @@ text.ax-v {
 }
 
 @media (max-width: 920px) {
+  .sys-trio { grid-template-columns: 1fr; }
+  .sys-bento { grid-template-columns: 1fr; }
+  .sys-glass-card[data-tone="wide"] { grid-column: span 1; }
+  .sys-phase-head { grid-template-columns: 1fr; gap: 14px; }
+  .sys-phase { padding: 92px 22px 44px; }
   .sys-scene-simple { grid-template-columns: 1fr; gap: 26px; }
   .sys-scene-head { grid-template-columns: 1fr; gap: 12px; }
   .sys-branch-grid { grid-template-columns: 1fr; }
@@ -851,6 +999,14 @@ text.ax-v {
 }
 
 @media (max-width: 620px) {
+  .sys-phase { padding: 96px 18px 40px; }
+  .sys-phase-head h2 { font-size: 32px; }
+  .sys-hero-value { font-size: 84px; }
+  .sys-hero-sub { font-size: 12px; }
+  .sys-chart.card { padding: 12px; }
+  .sys-finale-head h2 { font-size: 34px; }
+  .sys-glass-card { padding: 16px; }
+  .sys-heatmap { grid-template-columns: repeat(6, 1fr); }
   .sys-story { min-height: 470svh; }
   .sys-scene { padding: 94px 18px 42px; }
   .sys-scene-copy h1 { font-size: 48px; }
@@ -892,9 +1048,11 @@ text.ax-v {
   .sys *, .sys *::before, .sys *::after { transition: none !important; animation: none !important; }
   .sys-story { min-height: auto; padding: 72px 0; background: #c8cdcc; }
   .sys-story-sticky { position: relative; height: auto; overflow: visible; }
-  .sys-atmosphere, .sys-story-progress, .sys-story-step { display: none; }
-  .sys-scene { position: relative; inset: auto; opacity: 1 !important; transform: none !important; margin-bottom: 56px; }
+  .sys-atmosphere, .sys-story-progress, .sys-story-step, .sys-grid-bg { display: none; }
+  .sys-phase, .sys-scene { position: relative; inset: auto; opacity: 1 !important; transform: none !important; margin-bottom: 56px; }
+  .sys-phase-charts, .sys-phase-finale { background: transparent; }
   .sys-scene-wall, .sys-scene-branches { background: #0b1622; }
   .sys-scene-console .sys-face-panel,
   .sys-scene-wall .sys-face-panel { max-height: none; overflow: visible; }
+  .sys-trio, .sys-bento { grid-template-columns: 1fr; }
 }
