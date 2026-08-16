@@ -32,7 +32,16 @@
   font-family: "Segoe UI", system-ui, sans-serif;
 }
 .sys > * { position: relative; z-index: 5; }
-.sys > .world-return { z-index: 130; }
+.sys > .world-return { position: fixed; z-index: 130; }
+.sys > .device-preview,
+.sys > .device-preview-restore { position: fixed; z-index: 80; }
+.sys > .sys-return {
+  color: #f5f8fa;
+  border-color: rgba(255,255,255,.3);
+  background: var(--sys-blue-deep);
+  box-shadow: 0 14px 34px rgba(16,36,58,.28), 0 0 0 3px rgba(255,255,255,.3);
+}
+.sys > .sys-return:hover { background: var(--sys-ink); }
 
 .sys-utility {
   position: relative;
@@ -615,6 +624,20 @@ text.ax-v {
   text-transform: uppercase;
 }
 
+@media (min-width: 1181px) {
+  .sys:has(> .device-preview) .sys-faces,
+  .sys:has(> .device-preview) .sys-list,
+  .sys:has(> .device-preview) .sys-contact,
+  .sys:has(> .device-preview) .sys-footer {
+    padding-right: clamp(330px, 27vw, 410px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .sys > .device-preview,
+  .sys > .device-preview-restore { display: none; }
+}
+
 @media (max-width: 1080px) {
   .sys-face-dash { grid-template-columns: minmax(0, 1fr); }
   .sp12, .sp7, .sp5 { grid-column: 1 / -1; }
@@ -636,6 +659,7 @@ text.ax-v {
 @media (max-width: 620px) {
   .sys-utility { min-height: 28px; padding: 0 14px; }
   .sys-utility span:nth-child(2) { display: none; }
+  .sys > .sys-return { top: 42px; }
   .sys-hero { padding: 80px 20px; min-height: auto; }
   .sys-hero-copy h1 { font-size: 48px; }
   .sys-faces, .sys-list { padding-left: 20px; padding-right: 20px; }

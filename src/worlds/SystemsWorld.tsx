@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
+import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 
 /* Systems world — inspection interfaces.
@@ -420,22 +421,25 @@ const more = [
   },
 ];
 
-export default function SystemsWorld({ onClose }: { onClose?: () => void }) {
+export default function SystemsWorld({ onClose, embed = false }: { onClose?: () => void; embed?: boolean }) {
   const ctx = useActiveWorld();
+  usePreviewReceiver(embed);
 
   return (
     <motion.div className="sys" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <button type="button" className="world-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
-        <i aria-hidden="true">←</i> Surface
-      </button>
+      {!embed && (
+        <button type="button" className="world-return sys-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
+          <i aria-hidden="true">←</i> Main menu
+        </button>
+      )}
 
-      <div className="sys-utility">
+      <div className="sys-utility" data-sync="utility">
         <span>Inspection dashboards · Monitoring walls · Consoles</span>
         <span>Kuala Lumpur · Remote</span>
       </div>
 
       <main id="sys-top">
-        <section className="sys-hero">
+        <section className="sys-hero" data-sync="hero">
           <div className="sys-hero-copy">
             <p>02 · Systems — Inspection & monitoring</p>
             <h1>Where serious<br />software lives.</h1>
@@ -526,16 +530,17 @@ export default function SystemsWorld({ onClose }: { onClose?: () => void }) {
           ))}
         </section>
 
-        <section className="sys-contact" id="sys-contact">
+        <section className="sys-contact" id="sys-contact" data-sync="contact">
           <span>Have a system that needs a face?</span>
           <h2>Tell me what it watches,<br />I'll build the wall.</h2>
           <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
         </section>
       </main>
 
-      <footer className="sys-footer">
+      <footer className="sys-footer" data-sync="footer">
         <b>TUAN DEV · SYSTEMS</b><span>Kuala Lumpur · Malaysia</span><span>GitHub · Contact</span>
       </footer>
+      {!embed && <DevicePreview world="systems" />}
     </motion.div>
   );
 }

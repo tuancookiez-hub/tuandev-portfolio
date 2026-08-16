@@ -49,7 +49,7 @@ export function usePreviewReceiver(enabled: boolean) {
   }, [enabled]);
 }
 
-export default function DevicePreview({ world }: { world: "hospitality" }) {
+export default function DevicePreview({ world }: { world: "hospitality" | "systems" }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const tick = useRef(0);
   const [open, setOpen] = useState(true);
@@ -80,12 +80,13 @@ export default function DevicePreview({ world }: { world: "hospitality" }) {
   const src = `${window.location.pathname}?world=${world}&embed=1`;
 
   if (!open) {
-    return <motion.button className="device-preview-restore" type="button" onClick={() => setOpen(true)} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>Mobile view ▣</motion.button>;
+    return <motion.button className="device-preview-restore" data-world={world} type="button" onClick={() => setOpen(true)} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>Mobile view ▣</motion.button>;
   }
 
   return (
     <motion.aside
       className="device-preview"
+      data-world={world}
       aria-label="Synchronized mobile website preview"
       initial={{ opacity: 0, x: 28, y: "calc(-50% + 18px)" }}
       animate={{ opacity: 1, x: 0, y: "-50%" }}
@@ -100,7 +101,7 @@ export default function DevicePreview({ world }: { world: "hospitality" }) {
         <div className="device-screen">
           <iframe
             ref={frame}
-            title="Mobile version of this hospitality portfolio page"
+            title={`Mobile version of this ${world} portfolio page`}
             src={src}
             onLoad={() => setReady(true)}
           />

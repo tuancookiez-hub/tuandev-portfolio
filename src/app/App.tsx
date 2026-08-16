@@ -21,8 +21,12 @@ function Shell() {
     return <HospitalityPortal />;
   }
 
+  if (direct === "systems" && embed) {
+    return <SystemsWorld embed />;
+  }
+
   if (direct === "systems") {
-    return <SystemsWorld />;
+    return <SystemsWorld onClose={() => window.location.assign(window.location.pathname)} />;
   }
 
   return (
