@@ -29,6 +29,7 @@ import {
   type EdgeProps,
   type Node,
   type NodeProps,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -143,6 +144,8 @@ type GraphState = {
   nodes: Node[];
   edges: Edge[];
   metrics: { throughput: number; dispatches: number; nodeCount: number; fusion: number };
+  // Camera target — pan right through the graph as passes advance (flow coords to center on).
+  center?: { x: number; y: number; zoom: number };
 };
 
 type Op = { id: string; label: string; subtitle?: string; tone?: OpNodeData["tone"]; x: number; y: number; fused?: boolean; parent?: string };
@@ -212,6 +215,7 @@ const timeline: GraphState[] = [
     nodes: buildState(p1Ops),
     edges: buildEdges([["a", "b"], ["b", "c"], ["c", "d"], ["c", "e"], ["c", "f"], ["d", "g"], ["e", "g"], ["f", "g"], ["g", "h"], ["h", "i"], ["i", "j"]]),
     metrics: { throughput: 65, dispatches: 331, nodeCount: 10, fusion: 0 },
+    center: { x: 340, y: 250, zoom: 0.8 },
   },
   {
     id: "pass-02",
@@ -219,6 +223,7 @@ const timeline: GraphState[] = [
     nodes: buildState(p2Ops),
     edges: buildEdges([["a", "bc"], ["bc", "d"], ["bc", "eq"], ["bc", "f"], ["d", "g"], ["eq", "g"], ["f", "g"], ["g", "h"], ["h", "i"], ["i", "j"]]),
     metrics: { throughput: 82.3, dispatches: 190, nodeCount: 9, fusion: 2 },
+    center: { x: 540, y: 240, zoom: 0.8 },
   },
   {
     id: "pass-03",
@@ -226,6 +231,7 @@ const timeline: GraphState[] = [
     nodes: buildState(p3Ops),
     edges: buildEdges([["a", "bc"], ["bc", "qkv"], ["qkv", "g"], ["g", "ghi"], ["ghi", "j"]]),
     metrics: { throughput: 91.4, dispatches: 98, nodeCount: 6, fusion: 4 },
+    center: { x: 760, y: 230, zoom: 0.8 },
   },
   {
     id: "pass-04",
@@ -233,6 +239,7 @@ const timeline: GraphState[] = [
     nodes: buildState(p4Ops),
     edges: buildEdges([["a", "embed"], ["embed", "attn"], ["attn", "mlp"], ["mlp", "j"]]),
     metrics: { throughput: 97.8, dispatches: 32, nodeCount: 5, fusion: 6 },
+    center: { x: 620, y: 230, zoom: 0.9 },
   },
 ];
 
@@ -243,16 +250,29 @@ export default function KernelViz() {
   const [playing, setPlaying] = useState(true);
   const [nodes, setNodes, onNodesChange] = useNodesState(timeline[0].nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(timeline[0].edges);
+  const rf = useRef<ReactFlowInstance | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const next = useCallback(() => {
-    setIndex((i) => {
-      const n = (i + 1) % timeline.length;
-      setNodes(timeline[n].nodes);
-      setEdges(timeline[n].edges);
-      return n;
-    });
+  // Pan right through the graph as passes advance (smooth camera tracking).
+  const applyPass = useCallback((i: number) => {
+    const s = timeline[i];
+    setNodes(s.nodes);
+    setEdges(s.edges);
+    const inst = rf.current;
+    if (inst && s.center) {
+      inst.setCenter(s.center.x, s.center.y, { zoom: s.center.zoom, duration: 1400 });
+    }
   }, [setNodes, setEdges]);
+
+  const next = useCallback(() => {
+    setIndex((i) => (i + 1) % timeline.length);
+  }, []);
+
+  // When index changes, apply the new pass + pan.
+  useEffect(() => {
+    applyPass(index);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
 
   useEffect(() => {
     if (!playing) return;
@@ -274,7 +294,7 @@ export default function KernelViz() {
             key={s.id}
             type="button"
             className={`kv-step ${i === index ? "is-active" : ""} ${i < index ? "is-done" : ""}`}
-            onClick={() => { setIndex(i); setNodes(s.nodes); setEdges(s.edges); setPlaying(false); }}
+            onClick={() => { setIndex(i); applyPass(i); setPlaying(false); }}
           >
             {i < index ? "✓" : String(i + 1).padStart(2, "0")}
           </button>
@@ -291,8 +311,11 @@ export default function KernelViz() {
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
-          fitView
-          fitViewOptions={{ padding: 0.18 }}
+          onInit={(inst) => {
+            rf.current = inst;
+            const c0 = timeline[0].center;
+            if (c0) inst.setCenter(c0.x, c0.y, { zoom: c0.zoom, duration: 0 });
+          }}
           minZoom={0.3}
           maxZoom={1.6}
           proOptions={{ hideAttribution: true }}
