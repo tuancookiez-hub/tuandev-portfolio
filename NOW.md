@@ -1,17 +1,24 @@
 # NOW — Portfolio
 
-## Systems world — LIVE (deployed da6ca0c gh-pages / ce72e09 main)
+## Systems world — LIVE ops dashboard (rebuilt + deployed)
 
-Three-phase professional dashboard + two new business-facing showcases:
-1. **Three phases**: Hero stat (99.97%) → animated routing charts (latency/tokens/cost, Bklit clip-reveal + hover tooltips) → glass cards finale with heatmap
-2. **Routing diagram** (`src/components/RoutingDiagram.tsx`): anime.js v4 timeline scrub — base path in phase 2, complexity (Model B, fallback, monitoring loop, heat) grows into phase 3. No image assets — pure SVG + anime seek().
-3. **Built-in PDF viewer** (`src/components/PdfViewer.tsx`): react-pdf inline reader with pagination/zoom, shows generic sample inspection report. "How PDFs are shown on a business site."
+Full rework addressing Tuna feedback: no more scroll-scrubbing. Every animation is a **gesture/scroll-triggered entrance** — plays once when the section enters view, then stops.
 
-## Verified live (production URL)
-- Systems world renders, 0 console errors at all phases
-- Diagram present, 3 charts, PDF renders page 1, no error
+### Three sequential scroll stages (each min-height 100svh, no absolute stacking)
+1. **Operations overview** — professional dashboard: KPI tiles (availability, latency p95, error rate, requests/sec), traffic-by-hour bar chart, donut capacity gauge, CPU/mem/disk utilization bars, service-health status list. Numbers count up from 0 (motion useInView + spring).
+2. **Routing** — 3 line charts (latency/tokens/cost) that draw on entry + anime.js routing diagram that plays once (IntersectionObserver).
+3. **Reports** — built-in PDF reader (react-pdf) for a sample inspection report.
 
-## Notes
-- New deps: react-pdf@10.4.1, animejs@4.5.0. Bundle ~1.8MB (pdfjs heavy).
-- Added .gitignore (node_modules, dist) to the mirror — was missing, caused a near-oops with git add -A.
-- Deploy: build → mirror dist to gh-pages worktree → push both. Aegis session token didn't persist after gateway restart; used the accepted `execute_code`+`subprocess.run` fallback (Tuna approved "push it" in chat).
+### Files
+- `src/worlds/SystemsWorld.tsx` — 3-stage layout, gesture-triggered entrances
+- `src/components/SystemsWidgets.tsx` — CountUp, KpiTile, Donut, BarChart, UsageRow, StatusRow, Sparkline, Panel
+- `src/components/bklit/AnimatedChart.tsx` — draws on useInView + hover tooltip
+- `src/components/RoutingDiagram.tsx` — anime.js timeline, plays once on intersect
+- `src/components/PdfViewer.tsx` — inline PDF reader
+
+### Deployed
+- main `9fefa6c`, gh-pages `9b30548` (Pages built)
+- Verified live: 4 KPI tiles/7 bars/1 donut/5 status, count-up reaches 99.97%, 3 charts + diagram, PDF renders, 0 errors
+
+### Research basis
+Generic things people monitor (LogicMonitor golden signals + UptimeRobot/Netdata infra + SimpleKPI ops KPIs): availability, latency p95/p99, error rate, throughput/requests-ps, CPU/memory/disk utilization, service health.
