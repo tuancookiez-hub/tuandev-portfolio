@@ -977,8 +977,8 @@ text.ax-v {
 }
 
 @media (max-width: 920px) {
-  .sys-trio { grid-template-columns: 1fr; }
-  .sys-bento { grid-template-columns: 1fr; }
+  .sys-trio { grid-template-columns: minmax(0, 1fr); }
+  .sys-bento { grid-template-columns: minmax(0, 1fr); width: 100%; max-width: none; }
   .sys-glass-card[data-tone="wide"] { grid-column: span 1; }
   .sys-phase-head { grid-template-columns: 1fr; gap: 14px; }
   .sys-phase { padding: 92px 22px 44px; }
