@@ -1027,6 +1027,109 @@ text.ax-v {
 .rd-loop-label { fill: var(--sys-amber); font-size: 9px; }
 .rd-heat { fill: rgba(139, 92, 246, .7); }
 
+/* ── Kernel optimization visualizer (React Flow) ── */
+.kv-shell { width: 100%; max-width: 1100px; margin: 0 auto; }
+.kv-player { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.kv-play, .kv-next {
+  min-width: 34px; height: 34px;
+  border: 1px solid rgba(159, 208, 240, .3);
+  border-radius: 9px;
+  background: rgba(9,24,38,.5);
+  color: #d6e6f5;
+  font: 12px var(--font-mono);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 200ms, transform 150ms;
+}
+.kv-play:hover, .kv-next:hover { background: rgba(94,234,212,.18); transform: translateY(-1px); }
+.kv-step {
+  min-width: 32px; height: 32px;
+  border: 1px solid rgba(159,208,240,.22);
+  border-radius: 8px;
+  background: transparent; color: var(--sys-soft);
+  font: 10px var(--font-mono);
+  cursor: pointer;
+}
+.kv-step.is-active { background: rgba(94,234,212,.2); color: #5eead4; border-color: rgba(94,234,212,.6); }
+.kv-step.is-done { color: #5eead4; }
+
+.kv-canvas {
+  position: relative;
+  height: clamp(420px, 60vh, 560px);
+  border: 1px solid rgba(159,208,240,.16);
+  border-radius: 16px;
+  background: #070b12;
+  overflow: hidden;
+}
+.kv-glow-field {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 30%, rgba(94,234,212,.10), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 60%, rgba(232,121,249,.12), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.kv-flow { position: absolute; inset: 0; z-index: 1; background: transparent; }
+
+/* Node strip — layered soft pill */
+.kv-node {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px 7px 9px;
+  min-width: 118px;
+  border-radius: 10px;
+  border: 1px solid rgba(120,140,160,.22);
+  background: linear-gradient(180deg, rgba(18,26,38,.9), rgba(10,16,26,.9));
+  transition: box-shadow 500ms, border-color 500ms, transform 300ms;
+}
+.kv-node:hover { transform: translateY(-2px); }
+.kv-node-chip { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.kv-node-meta {
+  color: var(--sys-soft);
+  font: 700 7px var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.kv-node-label { color: #eaf3f9; font: 600 12px var(--font-mono); white-space: nowrap; }
+.kv-handle {
+  width: 8px !important; height: 8px !important;
+  background: #5eead4 !important;
+  border: 0 !important;
+}
+.kv-handle.react-flow__handle-left { left: -4px !important; }
+.kv-handle.react-flow__handle-right { right: -4px !important; }
+
+/* Counter board */
+.kv-label {
+  position: absolute; z-index: 10;
+  top: 14px; left: 16px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.kv-label-id { color: #5eead4; font: 700 9px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+.kv-label-title { color: #d6e6f5; font: 11px var(--font-mono); }
+.kv-counter {
+  position: absolute; z-index: 10;
+  bottom: 16px; left: 16px;
+  min-width: 200px;
+  border: 1px solid rgba(159,208,240,.16);
+  border-radius: 12px;
+  background: rgba(7,11,18,.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+}
+.kv-counter-head {
+  color: var(--sys-soft);
+  font-size: 8px; font-weight: 700; letter-spacing: .16em;
+  margin-bottom: 8px;
+}
+.kv-counter-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+.kv-counter-body div { display: flex; align-items: baseline; gap: 6px; }
+.kv-counter-body b { color: #eaf3f9; font-size: 17px; font-weight: 700; }
+.kv-counter-body span { color: var(--sys-soft); font-size: 8px; text-transform: uppercase; letter-spacing: .05em; }
+
 /* ── Built-in PDF viewer (react-pdf) ── */
 .sys-pdf-panel {
   margin-top: 26px;

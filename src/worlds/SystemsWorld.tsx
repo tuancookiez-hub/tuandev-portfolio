@@ -21,16 +21,8 @@ import { useActiveWorld } from "../context/ActiveWorldContext";
 import { AnimatedChart } from "../components/bklit/AnimatedChart";
 import RoutingDiagram from "../components/RoutingDiagram";
 import PdfViewer from "../components/PdfViewer";
-import {
-  BarChart,
-  CountUp,
-  Donut,
-  KpiTile,
-  Panel,
-  Sparkline,
-  StatusRow,
-  UsageRow,
-} from "../components/SystemsWidgets";
+import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRow } from "../components/SystemsWidgets";
+import KernelViz from "../components/KernelViz";
 
 // ─── SAMPLE DASHBOARD DATA ────────────────────────────────────
 
@@ -89,14 +81,14 @@ export default function SystemsWorld({
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end end"] });
   usePreviewReceiver(embed);
 
-  const wash = useTransform(scrollYProgress, [0, 0.2, 0.5, 0.78, 1], ["#eef0f2", "#eef0f2", "#0f172a", "#020617", "#020617"]);
-  const gridFade = useTransform(scrollYProgress, [0, 0.18, 0.5, 1], [1, 1, 0, 0]);
+  const wash = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.85, 1], ["#eef0f2", "#eef0f2", "#0f172a", "#020617", "#020617", "#020617"]);
+  const gridFade = useTransform(scrollYProgress, [0, 0.12, 0.4, 1], [1, 1, 0, 0]);
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);
-    setStageName(v < 0.34 ? "overview" : v < 0.7 ? "routing" : "reports");
+    setStageName(v < 0.25 ? "overview" : v < 0.5 ? "kernel" : v < 0.75 ? "routing" : "reports");
   });
   const theme = progress < 0.5 ? "light" : "dark";
 
@@ -174,7 +166,17 @@ export default function SystemsWorld({
               </div>
             </div>
 
-            {/* ── STAGE 2: ROUTING (charts + diagram) ── */}
+            {/* ── STAGE 2: KERNEL OPTIMIZATION (Xenova-style graph) ── */}
+            <div className="sys-stage sys-stage-kernel">
+              <header className="sys-r-head">
+                <span className="sys-r-eyebrow">compute graph · operator fusion</span>
+                <h2>Watch the graph optimize itself.</h2>
+                <p>An agent walks the computation graph and fuses operators into kernels. Toggle the pass or let it run — node count drops, throughput climbs. Drag to explore.</p>
+              </header>
+              <KernelViz />
+            </div>
+
+            {/* ── STAGE 3: ROUTING (charts + diagram) ── */}
             <div className="sys-stage sys-stage-routing">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">AIClient2API · routing console</span>
