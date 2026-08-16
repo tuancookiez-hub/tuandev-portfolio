@@ -38,7 +38,14 @@
 .sys-main {
   isolation: isolate;
   overflow: clip;
+  --sys-grid: rgba(32, 93, 171, .09);
+  background-color: var(--sys-paper);
+  background-image:
+    linear-gradient(var(--sys-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sys-grid) 1px, transparent 1px);
+  background-size: 36px 36px;
 }
+.sys-main[data-theme="dark"] { --sys-grid: rgba(159, 208, 240, .07); }
 .sys-story {
   position: relative;
   min-height: 520svh;
@@ -195,12 +202,12 @@
 .sys-branch[data-dir="Workflow board"] { color: #10243a; background: rgba(238, 242, 245, .94); }
 .sys-branch[data-dir="Workflow board"] .sys-dash-top { border-color: rgba(16, 36, 58, .12); }
 .sys-branch .sys-dash-body { min-height: 138px; padding: 18px 0; }
-.sys-branch > small { color: #5eead4; font: 9px var(--font-mono); }
-.sys-branch[data-dir="Workflow board"] > small { color: var(--sys-blue); }
-.sys-branch h3 { margin-top: 8px; font: 30px/1 Georgia, serif; letter-spacing: -.035em; }
-.sys-branch > b { display: block; margin-top: 10px; font-size: 12px; }
-.sys-branch > p { margin-top: 9px; color: #8fb0c7; font-size: 11px; line-height: 1.55; }
-.sys-branch[data-dir="Workflow board"] > p { color: var(--sys-soft); }
+.sys-branch-copy small { color: #5eead4; font: 9px var(--font-mono); }
+.sys-branch[data-dir="Workflow board"] .sys-branch-copy small { color: var(--sys-blue); }
+.sys-branch-copy h3 { margin-top: 8px; font: 30px/1 Georgia, serif; letter-spacing: -.035em; }
+.sys-branch-copy > b { display: block; margin-top: 10px; font-size: 12px; }
+.sys-branch-copy > p { margin-top: 9px; color: #8fb0c7; font-size: 11px; line-height: 1.55; }
+.sys-branch[data-dir="Workflow board"] .sys-branch-copy > p { color: var(--sys-soft); }
 .sys-story-step {
   position: absolute;
   z-index: 6;

@@ -419,6 +419,13 @@ export default function SystemsWorld({ onClose, embed = false }: { onClose?: () 
   const lightY = useTransform(scrollYProgress, [0, .1, .25, .56, 1], [50, 50, 0, -40, -40]);
   const darkY = useTransform(scrollYProgress, [0, .42, .57, .84, 1], [60, 60, 0, -44, -44]);
   const branchY = useTransform(scrollYProgress, [0, .72, .86, 1], [70, 70, 0, 0]);
+  const leftX = useTransform(scrollYProgress, [0, .72, .86, 1], [-72, -72, 0, 0]);
+  const midY = useTransform(scrollYProgress, [0, .74, .88, 1], [36, 36, 0, 0]);
+  const rightX = useTransform(scrollYProgress, [0, .72, .86, 1], [72, 72, 0, 0]);
+  const leftO = useTransform(scrollYProgress, [0, .72, .82, 1], [0, 0, 1, 1]);
+  const midO = useTransform(scrollYProgress, [0, .76, .88, 1], [0, 0, 1, 1]);
+  const rightO = useTransform(scrollYProgress, [0, .72, .82, 1], [0, 0, 1, 1]);
+  const join = useTransform(scrollYProgress, [0, .78, .92, 1], [0, 0, 1, 1]);
   const [progress, setProgress] = useState(0);
   usePreviewReceiver(embed);
 
@@ -439,7 +446,7 @@ export default function SystemsWorld({ onClose, embed = false }: { onClose?: () 
         <span>Kuala Lumpur · Remote</span>
       </div>
 
-      <motion.main id="sys-top" className="sys-main" style={reduced ? undefined : { backgroundColor: wash }}>
+      <motion.main id="sys-top" className="sys-main" data-theme={theme} style={reduced ? undefined : { backgroundColor: wash }}>
         <section
           ref={stage}
           className="sys-story"
@@ -497,16 +504,27 @@ export default function SystemsWorld({ onClose, embed = false }: { onClose?: () 
                 <span>These are coded interface studies for tools I am building. They are not screenshots or finished products.</span>
               </div>
               <div className="sys-branch-grid">
-                {more.map((item) => (
-                  <article key={item.number} className="sys-branch" data-dir={item.style}>
+                {[
+                  { item: more[0], x: leftX, y: undefined, o: leftO },
+                  { item: more[1], x: undefined, y: midY, o: midO },
+                  { item: more[2], x: rightX, y: undefined, o: rightO },
+                ].map(({ item, x, y, o }) => (
+                  <motion.article
+                    key={item.number}
+                    className="sys-branch"
+                    data-dir={item.style}
+                    style={reduced ? undefined : { x, y, opacity: o }}
+                  >
                     <div className="sys-dash-top"><i />{item.style}</div>
                     <div className="sys-dash-body">
                       {item.style === "Memory inspector" && <MemoryMock />}
                       {item.style === "Workflow board" && <KanbanMock />}
                       {item.style === "Router console" && <RouterMock />}
                     </div>
-                    <small>{item.number}</small><h3>{item.title}</h3><b>{item.line}</b><p>{item.text}</p>
-                  </article>
+                    <motion.div className="sys-branch-copy" style={reduced ? undefined : { opacity: join }}>
+                      <small>{item.number}</small><h3>{item.title}</h3><b>{item.line}</b><p>{item.text}</p>
+                    </motion.div>
+                  </motion.article>
                 ))}
               </div>
             </motion.div>
