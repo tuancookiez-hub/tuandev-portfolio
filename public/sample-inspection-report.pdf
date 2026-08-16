@@ -1,0 +1,84 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Catalog /Pages 4 0 R >>
+endobj
+4 0 obj
+<< /Type /Pages /Kids [5 0 R 6 0 R 7 0 R] /Count 3 >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 8 0 R >>
+endobj
+6 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 9 0 R >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 4 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 10 0 R >>
+endobj
+8 0 obj
+<< /Length 1156 >>
+stream
+BT /F2 18 Tf 30 736 Td (SITE INSPECTION REPORT  -  TUAN DEV) Tj ET
+BT /F1 16 Tf 60 700 Td (SITE INSPECTION REPORT) Tj ET
+BT /F1 10 Tf 60 680 Td (GENERIC SAMPLE - illustrative only, not a real site) Tj ET
+BT /F1 11 Tf 60 640 Td (Project:     Kwasa Damansara - Mechanical & Electrical) Tj ET
+BT /F1 11 Tf 60 622 Td (Location:    Selangor, Malaysia) Tj ET
+BT /F1 11 Tf 60 604 Td (Inspector:   Tuan Dev (Designated Person)) Tj ET
+BT /F1 11 Tf 60 586 Td (Date:        Thursday, 14 August 2026) Tj ET
+BT /F1 11 Tf 60 568 Td (Status:      UNDER REVIEW) Tj ET
+BT /F1 12 Tf 60 520 Td (1. Executive Summary) Tj ET
+BT /F1 10 Tf 60 500 Td (General condition of the site is satisfactory. Two minor observations were) Tj ET
+BT /F1 10 Tf 60 486 Td (raised regarding housekeeping and lighting. No critical findings recorded.) Tj ET
+BT /F1 12 Tf 60 436 Td (2. Scope of Inspection) Tj ET
+BT /F1 10 Tf 60 416 Td (Visual inspection of electrical distribution, cable routing, and access) Tj ET
+BT /F1 10 Tf 60 402 Td (points. This is a generic sample report for demonstration purposes.) Tj ET
+BT /F2 8 Tf 30 40 Td (TUAN DEV - GENERIC INSPECTION REPORT (SAMPLE) - Page 1) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Length 1038 >>
+stream
+BT /F2 18 Tf 30 736 Td (FINDINGS SUMMARY - SITE INSPECTION) Tj ET
+BT /F1 14 Tf 60 700 Td (3. Findings Summary) Tj ET
+BT /F1 10 Tf 60 672 Td (CLIENT SITE INSPECTION - FINDINGS) Tj ET
+BT /F1 10 Tf 60 640 Td (Ref    |   Finding                    |   Category      |   Status) Tj ET
+BT /F1 10 Tf 60 622 Td (F-01   |   Minor cable dressing         |   Housekeeping  |   Open) Tj ET
+BT /F1 10 Tf 60 604 Td (F-02   |   Armoured gland torque       |   Compliance    |   Verified) Tj ET
+BT /F1 10 Tf 60 586 Td (F-03   |   Emergency light test        |   Safety        |   Informational) Tj ET
+BT /F1 12 Tf 60 550 Td (4. Photographic Evidence) Tj ET
+BT /F1 10 Tf 60 530 Td ((Sample: placeholder for field photographs captured during inspection)) Tj ET
+BT /F1 12 Tf 60 490 Td (5. Risk Assessment) Tj ET
+BT /F1 10 Tf 60 470 Td (Overall residual risk after control measures: LOW.) Tj ET
+BT /F1 10 Tf 60 456 Td (No high or critical risk items were identified.) Tj ET
+BT /F2 8 Tf 30 40 Td (TUAN DEV - GENERIC INSPECTION REPORT (SAMPLE) - Page 2) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Length 833 >>
+stream
+BT /F2 18 Tf 30 736 Td (RECOMMENDATIONS - SITE INSPECTION) Tj ET
+BT /F1 14 Tf 60 700 Td (6. Recommendations) Tj ET
+BT /F1 10 Tf 60 678 Td (R-01: Schedule housekeeping rectification within 14 days.) Tj ET
+BT /F1 10 Tf 60 660 Td (R-02: Retest emergency lighting and log the result.) Tj ET
+BT /F1 10 Tf 60 642 Td (R-03: Maintain cable dressing at all junction boxes.) Tj ET
+BT /F1 12 Tf 60 600 Td (7. Sign-off) Tj ET
+BT /F1 10 Tf 60 578 Td (Inspected and prepared by:) Tj ET
+BT /F1 10 Tf 60 560 Td (TUAN DEV) Tj ET
+BT /F1 10 Tf 60 540 Td (Designated Person - Systems) Tj ET
+BT /F1 10 Tf 60 480 Td (This document is a GENERIC SAMPLE for portfolio demonstration.) Tj ET
+BT /F1 10 Tf 60 466 Td (No client, site, or operational data is represented.) Tj ET
+BT /F2 8 Tf 30 40 Td (TUAN DEV - GENERIC INSPECTION REPORT (SAMPLE) - Page 3) Tj ET
+endstream
+endobj
+xref
+0 11
+0 0000000000 65535 f 0000000009 00000 n 0000000079 00000 n 0000000154 00000 n 0000000203 00000 n 0000000272 00000 n 0000000408 00000 n 0000000544 00000 n 0000000681 00000 n 0000001888 00000 n 0000002977 00000 n trailer
+<< /Size 11 /Root 3 0 R >>
+startxref
+3861
+%%EOF

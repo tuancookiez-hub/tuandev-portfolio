@@ -30,6 +30,8 @@ import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import { ChartRevealClip } from "../components/bklit/chart-reveal-clip";
 import { intFmt } from "../components/bklit/chart-formatters";
+import RoutingDiagram from "../components/RoutingDiagram";
+import PdfViewer from "../components/PdfViewer";
 
 // ─── MOCK DATASETS ────────────────────────────────────────────
 // Representative (clearly labeled) series for routing latency / token / cost.
@@ -278,6 +280,8 @@ export default function SystemsWorld({
                 <AnimatedChart data={tokens} width={800} height={200} yMin={10_000_000} yMax={22_000_000} color="var(--sys-blue)" label="TOKENS" unit="" />
                 <AnimatedChart data={cost} width={800} height={200} yMin={34_000} yMax={56_000} color="var(--sys-amber)" label="COST" unit=" USD" />
               </div>
+              {/* Routing diagram — appears in phase 2, gains complexity into phase 3 */}
+              <RoutingDiagram />
             </motion.div>
 
             {/* PHASE 3 */}
@@ -310,6 +314,12 @@ export default function SystemsWorld({
                     ))}
                   </div>
                 </GlassCard>
+              </div>
+              {/* Built-in PDF reader — shows a report as a client would on their site */}
+              <div className="sys-finale-reports">
+                <h3>Reports, read inline</h3>
+                <p>Inspection work ends in a report. This is how a client sees it on their site — a built-in reader, not a download. A generic sample report is rendered below.</p>
+                <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
               </div>
             </motion.div>
 

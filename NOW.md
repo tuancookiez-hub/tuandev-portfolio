@@ -1,8 +1,10 @@
 # NOW — Portfolio
 
-- Systems rebuilt as a three-phase professional dashboard: editorial hero stat (99.97%) → animated routing charts (AIClient2API latency/tokens/cost with hover tooltips) → flowing glass-cards finale (Kokonut glass + Bklit chart grammar).
-- Adopted real resources via lean extract: Bklit clip-reveal/tooltip/formatter (3 self-contained files), Kokonut glass/shimmer aesthetics via custom CSS. No full Bklit/Kokonut engine.
-- Clean scroll crossfade between phases, gated pointer-events per data-stage. Zero overflow, no console errors, desktop + 390px mobile verified.
-- Committed locally to `main` (unpushed): `507584c` (mobile fix) + `7f52443` (three-phase rebuild).
-- pdfcn (shadcn-labs) noted as next-layer idea: showcase inspection-report → generated PDF via Takumi/Forme in the Systems finale. Not yet integrated (heavy WASM/Next deps).
-- Next move: Tuna reviews the rebuilt Systems phases; then decide on pdfcn PDF-report showcase integration and deploy.
+- Systems rebuilt as three-phase professional dashboard + two new showcase features:
+  1. **Three phases**: Hero stat (99.97%) → animated routing charts (latency/tokens/cost) → glass cards finale with heatmap
+  2. **Routing diagram** (`src/components/RoutingDiagram.tsx`): anime.js v4 scrubbed SVG — base path in phase 2, complexity grows in phase 3. 0 errors, nodes visible.
+  3. **Built-in PDF viewer** (`src/components/PdfViewer.tsx`): react-pdf inline reader with pagination + zoom. Shows a generic sample inspection report. Zero errors.
+- Zero console errors at any phase. Mobile 390px clean. Reduced-motion graceful.
+- New deps: `react-pdf@10.4.1`, `animejs@4.5.0`. Bundle ~1.8MB.
+- Committed locally to `main` (unpushed). Waiting on Tuan review.
+- pdfcn (shadcn-labs) noted for future: PDF report generation showcase, but not needed now since react-pdf handles viewing.
