@@ -1,207 +1,78 @@
 "use client";
 
 /**
- * Systems world — rebuilt as a three-phase professional-grade dashboard.
- *  Phase 1: Hero stat (light, editorial) — one meaningful KPI.
- *  Phase 2: Animated chart core (AIClient2API — latency / tokens / cost)
- *           with draw-in reveal, hover tooltip, y-domain tween.
- *  Phase 3: Flowing finale — Kokonut beams canvas + glass cards + shimmer.
+ * Systems world — a professional system-operations dashboard.
  *
- * Visual grammar adopted from Bklit (clip-reveal, y-domain tween, tooltip)
- * and Kokonut (beams canvas, glass card, shimmer text). Contents stay honest:
- * vague-NDA inspection as framing, AIClient2API routing metrics as the data.
+ * Every animation is a gesture/scroll-triggered ENTRANCE animation: it plays
+ * once, fully, when its section scrolls into view, then stops. Numbers count
+ * up from 0, line charts draw, bars grow, donuts sweep — all fire on entry.
+ * (Uses Motion's useInView + anime.js on an IntersectionObserver.)
+ *
+ * Content is representative AIClient2API / generic ops-monitoring data,
+ * clearly marked as sample. This mirrors what people actually monitor on a
+ * system dashboard: availability, latency (p95), error rate, throughput,
+ * CPU / memory / disk utilization, and service health.
  */
 
-import {
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
+import { useRef, useState } from "react";
 import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
-import { ChartRevealClip } from "../components/bklit/chart-reveal-clip";
-import { intFmt } from "../components/bklit/chart-formatters";
+import { AnimatedChart } from "../components/bklit/AnimatedChart";
 import RoutingDiagram from "../components/RoutingDiagram";
 import PdfViewer from "../components/PdfViewer";
+import {
+  BarChart,
+  CountUp,
+  Donut,
+  KpiTile,
+  Panel,
+  Sparkline,
+  StatusRow,
+  UsageRow,
+} from "../components/SystemsWidgets";
 
-// ─── MOCK DATASETS ────────────────────────────────────────────
-// Representative (clearly labeled) series for routing latency / token / cost.
+// ─── SAMPLE DASHBOARD DATA ────────────────────────────────────
 
-const mkSeries = (base: number, noise: number, rise: number, n = 30) =>
-  Array.from({ length: n }, (_, i) => ({
-    date: new Date(2026, 0, 1 + i),
-    v: Math.round(base + (Math.random() - 0.5) * noise + i * rise),
-  }));
+const kpis = {
+  uptime: 99.97,
+  availability: 99.982,
+  latencyP95: 232,
+  errorRate: 0.38,
+  throughputRps: 1842,
+  cpu: 47.2,
+  memory: 64.8,
+  disk: 71.4,
+};
 
-const latency = mkSeries(840, 260, 6);
-const tokens = mkSeries(14_000_000, 3_000_000, 180_000);
-const cost = mkSeries(40_000, 9_000, 420);
+const barData = [
+  { label: "00", value: 420 },
+  { label: "04", value: 610 },
+  { label: "08", value: 1180 },
+  { label: "12", value: 1640 },
+  { label: "16", value: 1890 },
+  { label: "20", value: 1430 },
+  { label: "24", value: 780 },
+];
 
-const X_MIN = new Date(2026, 0, 1).getTime();
-const X_MAX = new Date(2026, 0, 30).getTime();
+const usage = [
+  { label: "CPU", value: 47.2, color: "#14b8a6" },
+  { label: "Memory", value: 64.8, color: "#477da2" },
+  { label: "Disk", value: 71.4, color: "#c98a12" },
+];
 
-// ─── ANIMATED CHART (Bklit reveal + tween + tooltip grammar) ──
+const services = [
+  { name: "API Gateway", status: "Operational" as const, detail: "12 routes · 99.98% uptime" },
+  { name: "Model Router", status: "Operational" as const, detail: "3 providers, auto-failover" },
+  { name: "Vector Store", status: "Degraded" as const, detail: "p95 latency 4.1s" },
+  { name: "Batch Worker", status: "Operational" as const, detail: "430 jobs in last 24h" },
+  { name: "Auth Service", status: "Operational" as const, detail: "2.1k tokens issued" },
+];
 
-function AnimatedChart({
-  data,
-  width,
-  height,
-  yMin,
-  yMax,
-  color,
-  label,
-  unit,
-}: {
-  data: { date: Date; v: number }[];
-  width: number;
-  height: number;
-  yMin: number;
-  yMax: number;
-  color: string;
-  label: string;
-  unit: string;
-}) {
-  const [epoch, setEpoch] = useState(0);
-  const [revealing, setRevealing] = useState(true);
-  const [hover, setHover] = useState<{ x: number; y: number; v: number } | null>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-  const clipId = useRef(`clip-${Math.random().toString(36).slice(2, 8)}`).current;
-  const range = X_MAX - X_MIN;
-  const ySpan = yMax - yMin || 1;
-
-  const pts = data.map((d) => {
-    const x = ((d.date.getTime() - X_MIN) / range) * width;
-    const y = height - ((d.v - yMin) / ySpan) * height;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const pathD = `M${pts.join(" L")}`;
-
-  // Draw-in reveal on mount
-  useEffect(() => {
-    setEpoch((e) => e + 1);
-    const t = setTimeout(() => setRevealing(false), 1250);
-    return () => clearTimeout(t);
-  }, []);
-
-  const onMove = useCallback(
-    (e: React.MouseEvent<SVGSVGElement>) => {
-      const rect = svgRef.current?.getBoundingClientRect();
-      if (!rect) return;
-      const rel = (e.clientX - rect.left) / rect.width;
-      const idx = Math.min(data.length - 1, Math.max(0, Math.round(rel * (data.length - 1))));
-      const px = ((data[idx].date.getTime() - X_MIN) / range) * width;
-      const py = height - ((data[idx].v - yMin) / ySpan) * height;
-      setHover({ x: px, y: py, v: data[idx].v });
-    },
-    [data, width, height, yMin, ySpan, range],
-  );
-
-  return (
-    <div className="sys-chart card">
-      <div className="sys-chart-head">
-        <span className="sys-chart-label" style={{ color }}>{label}</span>
-        <span className="sys-chart-live">● live series</span>
-      </div>
-      <svg
-        ref={svgRef}
-        viewBox={`0 0 ${width} ${height}`}
-        className="sys-chart-svg"
-        onMouseMove={onMove}
-        onMouseLeave={() => setHover(null)}
-        role="img"
-        aria-label={`${label} trend, ${unit}`}
-      >
-        <defs>
-          <ChartRevealClip
-            clipPathId={clipId}
-            height={height}
-            targetWidth={width}
-            revealEpoch={epoch}
-            animating={revealing}
-          />
-        </defs>
-        <path d={pathD} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" style={{ clipPath: `url(#${clipId})` }} />
-        {hover && (
-          <>
-            <line x1={hover.x} y1={0} x2={hover.x} y2={height} stroke="rgba(148,163,184,.35)" strokeWidth={1} />
-            <circle cx={hover.x} cy={hover.y} r={4} fill={color} />
-            <rect x={hover.x + 8} y={hover.y - 22} width={86} height={22} rx={6} fill="rgba(2,6,23,.92)" />
-            <text x={hover.x + 14} y={hover.y - 7} fill="#fff" fontSize={11} fontFamily="var(--font-mono)">
-              {intFmt(hover.v)}{unit}
-            </text>
-          </>
-        )}
-      </svg>
-      <div className="sys-chart-foot">
-        <span>30-day window</span>
-        <span>hover to inspect</span>
-      </div>
-    </div>
-  );
-}
-
-// ─── GLASS CARD (Kokonut grammar) ─────────────────────────────
-
-function GlassCard({ children, tone }: { children: ReactNode; tone: "teal" | "blue" | "amber" | "wide" }) {
-  const dot = tone === "teal" ? "var(--sys-teal)" : tone === "blue" ? "var(--sys-blue)" : tone === "amber" ? "var(--sys-amber)" : "var(--sys-violet)";
-  return (
-    <div className="sys-glass-card" data-tone={tone}>
-      <div className="sys-glass-dot" style={{ background: dot }} />
-      {children}
-    </div>
-  );
-}
-
-// ─── PHASE 1: HERO STAT ───────────────────────────────────────
-
-function HeroStat() {
-  return (
-    <div className="sys-hero-stat">
-      <motion.span
-        className="sys-hero-eyebrow"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        02 · Systems — monitoring you can act on
-      </motion.span>
-      <motion.h1
-        className="sys-hero-value"
-        initial={{ opacity: 0, scale: 0.92, y: 18 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      >
-        99.97%
-      </motion.h1>
-      <motion.p
-        className="sys-hero-label"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
-      >
-        SYSTEM HEALTH
-      </motion.p>
-      <motion.p
-        className="sys-hero-sub"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1 }}
-      >
-        Measured across routing, latency, and token spend. One number when you
-        need it — surfacing the detail only when you ask. Scroll to unfold.
-      </motion.p>
-    </div>
-  );
-}
+const spark = {
+  latency: [180, 190, 175, 205, 195, 220, 210, 232, 215, 208, 226, 232],
+  throughput: [120, 240, 380, 520, 690, 860, 1020, 1180, 1360, 1540, 1710, 1842],
+};
 
 // ─── SYSTEMS WORLD ────────────────────────────────────────────
 
@@ -218,19 +89,14 @@ export default function SystemsWorld({
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end end"] });
   usePreviewReceiver(embed);
 
-  // Background wash: light grey → deep ink
   const wash = useTransform(scrollYProgress, [0, 0.2, 0.5, 0.78, 1], ["#eef0f2", "#eef0f2", "#0f172a", "#020617", "#020617"]);
   const gridFade = useTransform(scrollYProgress, [0, 0.18, 0.5, 1], [1, 1, 0, 0]);
-  const phase2 = useTransform(scrollYProgress, [0.14, 0.3, 0.68], [0, 1, 1]);
-  const phase2Y = useTransform(scrollYProgress, [0.14, 0.3], [40, 0]);
-  const phase3 = useTransform(scrollYProgress, [0.66, 0.8, 1], [0, 1, 1]);
-  const phase3Y = useTransform(scrollYProgress, [0.66, 0.8], [60, 0]);
   const [progress, setProgress] = useState(0);
-  const [stageName, setStageName] = useState("hero");
+  const [stageName, setStageName] = useState("overview");
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);
-    setStageName(v < 0.22 ? "hero" : v < 0.68 ? "charts" : "finale");
+    setStageName(v < 0.34 ? "overview" : v < 0.7 ? "routing" : "reports");
   });
   const theme = progress < 0.5 ? "light" : "dark";
 
@@ -242,13 +108,14 @@ export default function SystemsWorld({
         </button>
       )}
 
-      <div className="sys-utility" data-sync="utility">
-        <span>Inspection · Routing · Live monitoring</span>
-        <span>Kuala Lumpur · Remote</span>
+      <div className="sys-topbar" data-sync="utility">
+        <span className="sys-topbar-left">SYS · LIVE OPERATIONS CONSOLE</span>
+        <span className="sys-topbar-right">
+          <i className="sys-live-dot" /> LIVE · Kuala Lumpur · MYT
+        </span>
       </div>
 
       <motion.main className="sys-main" data-theme={theme} style={reduced ? undefined : { backgroundColor: wash }}>
-        {/* Technical grid — fades out past the hero/chart phase */}
         <motion.div className="sys-grid-bg" style={reduced ? undefined : { opacity: gridFade }} aria-hidden="true">
           <div className="sys-grid-pattern" />
         </motion.div>
@@ -257,71 +124,80 @@ export default function SystemsWorld({
           <div className="sys-story-sticky">
             <div className="sys-story-progress" aria-hidden="true"><i style={{ transform: `scaleX(${progress})` }} /></div>
 
-            {/* PHASE 1 */}
-            <motion.div
-              className="sys-phase sys-phase-hero"
-              style={reduced ? undefined : { opacity: 1 - Math.min(1, progress / 0.25), y: -Math.min(1, progress / 0.14) * 30 }}
-            >
-              <HeroStat />
-            </motion.div>
+            {/* ── STAGE 1: OPERATIONS OVERVIEW (professional dashboard) ── */}
+            <div className="sys-stage sys-stage-overview">
+              <header className="sys-ov-head">
+                <div>
+                  <span className="sys-ov-eyebrow">System overview</span>
+                  <h1 className="sys-ov-title">Operations at a glance.</h1>
+                </div>
+                <div className="sys-ov-uptime">
+                  <span className="sys-ov-uptime-label">uptime · 30d</span>
+                  <div className="sys-ov-uptime-num"><CountUp value={kpis.uptime} decimals={2} suffix="%" /></div>
+                </div>
+              </header>
 
-            {/* PHASE 2 */}
-            <motion.div
-              className="sys-phase sys-phase-charts"
-              style={reduced ? undefined : { opacity: phase2, y: phase2Y }}
-            >
-              <div className="sys-phase-head">
-                <p>Routing console — AIClient2API</p>
-                <h2>Latency, tokens, cost. Drawn live.</h2>
-                <span>Each provider's real routing trend, animated on scroll with hover-to-inspect. No fake numbers — these are representative AIClient2API patterns.</span>
+              {/* KPI grid */}
+              <div className="sys-kpi-grid">
+                <KpiTile label="Availability" value={kpis.availability} decimals={3} suffix="%" delta={0.01} tone="#14b8a6" />
+                <KpiTile label="Latency p95" value={kpis.latencyP95} decimals={0} suffix=" ms" delta={-18} deltaUnit="ms" tone="#477da2" />
+                <KpiTile label="Error rate" value={kpis.errorRate} decimals={2} suffix="%" delta={-0.2} tone="#c98a12" />
+                <KpiTile label="Requests / sec" value={kpis.throughputRps} decimals={0} suffix="" delta={12.4} tone="#8b5cf6" />
               </div>
-              <div className="sys-trio">
-                <AnimatedChart data={latency} width={800} height={200} yMin={400} yMax={1150} color="var(--sys-teal)" label="LATENCY" unit=" ms" />
-                <AnimatedChart data={tokens} width={800} height={200} yMin={10_000_000} yMax={22_000_000} color="var(--sys-blue)" label="TOKENS" unit="" />
-                <AnimatedChart data={cost} width={800} height={200} yMin={34_000} yMax={56_000} color="var(--sys-amber)" label="COST" unit=" USD" />
-              </div>
-              {/* Routing diagram — appears in phase 2, gains complexity into phase 3 */}
-              <RoutingDiagram />
-            </motion.div>
 
-            {/* PHASE 3 */}
-            <motion.div
-              className="sys-phase sys-phase-finale"
-              style={reduced ? undefined : { opacity: phase3, y: phase3Y }}
-            >
-              <div className="sys-finale-head">
-                <p>Flowing — live panels</p>
-                <h2>Every signal, one glance.</h2>
-                <span>Glass panels over an ambient animated field. The data keeps moving because the system never stops.</span>
-              </div>
-              <div className="sys-bento">
-                <GlassCard tone="teal"><div className="sys-card-num">2,847</div><div className="sys-card-label">active inspection passes</div></GlassCard>
-                <GlassCard tone="blue"><div className="sys-card-num">94.2%</div><div className="sys-card-label">vendor SLA this month</div></GlassCard>
-                <GlassCard tone="amber"><div className="sys-card-num">0.03</div><div className="sys-card-label">deviation score</div></GlassCard>
-                <GlassCard tone="wide">
-                  <div className="sys-card-num">24h</div>
-                  <div className="sys-card-label">routing heatmap</div>
-                  <div className="sys-heatmap">
-                    {Array.from({ length: 24 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="sys-heat-cell"
-                        initial={{ opacity: reduced ? 0.4 : 0.1, scale: reduced ? 0.8 : 1 }}
-                        animate={{ opacity: 0.3 + Math.random() * 0.7, scale: 1 }}
-                        transition={{ duration: 1, repeat: Infinity, repeatType: "mirror", delay: i * 0.06 }}
-                        style={{ background: `hsl(${200 + i * 5}, 70%, ${28 + Math.random() * 42}%)` }}
-                      />
-                    ))}
+              {/* Middle row: bar chart + donut + utilization */}
+              <div className="sys-ov-mid">
+                <Panel title="Traffic by hour" hint="requests · 24h">
+                  <BarChart data={barData} color="#477da2" height={150} />
+                </Panel>
+                <Panel title="Resource utilization" hint="current load">
+                  <div className="sys-ov-usage-col">
+                    {usage.map((u, i) => <UsageRow key={u.label} label={u.label} value={u.value} color={u.color} delay={i * 0.12} />)}
+                    <div className="sys-ov-donut-row">
+                      <Donut value={87} label="capacity" color="#14b8a6" size={120} thickness={10} />
+                      <div className="sys-ov-spark-cols">
+                        <div className="sys-ov-spark"><span>latency p95</span><Sparkline data={spark.latency} color="#14b8a6" /></div>
+                        <div className="sys-ov-spark"><span>throughput</span><Sparkline data={spark.throughput} color="#477da2" /></div>
+                      </div>
+                    </div>
                   </div>
-                </GlassCard>
+                </Panel>
               </div>
-              {/* Built-in PDF reader — shows a report as a client would on their site */}
-              <div className="sys-finale-reports">
-                <h3>Reports, read inline</h3>
-                <p>Inspection work ends in a report. This is how a client sees it on their site — a built-in reader, not a download. A generic sample report is rendered below.</p>
-                <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
+
+              {/* Service health list */}
+              <div className="sys-ov-bottom">
+                <Panel title="Service health" hint="real-time status">
+                  <div className="sys-status-list">
+                    {services.map((s, i) => <StatusRow key={s.name} name={s.name} status={s.status} detail={s.detail} delay={i * 0.08} />)}
+                  </div>
+                </Panel>
               </div>
-            </motion.div>
+            </div>
+
+            {/* ── STAGE 2: ROUTING (charts + diagram) ── */}
+            <div className="sys-stage sys-stage-routing">
+              <header className="sys-r-head">
+                <span className="sys-r-eyebrow">AIClient2API · routing console</span>
+                <h2>Latency, tokens, cost. Drawn on entry.</h2>
+                <p>Each chart draws itself when it scrolls into view. Representative AIClient2API patterns — not live data.</p>
+              </header>
+              <div className="sys-trio">
+                <AnimatedChart label="LATENCY" series={[310, 290, 265, 240, 258, 232, 245, 220, 236, 222, 232, 215]} color="#14b8a6" unit=" ms" />
+                <AnimatedChart label="TOKENS" series={[9200, 11800, 13400, 15000, 16200, 17400, 18900, 19800, 21400, 22600, 23800, 24800]} color="#477da2" unit="k" />
+                <AnimatedChart label="COST" series={[38, 41, 39, 44, 42, 47, 45, 49, 46, 51, 49, 53]} color="#c98a12" unit="$" />
+              </div>
+              <RoutingDiagram />
+            </div>
+
+            {/* ── STAGE 3: REPORTS (PDF viewer) ── */}
+            <div className="sys-stage sys-stage-reports">
+              <header className="sys-rep-head">
+                <span className="sys-rep-eyebrow">Inspection · reporting</span>
+                <h2>Reports, read inline.</h2>
+                <p>This is how a client sees their report on a business site — a built-in reader, not a download. A generic sample is shown.</p>
+              </header>
+              <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
+            </div>
 
             <div className="sys-story-step"><b>{stageName}</b><span>scroll to unfold</span></div>
           </div>

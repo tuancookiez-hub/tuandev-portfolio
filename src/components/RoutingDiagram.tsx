@@ -1,17 +1,16 @@
 "use client";
 
 /**
- * Scroll-scrubbed routing diagram — appears in phase 2, grows in complexity
- * into phase 3. Uses anime.js v4 timelines + seek() for the scrub.
+ * Routing diagram — plays a full animation once when it scrolls into view
+ * (gesture-triggered entrance animation), then stops. Built with anime.js v4.
  *
- * The diagram opens as a simple Client → Gateway → Router → Model A → Sink
- * path (phase 2), then layers on Model B, a fallback, a live monitoring loop
- * and heat glyphs (phase 3) as the user scrolls deeper. No external assets —
- * pure inline SVG + an anime timeline scrubbed by the page's own scroll.
+ * It opens as a simple Client → Gateway → Router → Model A → Sink path, then
+ * layers on Model B, a fallback, a live monitoring loop and heat glyphs. No
+ * external assets — pure inline SVG + an anime timeline that plays on entry.
  */
 
 import { useEffect, useRef } from "react";
-import { createTimeline, stagger } from "animejs";
+import { animate } from "animejs";
 
 export default function RoutingDiagram() {
   const root = useRef<HTMLDivElement>(null);
@@ -19,7 +18,6 @@ export default function RoutingDiagram() {
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const baseLines = Array.from(el.querySelectorAll<SVGPathElement>(".rd-base"));
     const baseNodes = Array.from(el.querySelectorAll<SVGElement>(".rd-node-base"));
@@ -35,48 +33,50 @@ export default function RoutingDiagram() {
       });
     prep(baseLines);
     extra.forEach((g) => prep(Array.from(g.querySelectorAll<SVGPathElement>(".rd-line"))));
-    const extraLines = extra.flatMap((g) => Array.from(g.querySelectorAll<SVGPathElement>(".rd-line")));
 
     if (reduced) {
       baseLines.forEach((p) => (p.style.strokeDashoffset = "0"));
-      extraLines.forEach((p) => (p.style.strokeDashoffset = "0"));
       baseNodes.forEach((n) => (n.style.opacity = "1"));
       extra.forEach((n) => (n.style.opacity = "1"));
       return;
     }
 
-    // anime.js timelines — scrub is driven by a light scroll listener below.
-    const baseTl = createTimeline({ defaults: { ease: "inOut(2)" } });
-    baseTl.add(baseLines, { strokeDashoffset: [0], duration: 1200, delay: stagger(140) });
-    baseTl.add(baseNodes, { opacity: [0, 1], duration: 300, delay: stagger(90) }, ">");
+    // Build a scrubbed animation but drive it only via a one-shot scroll trigger.
+    const tl = animate(el.querySelectorAll(".rd-line"), {
+      strokeDashoffset: 0,
+      duration: 1600,
+      ease: "inOut(2)",
+    });
+    extra.forEach((g) => (g.style.opacity = "0"));
+    // Also fade nodes + extra in progressively
+    const nodeFade = animate(baseNodes, { opacity: 1, duration: 500, delay: 200, ease: "out(3)" });
+    const extraFade = animate(extra, { opacity: 1, duration: 600, delay: 1400, ease: "out(3)" });
 
-    const extraTl = createTimeline({ defaults: { ease: "out(3)" } });
-    extraTl.add(extraLines, { strokeDashoffset: [0], duration: 900, delay: stagger(120) });
-    extraTl.add(extra, { opacity: [0, 1], duration: 300, delay: 60 }, ">");
+    // Pause everything until entry.
+    tl.pause();
+    nodeFade.pause();
+    extraFade.pause();
 
-    const baseDur = baseTl.duration || 1200;
-    const extraDur = extraTl.duration || 900;
+    let played = false;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (!played && entries[0]?.isIntersecting) {
+          played = true;
+          tl.play();
+          nodeFade.play();
+          extraFade.play();
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    obs.observe(el);
 
-    const apply = () => {
-      const rect = el.getBoundingClientRect();
-      if (rect.height === 0) return;
-      const vh = window.innerHeight;
-      const p = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
-      // 0 → 0.62 drives the base path; 0.62 → 1 drives the complexity layer.
-      const baseP = Math.min(1, p / 0.62);
-      const extraP = Math.max(0, Math.min(1, (p - 0.62) / 0.38));
-      baseTl.seek(baseP * baseDur);
-      extraTl.seek(extraP * extraDur);
-    };
-
-    apply();
-    window.addEventListener("scroll", apply, { passive: true });
-    window.addEventListener("resize", apply);
     return () => {
-      window.removeEventListener("scroll", apply);
-      window.removeEventListener("resize", apply);
-      baseTl.revert();
-      extraTl.revert();
+      obs.disconnect();
+      tl.revert();
+      nodeFade.revert();
+      extraFade.revert();
     };
   }, []);
 
@@ -85,21 +85,21 @@ export default function RoutingDiagram() {
       <svg viewBox="0 0 820 380" className="rd-svg" role="img">
         {/* PHASE 2 — base routing path */}
         <path className="rd-line rd-base" d="M40 190 H 210" />
-        <g className="rd-node-base"><circle className="rd-node" cx="40" cy="190" r="9" /><text className="rd-label" x="18" y="220">Client</text></g>
+        <g className="rd-node-base" style={{ opacity: 0 }}><circle className="rd-node" cx="40" cy="190" r="9" /><text className="rd-label" x="18" y="220">Client</text></g>
 
         <path className="rd-line rd-base" d="M210 190 C 290 190, 290 100, 370 100" />
-        <g className="rd-node-base"><circle className="rd-node" cx="210" cy="190" r="9" /><text className="rd-label" x="170" y="210">Gateway</text></g>
+        <g className="rd-node-base" style={{ opacity: 0 }}><circle className="rd-node" cx="210" cy="190" r="9" /><text className="rd-label" x="170" y="210">Gateway</text></g>
 
         <path className="rd-line rd-base" d="M370 100 H 530" />
-        <g className="rd-node-base"><circle className="rd-node rd-core" cx="370" cy="100" r="12" /><text className="rd-label" x="330" y="82">Router</text></g>
+        <g className="rd-node-base" style={{ opacity: 0 }}><circle className="rd-node rd-core" cx="370" cy="100" r="12" /><text className="rd-label" x="330" y="82">Router</text></g>
 
         <path className="rd-line rd-base" d="M530 100 C 610 100, 610 190, 690 190" />
-        <g className="rd-node-base"><circle className="rd-node" cx="530" cy="100" r="9" /><text className="rd-label" x="500" y="82">Model A</text></g>
+        <g className="rd-node-base" style={{ opacity: 0 }}><circle className="rd-node" cx="530" cy="100" r="9" /><text className="rd-label" x="500" y="82">Model A</text></g>
 
-        <g className="rd-node-base"><circle className="rd-node" cx="690" cy="190" r="9" /><text className="rd-label" x="668" y="216">Sink</text></g>
+        <g className="rd-node-base" style={{ opacity: 0 }}><circle className="rd-node" cx="690" cy="190" r="9" /><text className="rd-label" x="668" y="216">Sink</text></g>
 
         {/* PHASE 3 — extra complexity */}
-        <g className="rd-extra">
+        <g className="rd-extra" style={{ opacity: 0 }}>
           <path className="rd-line" d="M370 100 C 450 100, 450 300, 540 296" />
           <circle className="rd-node" cx="540" cy="296" r="8" /><text className="rd-label" x="500" y="320">Model B</text>
 
