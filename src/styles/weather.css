@@ -1,60 +1,26 @@
-@property --cam-z {
-  syntax: "<number>";
-  inherits: false;
-  initial-value: 1;
-}
-@property --cam-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-@property --cam-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
-}
-
 .wx-portal {
   isolation: isolate;
+  box-shadow: 0 28px 80px rgba(8, 12, 18, .28);
 }
 .wx-page {
   position: relative;
   z-index: 4;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100%;
 }
 .wx-portal[data-phase="entering"] .wx-page,
 .wx-portal[data-phase="closing"] .wx-page {
   max-height: 100dvh;
   overflow: hidden;
-  pointer-events: none;
 }
 
-.landing {
-  --cam-z: 1;
-  --cam-x: 0px;
-  --cam-y: 0px;
-  --cam-ox: 50%;
-  --cam-oy: 50%;
-  transform-origin: var(--cam-ox) var(--cam-oy);
-  transform: translate3d(
-      calc(var(--cam-x) * (var(--cam-z) - 1) / 5.4),
-      calc(var(--cam-y) * (var(--cam-z) - 1) / 5.4),
-      0
-    ) scale(var(--cam-z));
-  transition:
-    --cam-z 920ms cubic-bezier(.22, 1, .32, 1),
-    --cam-x 920ms cubic-bezier(.22, 1, .32, 1),
-    --cam-y 920ms cubic-bezier(.22, 1, .32, 1);
-  will-change: transform;
-}
-.landing[data-cam="open"] {
+.landing[data-entered="true"] {
   pointer-events: none;
+}
+.world[data-entered="true"][data-active="true"] {
+  visibility: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing {
-    transition: none;
-    transform: none;
-  }
+  .wx-portal { box-shadow: none; }
 }

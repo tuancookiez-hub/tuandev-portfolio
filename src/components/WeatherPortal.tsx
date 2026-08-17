@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * Dolly lives on the landing. Click a card → camera pushes
- * forward toward that card's center. Height and aim stay locked.
- * Destination fades in only after the lens is tight. Leave reverses.
+ * The clicked card IS the door. It lifts from its slot to fill
+ * the viewport. The world lives inside that same surface.
+ * Leave shrinks the same card back into its slot.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import type { WorldId } from "../data/worlds";
@@ -15,8 +15,6 @@ import type { Origin } from "../context/ActiveWorld.types";
 
 type Phase = "hidden" | "entering" | "open" | "closing";
 const EASE = [0.22, 1, 0.32, 1] as const;
-const PUSH = 6.4;
-const DOLLY_MS = 920;
 
 const HOLD: Record<Exclude<WorldId, "robotics">, string> = {
   hospitality: "#fff9ec",
@@ -24,18 +22,13 @@ const HOLD: Record<Exclude<WorldId, "robotics">, string> = {
   creative: "#07060a",
 };
 
-function aim(origin: Origin | null) {
+function box(origin: Origin | null) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  if (!origin) return { ox: 50, oy: 50, x: 0, y: 0 };
-  const cx = origin.x + origin.w / 2;
-  const cy = origin.y + origin.h / 2;
-  return {
-    ox: (cx / vw) * 100,
-    oy: (cy / vh) * 100,
-    x: vw / 2 - cx,
-    y: vh / 2 - cy,
-  };
+  if (!origin) {
+    return { left: vw * 0.25, top: vh * 0.2, width: vw * 0.5, height: vh * 0.6 };
+  }
+  return { left: origin.x, top: origin.y, width: origin.w, height: origin.h };
 }
 
 export default function WeatherPortal({
@@ -48,67 +41,36 @@ export default function WeatherPortal({
   const ctx = useActiveWorld();
   const reduced = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("hidden");
-  const [shot, setShot] = useState({ ox: 50, oy: 50, x: 0, y: 0 });
-  const wait = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [from, setFrom] = useState({ left: 0, top: 0, width: 0, height: 0 });
 
   useEffect(() => {
     if (ctx.entered === world && phase === "hidden") {
-      setShot(aim(ctx.origin));
+      setFrom(box(ctx.origin));
       setPhase("entering");
     }
   }, [ctx.entered, ctx.origin, phase, world]);
 
   useEffect(() => {
     if (ctx.entered === null && (phase === "open" || phase === "entering")) {
-      setShot(aim(ctx.origin));
+      setFrom(box(ctx.origin));
       setPhase("closing");
     }
   }, [ctx.entered, ctx.origin, phase]);
 
-  useEffect(() => {
-    if (wait.current) clearTimeout(wait.current);
-    if (phase === "entering") {
-      wait.current = setTimeout(() => setPhase("open"), reduced ? 80 : DOLLY_MS);
-    }
-    if (phase === "closing") {
-      wait.current = setTimeout(() => setPhase("hidden"), reduced ? 80 : DOLLY_MS);
-    }
-    return () => { if (wait.current) clearTimeout(wait.current); };
-  }, [phase, reduced]);
-
-  useEffect(() => {
-    const root = document.querySelector<HTMLElement>(".landing");
-    if (!root) return;
-    if (phase === "hidden") {
-      root.style.removeProperty("--cam-x");
-      root.style.removeProperty("--cam-y");
-      root.style.removeProperty("--cam-z");
-      root.style.removeProperty("--cam-ox");
-      root.style.removeProperty("--cam-oy");
-      root.dataset.cam = "";
-      return;
-    }
-    root.style.setProperty("--cam-x", `${shot.x}px`);
-    root.style.setProperty("--cam-y", `${shot.y}px`);
-    root.style.setProperty("--cam-ox", `${shot.ox}%`);
-    root.style.setProperty("--cam-oy", `${shot.oy}%`);
-    root.style.setProperty("--cam-z", phase === "closing" ? "1" : String(PUSH));
-    root.dataset.cam = phase;
-  }, [phase, shot]);
-
   if (phase === "hidden") return null;
 
-  const wrap: CSSProperties = {
+  const full = phase === "open" || phase === "entering";
+  const dur = reduced ? 0.2 : 0.88;
+
+  const frame: CSSProperties = {
     position: "fixed",
-    inset: 0,
     zIndex: 120,
-    width: "100%",
-    height: "100dvh",
     overflow: phase === "open" ? "auto" : "hidden",
     overscrollBehavior: "contain",
     background: HOLD[world],
-    pointerEvents: phase === "open" ? "auto" : "none",
+    pointerEvents: "auto",
     WebkitOverflowScrolling: "touch",
+    transformOrigin: "top left",
   };
 
   return (
@@ -116,12 +78,25 @@ export default function WeatherPortal({
       className="wx-portal"
       data-world={world}
       data-phase={phase}
-      style={wrap}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: phase === "open" ? 1 : 0 }}
-      transition={{ duration: reduced ? 0.16 : 0.38, ease: EASE }}
+      style={frame}
+      initial={from}
+      animate={full
+        ? { left: 0, top: 0, width: "100vw", height: "100dvh", borderRadius: 0 }
+        : { ...from, borderRadius: 3 }}
+      transition={{ duration: dur, ease: EASE }}
+      onAnimationComplete={() => {
+        if (phase === "entering") setPhase("open");
+        if (phase === "closing") setPhase("hidden");
+      }}
     >
-      <div className="wx-page">{children(phase === "open")}</div>
+      <motion.div
+        className="wx-page"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: phase === "closing" ? 0 : 1 }}
+        transition={{ duration: reduced ? 0.16 : 0.42, delay: full && !reduced ? 0.28 : 0, ease: EASE }}
+      >
+        {children(phase === "open")}
+      </motion.div>
     </motion.div>
   );
 }
