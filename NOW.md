@@ -1,22 +1,17 @@
 # NOW — Portfolio
 
-## Systems world — LIVE 5-tier (gh-pages 420d73c, main 85b1abf)
+## Systems world — 4-tier (L5 removed)
+
+### Theme
+- L1 white `#eef0f2`
+- L2 grey `#c8cdcc`
+- L3+ dark `#0a0a0f` (theme flips at L3, holds through L4)
 
 ### Tier map
-1. **L1 overview** — static KPI dashboard (white bg)
-2. **L2 aiclient** — AIClient2API console (transitions to grey bg)
-3. **L3 flow** — Kernel viz (react-force-graph tutorial pattern: node/edge swap per pass, clean setCenter pan, particle edges)
-4. **L4 reports** — flip-page PDF viewer (dark bg)
-5. **L5 swarm** — 3D force-directed graph (react-force-graph-3d + Three.js, lazy-loaded) with bottom HUD
+1. **L1 overview** — KPI dashboard
+2. **L2 aiclient** — AIClient2API console
+3. **L3 kernel** — Xenova fusion DAG from scratch (`KernelViz` + `src/data/kernelPasses.ts`). 6 discrete GraphState passes, 65→406 tok/s, glass nodes, particle edges, play/step.
+4. **L4 reports** — StPageFlip PDF
 
-### Key lessons
-- **L3 (KernelViz)**: rewritten per tutorial — simple node/edge swap, no hidden/opacity tricks, no rAF counter loops
-- **L5 (SwarmGraph)**: rewritten — removed all ref calls (`graphData`, `cameraPosition`, `width/height`) that crashed the app. Now purely prop-driven. `react-force-graph-3d` handles re-renders automatically.
-- **Background wash**: L1 white → L2 grey (#c8cdcc) → L3+ dark (#1a2435) with smooth 800ms text color transitions
-- **Lazy loading**: SwarmGraph lazy-loaded from SystemsWorld via `React.lazy` + Suspense
-
-### Deps
-@xyflow/react (L3), react-force-graph-3d + three (L5 lazy, code-split 580KB chunk)
-
-## Deployed
-gh-pages 420d73c, main 85b1abf. Verified: L3 = 9 nodes, 20 edges, particles streaming; L5 = 3D graph + 5 HUD panels, zero errors.
+### Next
+Verify live Pages after this push. No L5.

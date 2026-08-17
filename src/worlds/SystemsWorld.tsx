@@ -1,16 +1,8 @@
 "use client";
 
 /**
- * Systems world — five-tier escalation from static cards to an organic agentic
- * network. Each stage is a full-height scroll section; animations are
- * gesture-triggered entrances (once-per-scroll).
- *
- * Tier map (low → high complexity):
- *   1 · overview — static KPI dashboard
- *   2 · aiclient — AIClient2API routing console (provider pool + golden signals)
- *   3 · flow — React Flow kernel optimization graph (markdown tutorial)
- *   4 · reports — flip-page PDF viewer
- *   5 · removed — was organic agentic network
+ * Systems world — four-tier scroll.
+ * L1 white overview · L2 grey console · L3 dark kernel graph · L4 reports.
  */
 
 import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
@@ -75,16 +67,15 @@ export default function SystemsWorld({
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end end"] });
   usePreviewReceiver(embed);
 
-  // 5-level wash: light field → dark → very dark
+  // L1 white · L2 grey · L3 dark (theme flips at L3, holds through L4)
   const wash = useTransform(scrollYProgress,
-    [0, 0.10, 0.22, 0.38, 0.52, 0.68, 1],
-    ["#eef0f2", "#eef0f2", "#c8cdcc", "#1a2435", "#0c1420", "#020617", "#020617"],
+    [0, 0.18, 0.28, 0.42, 0.55, 1],
+    ["#eef0f2", "#eef0f2", "#c8cdcc", "#c8cdcc", "#0a0a0f", "#0a0a0f"],
   );
-  const gridFade = useTransform(scrollYProgress, [0, 0.10, 0.30, 0.55, 1], [1, 0.85, 0.3, 0, 0]);
+  const gridFade = useTransform(scrollYProgress, [0, 0.18, 0.42, 0.55, 1], [1, 0.9, 0.35, 0, 0]);
 
-  // Smooth text colors — stay dark through the grey zone, only lighten when bg is dark
-  const textColor = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
-  const softColor = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
+  const textColor = useTransform(scrollYProgress, [0, 0.42, 0.55, 1], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
+  const softColor = useTransform(scrollYProgress, [0, 0.42, 0.55, 1], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
 
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
@@ -92,21 +83,23 @@ export default function SystemsWorld({
   const [soft, setSoft] = useState("#2a3a4a");
 
   // Card background: white → dark at the same thresholds as ink
-  const cardColorLight = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["rgba(255,255,255,.72)", "rgba(255,255,255,.72)", "rgba(9,24,38,.6)", "rgba(9,24,38,.6)"]);
+  const cardColorLight = useTransform(
+    scrollYProgress,
+    [0, 0.18, 0.28, 0.42, 0.55, 1],
+    ["rgba(255,255,255,.88)", "rgba(255,255,255,.88)", "rgba(232,236,236,.78)", "rgba(232,236,236,.78)", "rgba(10,10,16,.72)", "rgba(10,10,16,.72)"],
+  );
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);
-    if (v < 0.16) setStageName("overview");
-    else if (v < 0.34) setStageName("aiclient");
-    else if (v < 0.52) setStageName("flow");
-    else if (v < 0.72) setStageName("reports");
-    else setStageName("network");
+    if (v < 0.22) setStageName("overview");
+    else if (v < 0.46) setStageName("aiclient");
+    else if (v < 0.72) setStageName("flow");
+    else setStageName("reports");
   });
   useMotionValueEvent(textColor, "change", setInk);
   useMotionValueEvent(softColor, "change", setSoft);
 
-  // Theme is now smooth, not a hard switch
-  const theme = progress < 0.22 ? "light" : progress < 0.45 ? "mid" : "dark";
+  const theme = progress < 0.28 ? "light" : progress < 0.50 ? "mid" : "dark";
 
   return (
     <div className="sys" data-stage={stageName} data-theme={theme}>
@@ -189,9 +182,9 @@ export default function SystemsWorld({
             {/* ── LEVEL 3: FLOW (React Flow kernel visualization) ── */}
             <div className="sys-stage sys-stage-flow">
               <header className="sys-r-head">
-                <span className="sys-r-eyebrow">compute graph · L3</span>
-                <h2>Operator fusion in real time.</h2>
-                <p>Nodes merge, edges rewrite, particles stream through the graph. Step through each pass or let the optimization run.</p>
+                <span className="sys-r-eyebrow">kernel fusion · L3</span>
+                <h2>65 tok/s → 406. One graph.</h2>
+                <p>A decomposed compute DAG fuses across six passes. Nodes merge. Dispatches drop. Play it or step it.</p>
               </header>
               <KernelViz />
             </div>
