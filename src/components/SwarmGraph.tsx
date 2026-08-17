@@ -236,7 +236,6 @@ function SpendGauge({ value, max }: { value: number; max: number }) {
 // ─── 3D Canvas ─────────────────────────────────────────────────
 
 function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
-  const fgRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Custom node: glowing sphere + halo
@@ -269,29 +268,12 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   }, []);
 
-  // Update graph data when stage changes
-  useEffect(() => {
-    const fg = fgRef.current;
-    if (fg) {
-      fg.graphData({ nodes: stage.nodes, links: stage.links });
-      fg.d3Force("charge")?.strength(-30);
-      fg.d3Force("link")?.distance(20);
-      fg.d3Force("center")?.strength(0.6);
-    }
-  }, [stage]);
-
-  // Camera position on mount
-  useEffect(() => {
-    const fg = fgRef.current;
-    if (fg) fg.cameraPosition({ z: 280 });
-  }, []);
-
   // Resize handler
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
-      fgRef.current?.width(el.offsetWidth).height(el.offsetHeight);
+      // Resize is handled by the canvas auto-resize
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -300,7 +282,6 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
   return (
     <div className="sg-canvas-wrap" ref={containerRef}>
       <ForceGraph3D
-        ref={fgRef}
         graphData={{ nodes: stage.nodes, links: stage.links }}
         backgroundColor="#0a0a0f"
         showNavInfo={false}
