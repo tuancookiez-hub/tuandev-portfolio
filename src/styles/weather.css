@@ -1,39 +1,21 @@
+@property --cam-z {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+@property --cam-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --cam-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .wx-portal {
   isolation: isolate;
-  will-change: transform;
-}
-.wx-haze,
-.wx-grain {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 6;
-}
-.wx-haze {
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 48%, rgba(255,255,255,.18), transparent 62%),
-    linear-gradient(180deg, rgba(255,255,255,.08), transparent 40%, rgba(0,0,0,.12));
-}
-.wx-portal[data-world="hospitality"] .wx-haze {
-  background:
-    radial-gradient(ellipse 78% 58% at 50% 46%, rgba(255,244,220,.42), transparent 64%),
-    linear-gradient(180deg, rgba(255,249,236,.16), transparent 46%);
-}
-.wx-portal[data-world="systems"] .wx-haze {
-  background:
-    radial-gradient(ellipse 78% 58% at 50% 46%, rgba(232,238,244,.38), transparent 64%),
-    linear-gradient(180deg, rgba(200,205,204,.2), transparent 46%);
-}
-.wx-portal[data-world="creative"] .wx-haze {
-  background:
-    radial-gradient(ellipse 78% 58% at 50% 46%, rgba(28,18,40,.4), transparent 64%),
-    linear-gradient(180deg, rgba(7,6,10,.18), transparent 46%);
-}
-.wx-grain {
-  z-index: 7;
-  opacity: .08;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='.55'/></svg>");
 }
 .wx-page {
   position: relative;
@@ -48,6 +30,31 @@
   pointer-events: none;
 }
 
+.landing {
+  --cam-z: 1;
+  --cam-x: 0px;
+  --cam-y: 0px;
+  --cam-ox: 50%;
+  --cam-oy: 50%;
+  transform-origin: var(--cam-ox) var(--cam-oy);
+  transform: translate3d(
+      calc(var(--cam-x) * (var(--cam-z) - 1) / 5.4),
+      calc(var(--cam-y) * (var(--cam-z) - 1) / 5.4),
+      0
+    ) scale(var(--cam-z));
+  transition:
+    --cam-z 920ms cubic-bezier(.22, 1, .32, 1),
+    --cam-x 920ms cubic-bezier(.22, 1, .32, 1),
+    --cam-y 920ms cubic-bezier(.22, 1, .32, 1);
+  will-change: transform;
+}
+.landing[data-cam="open"] {
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .wx-portal { will-change: auto; }
+  .landing {
+    transition: none;
+    transform: none;
+  }
 }
