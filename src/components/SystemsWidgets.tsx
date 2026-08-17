@@ -73,6 +73,7 @@ export function KpiTile({
   deltaUnit = "%",
   status = "ok",
   tone,
+  delay = 0,
 }: {
   label: string;
   value: number;
@@ -82,11 +83,25 @@ export function KpiTile({
   deltaUnit?: string;
   status?: "ok" | "warn" | "bad" | "neutral";
   tone?: string;
+  delay?: number;
 }) {
   const up = delta !== undefined && delta >= 0;
   const toneStyle: React.CSSProperties = tone ? { ["--kpi-tone" as string]: tone } : {};
+  const [hovered, setHovered] = useState(false);
+  const opacity = useSpring(hovered ? 1 : 0.7);
+  const scale = useSpring(hovered ? 1.02 : 1);
+
   return (
-    <div className="sys-kpi" style={toneStyle} data-status={status}>
+    <motion.div
+      className="sys-kpi"
+      style={{ ...toneStyle, opacity, scale }}
+      data-status={status}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div className="sys-kpi-top">
         <span className="sys-kpi-label">{label}</span>
         <span className={`sys-kpi-status sys-st-${status}`} aria-label={status} />
@@ -102,7 +117,7 @@ export function KpiTile({
         )}
         <span className="sys-kpi-meta">24h / sample</span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
