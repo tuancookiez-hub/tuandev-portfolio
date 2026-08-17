@@ -1335,6 +1335,62 @@ text.ax-v {
   transition: background 200ms;
 }
 .sg-play:hover, .sg-step:hover { background: rgba(94,234,212,.18); }
+
+/* HUD strip (bottom) */
+.sg-hud-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.sg-hud-card {
+  border: 1px solid rgba(159,208,240,.12);
+  border-radius: 8px;
+  background: rgba(10,15,24,.65);
+  padding: 8px 10px;
+}
+.sg-hud-title {
+  font: 700 8px/1 var(--sys-mono, monospace);
+  letter-spacing: .12em;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.sg-hover-tooltip {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(10,15,24,.9);
+  border: 1px solid rgba(99,102,241,.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  pointer-events: none;
+  z-index: 20;
+}
+.sg-hover-name { font: 600 12px var(--sys-mono, monospace); color: #e4e4ed; }
+.sg-hover-type { font: 10px var(--sys-mono, monospace); color: #64748b; }
+.sg-hover-cluster { font: 10px var(--sys-mono, monospace); color: #a78bfa; }
+.sg-play-btn {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  z-index: 10;
+  min-width: 36px;
+  height: 36px;
+  border: 1px solid rgba(159,208,240,.25);
+  border-radius: 8px;
+  background: rgba(10,15,24,.65);
+  color: #d6e6f5;
+  font: 13px var(--sys-mono, monospace);
+  cursor: pointer;
+  transition: background 200ms;
+}
+.sg-play-btn:hover { background: rgba(94,234,212,.18); }
 .sg-step.is-active { background: rgba(94,234,212,.22); color: #5eead4; border-color: rgba(94,234,212,.5); }
 .sg-step.is-done { color: #5eead4; }
 
