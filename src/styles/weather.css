@@ -20,8 +20,7 @@
 }
 .world[data-face="true"] .world-shade {
   opacity: 1;
-  background: linear-gradient(180deg, rgba(4,10,14,.22), transparent 34%),
-    linear-gradient(0deg, rgba(3,8,12,.78), rgba(3,8,12,.08) 58%);
+  background: linear-gradient(0deg, rgba(3,8,12,.72), transparent 46%);
 }
 .world[data-face="true"] .world-copy,
 .world[data-face="true"] .world-topline,
