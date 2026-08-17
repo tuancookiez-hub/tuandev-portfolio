@@ -95,6 +95,9 @@ export default function SystemsWorld({
   const [ink, setInk] = useState("#10243a");
   const [soft, setSoft] = useState("#2a3a4a");
 
+  // Card background: white → dark at the same thresholds as ink
+  const cardColorLight = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["rgba(255,255,255,.72)", "rgba(255,255,255,.72)", "rgba(9,24,38,.6)", "rgba(9,24,38,.6)"]);
+
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);
     if (v < 0.16) setStageName("overview");
@@ -124,7 +127,7 @@ export default function SystemsWorld({
         </span>
       </div>
 
-      <motion.main className="sys-main" data-theme={theme} style={{ backgroundColor: wash, ["--sys-ink" as string]: ink, ["--sys-soft" as string]: soft } as any}>
+      <motion.main className="sys-main" data-theme={theme} style={{ backgroundColor: wash, ["--sys-ink" as string]: ink, ["--sys-soft" as string]: soft, ["--sys-card" as string]: cardColorLight } as any}>
         <motion.div className="sys-grid-bg" style={reduced ? undefined : { opacity: gridFade }} aria-hidden="true">
           <div className="sys-grid-pattern" />
         </motion.div>

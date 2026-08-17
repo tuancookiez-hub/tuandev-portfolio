@@ -470,7 +470,6 @@
   border-radius: 14px;
   background: var(--sys-card);
   box-shadow: 0 24px 60px rgba(16, 36, 58, .13);
-  transition: background 800ms ease, border-color 800ms ease;
 }
 .sys-face[data-face="dark"] .sys-face-panel {
   background: #0b1622;
@@ -931,9 +930,8 @@ text.ax-v {
   padding: 16px 16px 14px;
   border: 1px solid var(--sys-line);
   border-radius: 12px;
-  background: rgba(255,255,255,.72);
+  background: var(--sys-card);
   box-shadow: 0 12px 30px rgba(16,36,58,.08);
-  transition: background 800ms ease, border-color 800ms ease, box-shadow 800ms ease;
 }
 .sys[data-theme="dark"] .sys-kpi { background: rgba(9,24,38,.6); border-color: rgba(159,208,240,.14); }
 .sys-kpi-top { display: flex; align-items: center; justify-content: space-between; }
@@ -959,9 +957,8 @@ text.ax-v {
   padding: 16px;
   border: 1px solid var(--sys-line);
   border-radius: 12px;
-  background: rgba(255,255,255,.72);
+  background: var(--sys-card);
   box-shadow: 0 12px 30px rgba(16,36,58,.08);
-  transition: background 800ms ease, border-color 800ms ease;
 }
 .sys[data-theme="dark"] .sys-panel { background: rgba(9,24,38,.6); border-color: rgba(159,208,240,.14); }
 .sys-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -1382,9 +1379,8 @@ text.ax-v {
   margin-top: 26px;
   border: 1px solid var(--sys-line);
   border-radius: 16px;
-  background: rgba(255, 255, 255, .72);
+  background: var(--sys-card);
   overflow: hidden;
-  transition: background 800ms ease, border-color 800ms ease;
 }
 .sys[data-theme="dark"] .sys-pdf {
   background: rgba(6, 18, 32, .6);
