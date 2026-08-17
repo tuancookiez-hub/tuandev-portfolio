@@ -371,17 +371,17 @@ export default function SwarmGraph() {
   // Custom node rendering: glowing sphere with aura
   const nodeThreeObject = useMemo(() => {
     return (node: any) => {
-      const group = new THREE.Group();
-      const size = node.val ?? 1;
-      // Core sphere
-      const geo = new THREE.SphereGeometry(size * 1.2, 12, 12);
-      const mat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.85 });
-      group.add(new THREE.Mesh(geo, mat));
-      // Glow aura
-      const glowGeo = new THREE.SphereGeometry(size * 2.5, 12, 12);
-      const glowMat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.12 });
-      group.add(new THREE.Mesh(glowGeo, glowMat));
-      return group;
+        const group = new THREE.Group();
+        const size = node.val ?? 1;
+        // Core sphere
+        const geo = new THREE.SphereGeometry(size * 1.4, 12, 12);
+        const mat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.9 });
+        group.add(new THREE.Mesh(geo, mat));
+        // Glow aura (larger, brighter)
+        const glowGeo = new THREE.SphereGeometry(size * 3.5, 12, 12);
+        const glowMat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.18 });
+        group.add(new THREE.Mesh(glowGeo, glowMat));
+        return group;
     };
   }, []);
 
@@ -414,10 +414,10 @@ export default function SwarmGraph() {
           nodeColor={(n: any) => n.color}
           nodeOpacity={0.92}
           nodeThreeObject={nodeThreeObject}
-          linkColor={() => "rgba(159,208,240,.18)"}
-          linkOpacity={0.25}
-          linkWidth={0.4}
-          linkCurvature={0.15}
+          linkColor={() => "rgba(159,208,240,.28)"}
+          linkOpacity={0.35}
+          linkWidth={0.6}
+          linkCurvature={0.12}
           backgroundColor="#000000"
           width={1500}
           height={600}
@@ -426,13 +426,13 @@ export default function SwarmGraph() {
           cooldownTicks={0}
           enablePointerInteraction={false}
         />
-        {/* Floating cluster labels — positioned at graph center estimates */}
+        {/* Floating cluster labels — positioned at cluster center estimates */}
         <div className="sg-cluster-labels">
           {clusterCenters(stage.nodes).map((c) => (
             <div
               key={c.group}
               className="sg-cluster-label"
-              style={{ left: `${50 + (c.x / 80) * 30}%`, top: `${50 + (c.y / 80) * 25}%`, color: c.color }}
+              style={{ left: `${40 + (c.x / 60) * 25}%`, top: `${35 + (c.y / 60) * 30}%`, color: c.color }}
             >
               {c.label}
             </div>

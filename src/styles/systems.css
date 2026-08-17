@@ -1285,7 +1285,7 @@ text.ax-v {
 }
 .sg-graph-area {
   position: relative;
-  height: clamp(450px, 60vh, 620px);
+  height: clamp(500px, 70vh, 700px);
   border: 1px solid rgba(159,208,240,.16);
   border-radius: 16px;
   background: #000;
