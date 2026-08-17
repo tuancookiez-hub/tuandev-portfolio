@@ -1285,17 +1285,32 @@ text.ax-v {
 }
 .sg-graph-area {
   position: relative;
-  height: clamp(400px, 55vh, 560px);
+  height: clamp(450px, 60vh, 620px);
   border: 1px solid rgba(159,208,240,.16);
   border-radius: 16px;
-  background: #0a0a0f;
+  background: #000;
   overflow: hidden;
 }
-.sg-canvas-wrap {
-  position: absolute; inset: 0;
+.sg-graph-area canvas { width: 100% !important; height: 100% !important; }
+
+/* Floating cluster labels */
+.sg-cluster-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
 }
-.sg-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
-.sg-canvas-placeholder { width: 100%; height: 100%; background: #0a0a0f; }
+.sg-cluster-label {
+  position: absolute;
+  font: 600 11px/1 "SF Mono", "Cascadia Code", "Fira Code", monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  text-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.4s ease;
+}
 .sg-stage-label {
   position: absolute; z-index: 10;
   top: 16px; left: 20px;

@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * Level 5 — 3D agentic swarm graph.
- * Uses react-force-graph-3d for the 3D force-directed graph.
- * Lazy-loaded to avoid SSR/Three.js issues with main bundle.
+ * Level 5 — 3D agentic swarm graph (reference-matching).
+ * Massive dense graph with galaxy-like clusters, motion trails,
+ * floating labels, and continuous organic drift.
+ * Lazy-loaded to avoid SSR/Three.js issues.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -22,48 +23,55 @@ function makeNodes(groups: { name: string; color: string; count: number; spread:
   return groups.flatMap((g) =>
     Array.from({ length: g.count }, (_, i) => {
       const a = (i / g.count) * Math.PI * 2;
-      const r = g.spread * (0.4 + Math.random() * 0.6);
+      const r = g.spread * (0.3 + Math.random() * 0.7);
       return {
-        id: `${g.name}-${i}`, group: g.name, val: 0.5 + Math.random() * 1.5,
+        id: `${g.name}-${i}`, group: g.name, val: 0.3 + Math.random() * 1.8,
         color: g.color,
-        fx: Math.cos(a) * r + (Math.random() - 0.5) * g.spread * 0.3,
-        fy: Math.sin(a) * r + (Math.random() - 0.5) * g.spread * 0.3,
-        fz: (Math.random() - 0.5) * g.spread * 0.5,
+        fx: Math.cos(a) * r + (Math.random() - 0.5) * g.spread * 0.4,
+        fy: Math.sin(a) * r + (Math.random() - 0.5) * g.spread * 0.4,
+        fz: (Math.random() - 0.5) * g.spread * 0.6,
       };
     }),
   );
 }
 
 function makeLinks(nodes: SN[], density: number) {
-  const links: { source: string; target: string; value: number }[] = [];
+  const links: SL[] = [];
   const groups = [...new Set(nodes.map((n) => n.group))];
   groups.forEach((g) => {
     const gn = nodes.filter((n) => n.group === g);
     for (let i = 0; i < gn.length; i++)
       for (let j = i + 1; j < gn.length; j++)
-        if (Math.random() < density * 0.4)
-          links.push({ source: gn[i].id, target: gn[j].id, value: 0.3 + Math.random() * 0.7 });
+        if (Math.random() < density * 0.35)
+          links.push({ source: gn[i].id, target: gn[j].id, value: 0.2 + Math.random() * 0.8 });
   });
+  // Cross-group links (sparse web between clusters)
   for (let i = 0; i < nodes.length; i++)
     for (let j = i + 1; j < nodes.length; j++)
-      if (nodes[i].group !== nodes[j].group && Math.random() < density * 0.03)
-        links.push({ source: nodes[i].id, target: nodes[j].id, value: 0.1 + Math.random() * 0.3 });
+      if (nodes[i].group !== nodes[j].group && Math.random() < density * 0.015)
+        links.push({ source: nodes[i].id, target: nodes[j].id, value: 0.05 + Math.random() * 0.2 });
   return links;
 }
 
 type SN = { id: string; group: string; val: number; color: string; fx?: number; fy?: number; fz?: number };
 type SL = { source: string; target: string; value: number };
 
-const STAGES: { id: string; label: string; nodes: SN[]; links: SL[]; metrics: { bots: number; actions: number; throughput: number; spend: number }; log: string[] }[] = [
+// ─── Stage definitions (massive node counts) ──────────────────
+
+const STAGES: {
+  id: string; label: string; nodes: SN[]; links: SL[];
+  metrics: { bots: number; actions: number; throughput: number; spend: number };
+  log: string[];
+}[] = [
   {
     id: "s1", label: "Initial dispatch",
     nodes: makeNodes([
-      { name: "calendar", color: COLORS.magenta, count: 18, spread: 40 },
-      { name: "inbox", color: COLORS.cyan, count: 22, spread: 45 },
-      { name: "invoice", color: COLORS.purple, count: 14, spread: 35 },
-      { name: "outreach", color: COLORS.pink, count: 16, spread: 38 },
-      { name: "leads", color: COLORS.teal, count: 12, spread: 32 },
-      { name: "report", color: COLORS.orange, count: 10, spread: 30 },
+      { name: "calendar", color: COLORS.magenta, count: 90, spread: 55 },
+      { name: "inbox", color: COLORS.cyan, count: 110, spread: 60 },
+      { name: "invoice", color: COLORS.purple, count: 70, spread: 48 },
+      { name: "outreach", color: COLORS.pink, count: 80, spread: 52 },
+      { name: "leads", color: COLORS.teal, count: 60, spread: 45 },
+      { name: "report", color: COLORS.orange, count: 50, spread: 42 },
     ]),
     links: [], metrics: { bots: 4, actions: 124, throughput: 847, spend: 12.40 },
     log: ["08:00:12 — bot spawned: calendar-sync", "08:00:15 — bot spawned: inbox-triage", "08:00:18 — bot spawned: invoice-run", "08:00:21 — bot spawned: lead-scrape"],
@@ -71,376 +79,396 @@ const STAGES: { id: string; label: string; nodes: SN[]; links: SL[]; metrics: { 
   {
     id: "s2", label: "Connection wave",
     nodes: makeNodes([
-      { name: "calendar", color: COLORS.magenta, count: 24, spread: 48 },
-      { name: "inbox", color: COLORS.cyan, count: 28, spread: 52 },
-      { name: "invoice", color: COLORS.purple, count: 18, spread: 42 },
-      { name: "outreach", color: COLORS.pink, count: 20, spread: 44 },
-      { name: "leads", color: COLORS.teal, count: 16, spread: 38 },
-      { name: "report", color: COLORS.orange, count: 14, spread: 36 },
+      { name: "calendar", color: COLORS.magenta, count: 120, spread: 65 },
+      { name: "inbox", color: COLORS.cyan, count: 140, spread: 70 },
+      { name: "invoice", color: COLORS.purple, count: 90, spread: 55 },
+      { name: "outreach", color: COLORS.pink, count: 100, spread: 60 },
+      { name: "leads", color: COLORS.teal, count: 80, spread: 50 },
+      { name: "report", color: COLORS.orange, count: 70, spread: 48 },
     ]),
-    links: [], metrics: { bots: 6, actions: 312, throughput: 1240, spend: 28.75 },
-    log: ["08:02:30 — fusion: calendar+inbox linked", "08:02:45 — fusion: invoice+leads linked", "08:03:00 — new connection: outreach→report", "08:03:15 — cluster density increased"],
+    links: [], metrics: { bots: 8, actions: 256, throughput: 1240, spend: 24.80 },
+    log: ["08:15:03 — wave: 4 bots dispatched", "08:15:12 — connection: 84 nodes linked", "08:15:18 — merge: calendar+invoice clusters fused", "08:15:24 — pipeline: inbox→leads routing active"],
   },
   {
-    id: "s3", label: "Peak activity",
+    id: "s3", label: "Peak throughput",
     nodes: makeNodes([
-      { name: "calendar", color: COLORS.magenta, count: 32, spread: 55 },
-      { name: "inbox", color: COLORS.cyan, count: 35, spread: 58 },
-      { name: "invoice", color: COLORS.purple, count: 22, spread: 48 },
-      { name: "outreach", color: COLORS.pink, count: 26, spread: 50 },
-      { name: "leads", color: COLORS.teal, count: 20, spread: 44 },
-      { name: "report", color: COLORS.orange, count: 18, spread: 42 },
+      { name: "calendar", color: COLORS.magenta, count: 150, spread: 75 },
+      { name: "inbox", color: COLORS.cyan, count: 170, spread: 80 },
+      { name: "invoice", color: COLORS.purple, count: 110, spread: 62 },
+      { name: "outreach", color: COLORS.pink, count: 120, spread: 68 },
+      { name: "leads", color: COLORS.teal, count: 100, spread: 58 },
+      { name: "report", color: COLORS.orange, count: 90, spread: 55 },
     ]),
-    links: [], metrics: { bots: 8, actions: 584, throughput: 1820, spend: 45.20 },
-    log: ["08:05:00 — all clusters active", "08:05:15 — throughput peak: 1820/min", "08:05:30 — cross-cluster fusion active", "08:05:45 — spend alert: $45.20"],
+    links: [], metrics: { bots: 13, actions: 512, throughput: 2140, spend: 42.60 },
+    log: ["08:30:01 — peak: 2140 actions/min", "08:30:05 — cluster: 6 groups merged", "08:30:12 — alert: invoice spike detected", "08:30:18 — auto: outreach batch dispatched"],
   },
   {
-    id: "s4", label: "Settling",
+    id: "s4", label: "Self-healing",
     nodes: makeNodes([
-      { name: "calendar", color: COLORS.magenta, count: 20, spread: 42 },
-      { name: "inbox", color: COLORS.cyan, count: 24, spread: 46 },
-      { name: "invoice", color: COLORS.purple, count: 16, spread: 38 },
-      { name: "outreach", color: COLORS.pink, count: 18, spread: 40 },
-      { name: "leads", color: COLORS.teal, count: 14, spread: 34 },
-      { name: "report", color: COLORS.orange, count: 12, spread: 32 },
+      { name: "calendar", color: COLORS.magenta, count: 130, spread: 70 },
+      { name: "inbox", color: COLORS.cyan, count: 150, spread: 75 },
+      { name: "invoice", color: COLORS.purple, count: 100, spread: 58 },
+      { name: "outreach", color: COLORS.pink, count: 110, spread: 62 },
+      { name: "leads", color: COLORS.teal, count: 90, spread: 52 },
+      { name: "report", color: COLORS.orange, count: 80, spread: 50 },
     ]),
-    links: [], metrics: { bots: 5, actions: 420, throughput: 1380, spend: 36.80 },
-    log: ["08:08:00 — bots returning to idle", "08:08:15 — clusters contracting", "08:08:30 — spend stabilizing", "08:08:45 — cycle complete"],
+    links: [], metrics: { bots: 10, actions: 380, throughput: 1680, spend: 33.60 },
+    log: ["08:45:02 — heal: bot restarted (inbox-triage)", "08:45:08 — reroute: invoice→calendar fallback", "08:45:14 — stable: all clusters reconnecting", "08:45:20 — optimize: 12% latency reduction"],
   },
 ];
-STAGES.forEach((s) => { s.links = makeLinks(s.nodes, 0.3 + STAGES.indexOf(s) * 0.15); });
 
-// ─── HUD components ────────────────────────────────────────────
+// Generate links after nodes exist (density scales with node count)
+STAGES.forEach((s) => {
+  s.links = makeLinks(s.nodes, s.nodes.length > 300 ? 0.25 : 0.35);
+});
 
-function RunLog({ lines }: { lines: string[] }) {
-  return (
-    <div className="sh-log">
-      <div className="sh-log-head">Run Log</div>
-      {lines.map((l, i) => (
-        <motion.div key={l} className="sh-log-line"
-          initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.08, duration: 0.3 }}>{l}</motion.div>
-      ))}
-    </div>
-  );
+// ─── Cluster center labels ──────────────────────────────────────
+
+const CLUSTER_LABELS: Record<string, { label: string; color: string }> = {
+  calendar: { label: "calendar sync", color: "#ff66aa" },
+  inbox: { label: "inbox triage", color: "#66ffff" },
+  invoice: { label: "invoice_run", color: "#a78bfa" },
+  outreach: { label: "outreach", color: "#f472b6" },
+  leads: { label: "people 4 people", color: "#5eead4" },
+  report: { label: "report build", color: "#fb923c" },
+};
+
+function clusterCenters(nodes: SN[]) {
+  const groups = [...new Set(nodes.map((n) => n.group))];
+  return groups.map((g) => {
+    const gn = nodes.filter((n) => n.group === g);
+    const cx = gn.reduce((s, n) => s + (n.fx ?? 0), 0) / gn.length;
+    const cy = gn.reduce((s, n) => s + (n.fy ?? 0), 0) / gn.length;
+    const cz = gn.reduce((s, n) => s + (n.fz ?? 0), 0) / gn.length;
+    return { group: g, x: cx, y: cy, z: cz, ...CLUSTER_LABELS[g] };
+  });
 }
 
-function AccessLedger({ stageIdx }: { stageIdx: number }) {
-  const stageData = [
-    [{ name: "google", pct: 30 }, { name: "stripe", pct: 20 }, { name: "notion", pct: 15 }, { name: "calendar", pct: 40 }, { name: "slack", pct: 10 }],
-    [{ name: "google", pct: 55 }, { name: "stripe", pct: 40 }, { name: "notion", pct: 30 }, { name: "calendar", pct: 65 }, { name: "slack", pct: 22 }],
-    [{ name: "google", pct: 78 }, { name: "stripe", pct: 62 }, { name: "notion", pct: 45 }, { name: "calendar", pct: 88 }, { name: "slack", pct: 34 }],
-    [{ name: "google", pct: 50 }, { name: "stripe", pct: 38 }, { name: "notion", pct: 28 }, { name: "calendar", pct: 55 }, { name: "slack", pct: 20 }],
-  ];
-  const data = stageData[stageIdx];
-  return (
-    <div className="sh-ledger">
-      <div className="sh-ledger-head">Access Ledger</div>
-      {data.map((a) => (
-        <div key={a.name} className="sh-ledger-row">
-          <span className="sh-ledger-name">{a.name}</span>
-          <div className="sh-ledger-track"><motion.div className="sh-ledger-fill" initial={{ width: 0 }} animate={{ width: `${a.pct}%` }} transition={{ duration: 1.2 }} /></div>
-          <span className="sh-ledger-pct">{a.pct}%</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ThroughputChart({ value }: { value: number }) {
-  const spark = useMemo(() => Array.from({ length: 20 }, (_, i) => value * (0.5 + Math.sin(i * 0.4) * 0.3 + Math.random() * 0.2)), [value]);
-  const max = Math.max(...spark);
-  return (
-    <div className="sh-throughput">
-      <div className="sh-throughput-head">Throughput</div>
-      <motion.div className="sh-throughput-value"
-        key={value} initial={{ scale: 1.1, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}>{value.toLocaleString()}</motion.div>
-      <div className="sh-throughput-sub">actions / min</div>
-      <svg viewBox="0 0 200 40" className="sh-throughput-spark">
-        <polyline points={spark.map((v, i) => `${(i / 19) * 200},${40 - (v / max) * 36}`).join(" ")} fill="none" stroke="#5eead4" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    </div>
-  );
-}
-
-function ActionHeat({ stageIdx }: { stageIdx: number }) {
-  const stageItems = [
-    [{ label: "calendar", value: 30, color: COLORS.magenta }, { label: "inbox", value: 45, color: COLORS.cyan }, { label: "invoice", value: 20, color: COLORS.purple }, { label: "outreach", value: 25, color: COLORS.pink }, { label: "leads", value: 15, color: COLORS.teal }],
-    [{ label: "calendar", value: 55, color: COLORS.magenta }, { label: "inbox", value: 70, color: COLORS.cyan }, { label: "invoice", value: 40, color: COLORS.purple }, { label: "outreach", value: 50, color: COLORS.pink }, { label: "leads", value: 30, color: COLORS.teal }],
-    [{ label: "calendar", value: 78, color: COLORS.magenta }, { label: "inbox", value: 92, color: COLORS.cyan }, { label: "invoice", value: 54, color: COLORS.purple }, { label: "outreach", value: 66, color: COLORS.pink }, { label: "leads", value: 41, color: COLORS.teal }],
-    [{ label: "calendar", value: 50, color: COLORS.magenta }, { label: "inbox", value: 60, color: COLORS.cyan }, { label: "invoice", value: 35, color: COLORS.purple }, { label: "outreach", value: 42, color: COLORS.pink }, { label: "leads", value: 28, color: COLORS.teal }],
-  ];
-  const items = stageItems[stageIdx];
-  return (
-    <div className="sh-heat">
-      <div className="sh-heat-head">Action Heat</div>
-      {items.map((it) => (
-        <div key={it.label} className="sh-heat-row">
-          <span className="sh-heat-label">{it.label}</span>
-          <div className="sh-heat-track"><motion.div className="sh-heat-fill" style={{ background: it.color }} initial={{ width: 0 }} animate={{ width: `${it.value}%` }} transition={{ duration: 1 }} /></div>
-        </div>
-      ))}
-    </div>
-  );
-}
+// ─── HUD Panel Components ─────────────────────────────────────
 
 function BlastRadius({ stageIdx }: { stageIdx: number }) {
   const dims = ["scope", "speed", "cost", "risk", "impact"];
-  const stageValues = [
-    [0.4, 0.5, 0.2, 0.2, 0.3],
-    [0.6, 0.7, 0.35, 0.25, 0.6],
-    [0.85, 0.9, 0.6, 0.5, 0.95],
-    [0.55, 0.6, 0.4, 0.3, 0.7],
+  const values = [
+    [40, 55, 30, 25, 60],
+    [60, 70, 50, 40, 75],
+    [80, 85, 70, 55, 90],
+    [65, 75, 55, 45, 80],
   ];
-  const values = stageValues[stageIdx];
-  const cx = 50, cy = 50, r = 38;
-  const points = dims.map((_, i) => {
+  const v = values[stageIdx] ?? values[0];
+  const cx = 60, cy = 55, r = 38;
+  const pts = v.map((val, i) => {
     const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
-    return `${cx + Math.cos(a) * r * values[i]},${cy + Math.sin(a) * r * values[i]}`;
+    return `${cx + Math.cos(a) * r * val / 100},${cy + Math.sin(a) * r * val / 100}`;
   }).join(" ");
+
   return (
-    <div className="sh-blast">
-      <div className="sh-blast-head">Blast Radius</div>
-      <svg viewBox="0 0 100 100" className="sh-blast-svg">
+    <div className="sg-hud-panel">
+      <div className="sg-hud-label">BLAST RADIUS</div>
+      <svg width="120" height="110" viewBox="0 0 120 110">
+        {[20, 40, 60, 80].map((ring) => (
+          <polygon key={ring} points={dims.map((_, i) => {
+            const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
+            return `${cx + Math.cos(a) * r * ring / 100},${cy + Math.sin(a) * r * ring / 100}`;
+          }).join(" ")} fill="none" stroke="rgba(159,208,240,.12)" strokeWidth="0.5" />
+        ))}
         <motion.polygon
-          points={points} fill="rgba(94,234,212,.15)" stroke="#5eead4" strokeWidth="1"
-          animate={{ points }} transition={{ duration: 1.2, ease: "easeOut" }}
+          points={pts}
+          fill="rgba(99,225,197,.12)"
+          stroke="#63e1c5"
+          strokeWidth="1.5"
+          animate={{ points: pts }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
         />
         {dims.map((d, i) => {
           const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
-          return <text key={d} x={cx + Math.cos(a) * (r + 10)} y={cy + Math.sin(a) * (r + 10)} textAnchor="middle" fill="#a9c9db" fontSize="6" fontFamily="monospace">{d}</text>;
+          return <text key={d} x={cx + Math.cos(a) * (r + 14)} y={cy + Math.sin(a) * (r + 14)} fill="#8aa4b8" fontSize="6" textAnchor="middle" dominantBaseline="middle">{d}</text>;
         })}
       </svg>
     </div>
   );
 }
 
-function BotStatusList({ stageIdx }: { stageIdx: number }) {
-  const stageBots = [
-    [
-      { name: "calendar-sync", status: "active" as const, tasks: 6 },
-      { name: "inbox-triage", status: "active", tasks: 4 },
-      { name: "invoice-run", status: "idle", tasks: 0 },
-      { name: "lead-scrape", status: "active", tasks: 3 },
-    ],
-    [
-      { name: "calendar-sync", status: "active" as const, tasks: 12 },
-      { name: "inbox-triage", status: "active", tasks: 8 },
-      { name: "invoice-run", status: "active", tasks: 4 },
-      { name: "lead-scrape", status: "active", tasks: 5 },
-    ],
-    [
-      { name: "calendar-sync", status: "active" as const, tasks: 18 },
-      { name: "inbox-triage", status: "active", tasks: 14 },
-      { name: "invoice-run", status: "active", tasks: 9 },
-      { name: "lead-scrape", status: "active", tasks: 8 },
-      { name: "report-build", status: "active", tasks: 5 },
-      { name: "outreach", status: "active", tasks: 3 },
-    ],
-    [
-      { name: "calendar-sync", status: "active" as const, tasks: 8 },
-      { name: "inbox-triage", status: "active", tasks: 5 },
-      { name: "invoice-run", status: "idle", tasks: 0 },
-      { name: "lead-scrape", status: "active", tasks: 2 },
-    ],
+function ActionHeat({ stageIdx }: { stageIdx: number }) {
+  const bars = [
+    { label: "calendar", vals: [30, 55, 78, 50] },
+    { label: "inbox", vals: [45, 70, 90, 65] },
+    { label: "invoice", vals: [20, 40, 65, 45] },
+    { label: "outreach", vals: [35, 60, 82, 55] },
   ];
-  const bots = stageBots[stageIdx];
+  const max = 100;
   return (
-    <div className="sh-bots">
-      <div className="sh-bots-head">Bot Status</div>
-      {bots.map((b) => (
-        <div key={b.name} className="sh-bot-row">
-          <span className={`sh-bot-dot ${b.status === "active" ? "active" : ""}`} />
-          <span className="sh-bot-name">{b.name}</span>
-          <span className="sh-bot-tasks">{b.tasks > 0 ? `${b.tasks} tasks` : "idle"}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SpendGauge({ value, max }: { value: number; max: number }) {
-  const pct = Math.min(1, value / max);
-  const c = 2 * Math.PI * 28;
-  return (
-    <div className="sh-spend">
-      <div className="sh-spend-head">Spend</div>
-      <svg viewBox="0 0 70 70" className="sh-spend-gauge">
-        <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(150,170,200,.15)" strokeWidth="5" />
-        <motion.circle cx="35" cy="35" r="28" fill="none" stroke="#c98a12" strokeWidth="5" strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={c * (1 - pct)} transform="rotate(-90 35 35)"
-          initial={false} animate={{ strokeDashoffset: c * (1 - pct) }} transition={{ duration: 1.2, ease: "easeOut" }} />
-        <text x="35" y="33" textAnchor="middle" fill="#eaf3f9" fontSize="11" fontWeight="700" fontFamily="Georgia, serif">${value.toFixed(2)}</text>
-        <text x="35" y="44" textAnchor="middle" fill="#a9c9db" fontSize="7" fontFamily="monospace">of ${max.toFixed(2)}</text>
+    <div className="sg-hud-panel">
+      <div className="sg-hud-label">ACTION HEAT</div>
+      <svg width="130" height="70" viewBox="0 0 130 70">
+        {bars.map((b, i) => {
+          const x = 8 + i * 30;
+          const h = (b.vals[stageIdx] ?? 30) / max * 50;
+          return (
+            <g key={b.label}>
+              <rect x={x} y={55 - h} width="20" height={h} rx="3" fill={`rgba(251,146,60,${0.5 + (stageIdx * 0.12)})`} />
+              <text x={x + 10} y={66} fill="#8aa4b8" fontSize="5.5" textAnchor="middle">{b.label.slice(0, 4)}</text>
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
 }
 
-// ─── 3D Canvas ─────────────────────────────────────────────────
-
-function Swarm3DCanvas({ stage, playing }: { stage: typeof STAGES[0]; playing: boolean }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const fgRef = useRef<any>(null);
-  const angleRef = useRef(0);
-
-  // Custom node: glowing sphere + halo (with pulsing via uniform time)
-  const nodeThreeObject = useMemo(() => (node: SN) => {
-    const g = new THREE.Group();
-    const main = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5 + node.val * 0.25, 16, 16),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color(node.color), transparent: true, opacity: 0.85 }),
-    );
-    g.add(main);
-    const glow = new THREE.Mesh(
-      new THREE.SphereGeometry(1.0 + node.val * 0.4, 16, 16),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color(node.color), transparent: true, opacity: 0.1 }),
-    );
-    g.add(glow);
-    return g;
-  }, []);
-
-  // Custom link: simple line
-  const linkThreeObject = useMemo(() => () => {
-    const geo = new THREE.BufferGeometry();
-    const mat = new THREE.LineBasicMaterial({ color: 0x8ab4f8, transparent: true, opacity: 0.18 });
-    return new THREE.Line(geo, mat);
-  }, []);
-
-  const linkPositionUpdate = useMemo(() => (_line: any, coords: { start: { x: number; y: number; z: number }; end: { x: number; y: number; z: number } }) => {
-    const geo = _line.geometry as THREE.BufferGeometry;
-    const pos = new Float32Array([coords.start.x, coords.start.y, coords.start.z, coords.end.x, coords.end.y, coords.end.z]);
-    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  }, []);
-
-  // Camera: after engine settles, zoom to fit the graph
-  const handleEngineStop = useMemo(() => () => {
-    const fg = fgRef.current;
-    if (!fg) return;
-    const nodes = stage.nodes;
-    if (!nodes.length) return;
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
-    nodes.forEach((n) => {
-      const x = n.fx ?? 0, y = n.fy ?? 0, z = n.fz ?? 0;
-      minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-      minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-      minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
-    });
-    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
-    const spanX = maxX - minX, spanY = maxY - minY;
-    const dist = Math.max(spanX, spanY) * 1.2 + 50;
-    fg.cameraPosition({ x: cx + dist * 0.3, y: cy + dist * 0.15, z: cz + dist }, undefined, 1500);
-  }, [stage]);
-
-  // Continuous camera orbit when playing
-  useEffect(() => {
-    if (!playing) return;
-    let raf: number;
-    const orbit = () => {
-      const fg = fgRef.current;
-      if (!fg) { raf = requestAnimationFrame(orbit); return; }
-      angleRef.current += 0.003;
-      const a = angleRef.current;
-      const nodes = stage.nodes;
-      if (!nodes.length) { raf = requestAnimationFrame(orbit); return; }
-      // Compute center from node positions
-      let sx = 0, sy = 0, sz = 0;
-      nodes.forEach((n) => { sx += n.fx ?? 0; sy += n.fy ?? 0; sz += n.fz ?? 0; });
-      const cx = sx / nodes.length, cy = sy / nodes.length, cz = sz / nodes.length;
-      // Orbit radius based on spread
-      let mxx = 0, myy = 0;
-      nodes.forEach((n) => { mxx = Math.max(mxx, Math.abs((n.fx ?? 0) - cx)); myy = Math.max(myy, Math.abs((n.fy ?? 0) - cy)); });
-      const r = Math.max(mxx, myy) * 1.4 + 40;
-      const camX = cx + Math.cos(a) * r;
-      const camY = cy + Math.sin(a * 0.7) * r * 0.3;
-      const camZ = cz + Math.sin(a) * r;
-      fg.cameraPosition({ x: camX, y: camY, z: camZ }, { x: cx, y: cy, z: cz }, 0);
-      raf = requestAnimationFrame(orbit);
-    };
-    raf = requestAnimationFrame(orbit);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, stage]);
+function AccessLedger({ stageIdx }: { stageIdx: number }) {
+  const services = ["google", "stripe", "notion", "calendar", "slack"];
+  const percentages = [
+    [30, 20, 15, 25, 10],
+    [55, 35, 25, 40, 18],
+    [78, 50, 40, 60, 30],
+    [50, 30, 20, 35, 15],
+  ];
+  const pcts = percentages[stageIdx] ?? percentages[0];
 
   return (
-    <div className="sg-canvas-wrap" ref={containerRef}>
-      <ForceGraph3D
-        ref={fgRef}
-        graphData={{ nodes: stage.nodes, links: stage.links }}
-        backgroundColor="#0a0a0f"
-        showNavInfo={false}
-        width={undefined}
-        height={undefined}
-        nodeThreeObject={nodeThreeObject}
-        linkThreeObject={linkThreeObject}
-        linkPositionUpdate={linkPositionUpdate}
-        linkDirectionalParticles={4}
-        linkDirectionalParticleWidth={2}
-        linkDirectionalParticleSpeed={0.008}
-        linkDirectionalParticleColor={() => "#5eead4"}
-        linkOpacity={0.25}
-        nodeOpacity={0.9}
-        d3VelocityDecay={0.3}
-        warmupTicks={30}
-        cooldownTicks={100}
-        enablePointerInteraction
-        enableNavigationControls
-        onEngineStop={handleEngineStop}
-      />
+    <div className="sg-hud-panel">
+      <div className="sg-hud-label">ACCESS LEDGER</div>
+      <div className="sg-hud-bars">
+        {services.map((svc, i) => (
+          <div key={svc} className="sg-hud-bar-row">
+            <span className="sg-hud-bar-label">{svc}</span>
+            <div className="sg-hud-bar-track">
+              <motion.div
+                className="sg-hud-bar-fill"
+                animate={{ width: `${pcts[i]}%` }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              />
+            </div>
+            <span className="sg-hud-bar-val">{pcts[i]}%</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-// ─── Main ──────────────────────────────────────────────────────
+function ThroughputChart({ stageIdx }: { stageIdx: number }) {
+  const vals = [847, 1240, 2140, 1680];
+  const v = vals[stageIdx] ?? 847;
+  return (
+    <div className="sg-hud-panel">
+      <div className="sg-hud-label">THROUGHPUT</div>
+      <motion.div
+        className="sg-hud-big"
+        key={v}
+        initial={{ scale: 1.15, opacity: 0.6 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        {v.toLocaleString()}
+      </motion.div>
+      <div className="sg-hud-unit">actions / min</div>
+    </div>
+  );
+}
+
+function RunLog({ lines }: { lines: string[] }) {
+  return (
+    <div className="sg-hud-panel sg-hud-log">
+      <div className="sg-hud-label">RUN LOG</div>
+      <div className="sg-hud-log-lines">
+        {lines.map((l, i) => (
+          <div key={i} className="sg-hud-log-line">{l}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BotStatus({ stageIdx }: { stageIdx: number }) {
+  const bots = [
+    { name: "calendar-sync", status: "active" },
+    { name: "inbox-triage", status: "active" },
+    { name: "invoice-run", status: "active" },
+    { name: "lead-scrape", status: "active" },
+    { name: "outreach-blast", status: stageIdx >= 1 ? "active" : "pending" },
+    { name: "report-build", status: stageIdx >= 2 ? "active" : "pending" },
+  ];
+  return (
+    <div className="sg-hud-panel">
+      <div className="sg-hud-label">BOT STATUS</div>
+      <div className="sg-hud-bots">
+        {bots.map((b) => (
+          <div key={b.name} className="sg-hud-bot">
+            <span className={`sg-hud-dot ${b.status === "active" ? "on" : "off"}`} />
+            <span>{b.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ────────────────────────────────────────────
 
 export default function SwarmGraph() {
+  const fgRef = useRef<any>(null);
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const current = STAGES[index];
+  const [playing, setPlaying] = useState(false);
+  const [orbitAngle, setOrbitAngle] = useState(0);
+  const stage = STAGES[index];
 
-  const next = () => setIndex((i) => (i + 1) % STAGES.length);
+  // Camera auto-fit on engine stop
+  const onEngineStop = () => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    const nodes = stage.nodes;
+    if (nodes.length === 0) return;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    nodes.forEach((n: SN) => {
+      const x = n.fx ?? 0, y = n.fy ?? 0, z = n.fz ?? 0;
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+      if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+    });
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
+    const dist = Math.max(maxX - minX, maxY - minY, maxZ - minZ) * 1.8;
+    fg.cameraPosition({ x: cx + dist * 0.4, y: cy + dist * 0.3, z: cz + dist * 2.2 }, { x: cx, y: cy, z: cz }, 1500);
+  };
 
+  // Auto-play
   useEffect(() => {
     if (!playing) return;
-    timer.current = setTimeout(next, 5000);
-    return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [playing, next, index]);
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % STAGES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [playing]);
+
+  // Continuous orbit when playing
+  useEffect(() => {
+    if (!playing) return;
+    let raf: number;
+    const tick = () => {
+      setOrbitAngle((a) => a + 0.003);
+      const fg = fgRef.current;
+      if (fg) {
+        const nodes = stage.nodes;
+        let cx = 0, cy = 0, cz = 0;
+        nodes.forEach((n: SN) => { cx += n.fx ?? 0; cy += n.fy ?? 0; cz += n.fz ?? 0; });
+        cx /= nodes.length; cy /= nodes.length; cz /= nodes.length;
+        const dist = 300;
+        fg.cameraPosition(
+          { x: cx + Math.cos(orbitAngle) * dist, y: cy + Math.sin(orbitAngle * 0.7) * dist * 0.5, z: cz + Math.sin(orbitAngle) * dist * 1.5 },
+          { x: cx, y: cy, z: cz },
+          100,
+        );
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, orbitAngle, stage]);
+
+  // Re-fit camera on stage change
+  useEffect(() => { onEngineStop(); }, [index]);
+
+  // Custom node rendering: glowing sphere with aura
+  const nodeThreeObject = useMemo(() => {
+    return (node: any) => {
+      const group = new THREE.Group();
+      const size = node.val ?? 1;
+      // Core sphere
+      const geo = new THREE.SphereGeometry(size * 1.2, 12, 12);
+      const mat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.85 });
+      group.add(new THREE.Mesh(geo, mat));
+      // Glow aura
+      const glowGeo = new THREE.SphereGeometry(size * 2.5, 12, 12);
+      const glowMat = new THREE.MeshBasicMaterial({ color: node.color, transparent: true, opacity: 0.12 });
+      group.add(new THREE.Mesh(glowGeo, glowMat));
+      return group;
+    };
+  }, []);
 
   return (
     <div className="sg-shell">
-      <div className="sg-graph-area">
-        <Swarm3DCanvas stage={current} playing={playing} />
-
-        <motion.div className="sg-stage-label" key={current.id}
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }} transition={{ duration: 0.6 }}>
-          <span className="sg-stage-id">{current.id.toUpperCase()}</span>
-          <span className="sg-stage-title">{current.label}</span>
-        </motion.div>
-
-        <div className="sg-controls">
-          <button type="button" className="sg-play" onClick={() => setPlaying((p) => !p)}>
-            {playing ? "❚❚" : "▶"}
-          </button>
-          {STAGES.map((s, i) => (
-            <button key={s.id} type="button"
-              className={`sg-step ${i === index ? "is-active" : ""} ${i < index ? "is-done" : ""}`}
-              onClick={() => { setIndex(i); setPlaying(false); }}>
-              {i < index ? "✓" : String(i + 1)}
-            </button>
-          ))}
+      {/* ── Top status bar ── */}
+      <div className="sg-top-bar">
+        <div className="sg-top-left">
+          <span className="sg-top-logo">SYS</span>
+          <span className="sg-top-sep">·</span>
+          <span className="sg-top-nav">graph-overview</span>
+          <span className="sg-top-nav">labels</span>
+          <span className="sg-top-nav">physics</span>
+        </div>
+        <div className="sg-top-right">
+          <span className="sg-top-metric">ACTIONS <b>{stage.metrics.actions}</b></span>
+          <span className="sg-top-metric">NODES <b>{stage.nodes.length}</b></span>
+          <span className="sg-top-metric">EDGES <b>{stage.links.length}</b></span>
+          <span className="sg-top-sep">·</span>
+          <span className="sg-top-status">pending <b>{stage.metrics.bots}</b></span>
         </div>
       </div>
 
-      <div className="sg-hud">
-        <RunLog lines={current.log} />
+      {/* ── Graph canvas ── */}
+      <div className="sg-graph-area">
+        <ForceGraph3D
+          ref={fgRef}
+          graphData={stage}
+          nodeVal={(n: any) => n.val}
+          nodeColor={(n: any) => n.color}
+          nodeOpacity={0.92}
+          nodeThreeObject={nodeThreeObject}
+          linkColor={() => "rgba(159,208,240,.18)"}
+          linkOpacity={0.25}
+          linkWidth={0.4}
+          linkCurvature={0.15}
+          backgroundColor="#000000"
+          width={1500}
+          height={600}
+          d3VelocityDecay={0.3}
+          warmupTicks={40}
+          cooldownTicks={0}
+          enablePointerInteraction={false}
+        />
+        {/* Floating cluster labels — positioned at graph center estimates */}
+        <div className="sg-cluster-labels">
+          {clusterCenters(stage.nodes).map((c) => (
+            <div
+              key={c.group}
+              className="sg-cluster-label"
+              style={{ left: `${50 + (c.x / 80) * 30}%`, top: `${50 + (c.y / 80) * 25}%`, color: c.color }}
+            >
+              {c.label}
+            </div>
+          ))}
+        </div>
+        {/* Stage label */}
+        <div className="sg-stage-label">
+          <span className="sg-stage-idx">{String(index + 1).padStart(2, "0")}</span>
+          <span className="sg-stage-name">{stage.label}</span>
+        </div>
+      </div>
+
+      {/* ── Bottom HUD strip ── */}
+      <div className="sg-hud-strip">
+        <RunLog lines={stage.log} />
         <AccessLedger stageIdx={index} />
-        <ThroughputChart value={current.metrics.throughput} />
-        <ActionHeat stageIdx={index} />
         <BlastRadius stageIdx={index} />
-        <BotStatusList stageIdx={index} />
-        <SpendGauge value={current.metrics.spend} max={60} />
+        <ActionHeat stageIdx={index} />
+        <ThroughputChart stageIdx={index} />
+        <BotStatus stageIdx={index} />
+      </div>
+
+      {/* ── Controls ── */}
+      <div className="sg-controls">
+        <button className="sg-ctrl-btn" onClick={() => { setPlaying(!playing); }}>
+          {playing ? "⏸" : "▶"}
+        </button>
+        {STAGES.map((s, i) => (
+          <button
+            key={s.id}
+            className={`sg-ctrl-btn ${i === index ? "active" : ""}`}
+            onClick={() => { setIndex(i); setPlaying(false); }}
+          >
+            {String(i + 1).padStart(2, "0")}
+          </button>
+        ))}
       </div>
     </div>
   );
