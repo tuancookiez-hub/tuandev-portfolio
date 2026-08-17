@@ -1,13 +1,11 @@
 "use client";
 /**
  * Level 5 — 3D knowledge graph (GitNexus-inspired).
- * Community-colored clusters, force layout, typed edges, signal pulses.
- * Lazy-loaded.
+ * ForceGraph3D standalone (no R3F Canvas wrapper).
+ * Community-colored clusters, signal particles, orbital camera, full HUD.
  */
 import { useMemo, useState, useRef, useCallback, useEffect } from "react";
 import type { FC } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Environment } from "@react-three/drei";
 import ForceGraph3D from "react-force-graph-3d";
 import * as THREE from "three";
 
@@ -86,7 +84,6 @@ function buildStage(si: number) {
       cids.push(id);
     }
     idsByCluster.push(cids);
-    // Intra-cluster edges
     for (let i = 0; i < cids.length; i++) {
       for (let e = 0; e < 1 + Math.floor(Math.random() * 3); e++) {
         const j = Math.floor(Math.random() * cids.length);
@@ -97,7 +94,6 @@ function buildStage(si: number) {
       }
     }
   }
-  // Inter-cluster edges
   for (let i = 0; i < idsByCluster.length; i++) {
     for (let j = i + 1; j < idsByCluster.length; j++) {
       if (Math.random() > 0.4) {
@@ -113,25 +109,23 @@ function buildStage(si: number) {
   return { nodes, links };
 }
 
-/* ── Three.js node object (glowing sphere with aura) ── */
+/* ── Node object (glowing sphere with aura) ── */
 const NODE_OBJ = (node: any) => {
   const group = new THREE.Group();
   const size = node.val ?? 1;
   const col = new THREE.Color(node.color || "#6366f1");
-  const core = new THREE.Mesh(
+  group.add(new THREE.Mesh(
     new THREE.SphereGeometry(size * 1.4, 10, 10),
     new THREE.MeshBasicMaterial({ color: col.clone().multiplyScalar(1.6) })
-  );
-  group.add(core);
-  const aura = new THREE.Mesh(
+  ));
+  group.add(new THREE.Mesh(
     new THREE.SphereGeometry(size * 3.5, 8, 8),
     new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.10, depthWrite: false, blending: THREE.AdditiveBlending })
-  );
-  group.add(aura);
+  ));
   return group;
 };
 
-/* ── Three.js link object (curved tube) ── */
+/* ── Link object (curved tube) ── */
 const LINK_OBJ = (link: any) => {
   const src = link.source, tgt = link.target;
   if (!src?.x && src?.x !== 0 || !tgt?.x && tgt?.x !== 0) return null as any;
@@ -140,41 +134,10 @@ const LINK_OBJ = (link: any) => {
     new THREE.Vector3((src.x + tgt.x) / 2 + (Math.random() - 0.5) * 30, (src.y + tgt.y) / 2 + (Math.random() - 0.5) * 30, (src.z + tgt.z) / 2 + (Math.random() - 0.5) * 30),
     new THREE.Vector3(tgt.x, tgt.y, tgt.z),
   );
-  const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color(link.color || "#6366f1"), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
-  return new THREE.Mesh(new THREE.TubeGeometry(curve, 10, 0.12, 4, false), mat);
-};
-
-/* ── Signal pulse particles ── */
-const Pulses: FC<{ links: any[] }> = ({ links }) => {
-  const ref = useRef<THREE.Points>(null);
-  const phase = useRef(Math.random() * 1000);
-  useEffect(() => {
-    if (!ref.current) return;
-    const pts = links.slice(0, 200).map((l: any) => {
-      const s = l.source, t = l.target;
-      const p = Math.random();
-      return new THREE.Vector3(
-        s.x + (t.x - s.x) * p + (Math.random() - 0.5) * 15,
-        s.y + (t.y - s.y) * p + (Math.random() - 0.5) * 15,
-        s.z + (t.z - s.z) * p + (Math.random() - 0.5) * 15,
-      );
-    });
-    ref.current.geometry = new THREE.BufferGeometry().setFromPoints(pts);
-    ref.current.material = new THREE.PointsMaterial({ size: 1.2, color: "#9fd0f0", transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false });
-  }, [links]);
-  useFrame(({ clock }: any) => {
-    if (!ref.current) return;
-    const pos = ref.current.geometry.getAttribute("position") as THREE.BufferAttribute;
-    if (!pos) return;
-    const t = (clock.elapsedTime + phase.current) * 0.03;
-    for (let i = 0; i < pos.count; i++) {
-      pos.array[i * 3 + 1] += Math.sin(t + i * 0.7) * 0.02;
-      pos.array[i * 3 + 2] += Math.cos(t + i * 0.5) * 0.015;
-    }
-    pos.needsUpdate = true;
-    (ref.current.material as THREE.PointsMaterial).opacity = 0.45 + 0.15 * Math.sin(t * 0.5);
-  });
-  return <points ref={ref} frustumCulled={false} /> as any;
+  return new THREE.Mesh(
+    new THREE.TubeGeometry(curve, 10, 0.12, 4, false),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(link.color || "#6366f1"), transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false })
+  );
 };
 
 /* ── HUD mini-components ── */
@@ -270,16 +233,23 @@ const SwarmGraph: FC = () => {
       </div>
 
       <div className="sg-graph-area">
-        <Canvas gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }} camera={{ fov: 50, near: 0.1, far: 10000, position: [0, 40, R] }} style={{ background: "#000" }} dpr={[1, 2]}>
-          <ambientLight intensity={0.15} />
-          <ForceGraph3D ref={fgRef} graphData={{ nodes, links }} nodeThreeObject={NODE_OBJ} linkThreeObject={LINK_OBJ}
-            linkDirectionalParticles={3} linkDirectionalParticleWidth={1.8} linkDirectionalParticleSpeed={0.008}
-            linkDirectionalParticleColor={() => "#9fd0f0"}
-            d3VelocityDecay={0.3} warmupTicks={60} cooldownTicks={0} enablePointerInteraction={false} />
-          <Pulses links={links as any} />
-          <Environment preset="night" />
-          <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
-        </Canvas>
+        <ForceGraph3D
+          ref={fgRef}
+          graphData={{ nodes, links }}
+          nodeThreeObject={NODE_OBJ}
+          linkThreeObject={LINK_OBJ}
+          linkDirectionalParticles={3}
+          linkDirectionalParticleWidth={1.8}
+          linkDirectionalParticleSpeed={0.008}
+          linkDirectionalParticleColor={() => "#9fd0f0"}
+          backgroundColor="#000000"
+          d3VelocityDecay={0.3}
+          warmupTicks={60}
+          cooldownTicks={0}
+          enablePointerInteraction={false}
+          width={undefined}
+          height={undefined}
+        />
 
         {/* Floating cluster labels */}
         <div className="sg-cluster-labels">
@@ -315,8 +285,6 @@ const SwarmGraph: FC = () => {
       <button className="sg-play-btn" onClick={() => setPlaying(p => !p)}>
         {playing ? "❚❚" : "▶"}
       </button>
-
-      {/* Hover tooltip */}
     </div>
   );
 };
