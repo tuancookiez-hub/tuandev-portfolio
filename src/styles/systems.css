@@ -1097,7 +1097,7 @@ text.ax-v {
 
 .kv-canvas {
   position: relative;
-  height: clamp(380px, 56vh, 560px);
+  height: clamp(420px, 62vh, 620px);
   border: 1px solid rgba(167,139,250,.18);
   border-radius: 16px;
   background: #0a0a0f;
@@ -1119,16 +1119,16 @@ text.ax-v {
 .kv-node {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 16px 9px 10px;
-  min-width: 132px;
-  border-radius: 12px;
+  gap: 8px;
+  padding: 8px 12px 8px 8px;
+  min-width: 118px;
+  border-radius: 10px;
   border: 1px solid rgba(148,163,184,.22);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   transition: box-shadow 480ms, border-color 480ms, transform 280ms;
 }
-.kv-node.is-fused { min-width: 148px; }
+.kv-node.is-fused { min-width: 128px; }
 .kv-node:hover { transform: translateY(-2px); }
 .kv-node-chip { width: 8px; height: 8px; border-radius: 99px; flex-shrink: 0; }
 .kv-node-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -1160,14 +1160,14 @@ text.ax-v {
 
 .kv-metrics {
   position: absolute; z-index: 10;
-  right: 16px; bottom: 16px;
+  right: 12px; bottom: 12px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(88px, 1fr));
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
   gap: 8px;
-  min-width: 300px;
-  padding: 12px;
+  min-width: 0;
+  padding: 10px 12px;
   border: 1px solid rgba(167,139,250,.2);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgba(8,8,14,.78);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
@@ -1179,7 +1179,7 @@ text.ax-v {
 @media (max-width: 720px) {
   .kv-metrics { left: 10px; right: 10px; min-width: 0; grid-template-columns: repeat(3, 1fr); padding: 10px; }
   .kv-metric b { font-size: 16px; }
-  .kv-canvas { height: 340px; }
+  .kv-canvas { height: 380px; }
   .kv-player { gap: 6px; }
   .kv-play, .kv-next, .kv-step { min-width: 28px; height: 28px; }
   .kv-label { top: 10px; left: 10px; }

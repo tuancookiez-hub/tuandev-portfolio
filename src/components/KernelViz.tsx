@@ -89,9 +89,9 @@ function ParticleEdge({
 const nodeTypes = { op: OpNode };
 const edgeTypes = { particle: ParticleEdge };
 
-function fit(inst: ReactFlowInstance | null) {
+function frame(inst: ReactFlowInstance | null, wide: boolean) {
   if (!inst) return;
-  inst.fitView({ padding: 0.18, duration: 700, minZoom: 0.35, maxZoom: 1.15 });
+  inst.setViewport(wide ? { x: 24, y: 78, zoom: 0.94 } : { x: 10, y: 110, zoom: 0.58 }, { duration: 420 });
 }
 
 export default function KernelViz() {
@@ -117,7 +117,7 @@ export default function KernelViz() {
     const s = PASSES[index];
     setNodes(s.nodes);
     setEdges(s.edges);
-    const t = window.setTimeout(() => fit(rf.current), 40);
+    const t = window.setTimeout(() => frame(rf.current, window.innerWidth >= 760), 40);
     return () => window.clearTimeout(t);
   }, [index, setEdges, setNodes]);
 
@@ -165,10 +165,11 @@ export default function KernelViz() {
           defaultEdgeOptions={{ type: "particle" }}
           onInit={(inst) => {
             rf.current = inst as unknown as ReactFlowInstance;
-            fit(inst as unknown as ReactFlowInstance);
+            frame(inst as unknown as ReactFlowInstance, window.innerWidth >= 760);
           }}
-          minZoom={0.25}
-          maxZoom={1.4}
+          minZoom={0.45}
+          maxZoom={1.2}
+          defaultViewport={{ x: 24, y: 78, zoom: 0.94 }}
           proOptions={{ hideAttribution: true }}
           nodesConnectable={false}
           elementsSelectable={false}

@@ -203,8 +203,8 @@ export default function SystemsWorld({
             <div ref={l4} className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection · reporting · L4</span>
-                <h2>Four pages. No download.</h2>
-                <p>A flip-book PDF rendered inline — the way a client reads their inspection report on a business site. Cover, summary, findings, and timeline.</p>
+                <h2>The report, as a client reads it.</h2>
+                <p>Cover, summary, findings, timeline.</p>
               </header>
               <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
             </div>
