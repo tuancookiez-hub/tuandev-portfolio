@@ -74,9 +74,8 @@
   top: 24px;
   left: 24px;
   color: #dfe4ff;
-  background: rgba(9, 11, 26, .5);
+  background: #090b1a;
   border-color: rgba(158, 172, 255, .3);
-  backdrop-filter: blur(10px);
 }
 .creative-return:hover { background: rgba(26, 32, 66, .7); }
 
@@ -254,8 +253,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(2, 3, 9, .9);
-  backdrop-filter: blur(18px);
+  background: rgba(2, 3, 9, .94);
   pointer-events: auto;
 }
 .creative-player-shell {
@@ -339,9 +337,8 @@
   padding: 14px 18px;
   border: 1px solid rgba(255, 209, 132, .26);
   border-radius: 4px 20px 4px 20px;
-  background: rgba(5, 7, 18, .72);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .28);
+  background: #050712;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, .28);
   pointer-events: none;
   transform: translateX(-50%);
 }
@@ -640,8 +637,7 @@
     padding: 12px;
     border: 1px solid rgba(170, 182, 255, .2);
     border-radius: 4px 18px 4px 18px;
-    background: rgba(5, 7, 18, .72);
-    backdrop-filter: blur(12px);
+    background: #050712;
   }
   .bh-overview span { text-align: left; display: flex; align-items: center; gap: 7px; font-size: 8px; }
   .bh-markers > i { width: 23px; height: 23px; font-size: 8px; }

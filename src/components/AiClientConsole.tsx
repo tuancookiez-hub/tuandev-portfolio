@@ -141,11 +141,10 @@ export default function AiClientConsole() {
         </Panel>
         <motion.div
           className="acl-callout"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <span className="acl-callout-kicker">one client · many models</span>
           <h3>Plug the model in,<br />swap the provider later.</h3>
           <p>How AIClient2API works — a proxy that keeps the client stable while the pool of models rotates underneath.</p>
         </motion.div>

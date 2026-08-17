@@ -330,8 +330,7 @@
   color: rgba(255,255,255,.92);
   border: 1px solid rgba(255,255,255,.3);
   border-radius: 999px;
-  background: rgba(6,14,20,.5);
-  backdrop-filter: blur(8px);
+  background: #0b1420;
   font-size: 8px;
   font-weight: 750;
   letter-spacing: .13em;
@@ -357,100 +356,7 @@
 }
 .world[data-active="true"] .peek { opacity: 1; transform: none; }
 
-.peek-hospitality {
-  display: grid;
-  grid-template-rows: 16px 36px 1fr;
-  border-radius: 6px;
-  background: #fff9ec;
-  box-shadow: 0 23px 54px rgba(0,0,0,.3);
-  overflow: hidden;
-  transform: translateY(18px) scale(.94) rotate(-1deg);
-}
-.world[data-active="true"] .peek-hospitality { transform: rotate(-1deg); }
-.ph-utility {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 10px;
-  color: #f7fff8;
-  background: #214a38;
-  font-size: 5px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-.ph-utility i { width: 4px; height: 4px; border-radius: 50%; background: #8cdc75; }
-.ph-utility b { margin-left: auto; font-weight: 600; }
-.ph-utility em { font-style: normal; margin-left: 7px; }
-.ph-nav {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 10px;
-  color: #1e2a23;
-  border-bottom: 1px solid rgba(30,42,35,.13);
-  background: rgba(255,249,236,.91);
-  font-size: 5px;
-}
-.ph-brand { display: flex; align-items: baseline; gap: 5px; font: 14px/1 Georgia,serif; letter-spacing: -.05em; }
-.ph-brand span { color: #2f6b4f; font-size: 4px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
-.ph-nav nav { display: flex; gap: 8px; margin-left: auto; color: #1e2a23; font-size: 4px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
-.ph-cta { margin-left: auto; padding: 6px 9px; color: white; border-radius: 999px; background: #2f6b4f; font-size: 4px; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; font-style: normal; }
-.ph-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 10px 14px;
-  overflow: hidden;
-  background: #ddebc8;
-}
-.ph-kicker { color: #2f6b4f; font-size: 5px; font-weight: 800; letter-spacing: .19em; text-transform: uppercase; }
-.ph-title { font: 16px/1.05 Georgia,serif; letter-spacing: -.045em; color: #1e2a23; }
-.ph-title span { color: #2f6b4f; font-weight: 400; }
-.ph-line { max-width: 30ch; color: #526259; font-size: 5px; line-height: 1.5; }
-.ph-actions { display: flex; gap: 8px; margin-top: 3px; }
-.ph-actions i { padding: 4px 8px; color: white; border-radius: 999px; background: #2f6b4f; font-size: 4px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-style: normal; }
-.ph-actions .link { padding: 0 0 2px; color: #1e2a23; border-radius: 0; background: none; border-bottom: 1px solid; }
-.ph-sticker {
-  position: absolute;
-  right: 6%;
-  bottom: 16%;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  color: #1e2a23;
-  border-radius: 50%;
-  background: #f2a33a;
-  transform: rotate(8deg);
-  font: 7px/1.08 Georgia,serif;
-  text-align: center;
-  box-shadow: 0 4px 10px rgba(69,43,7,.14);
-}
-
-.peek-systems { top: 14%; height: 52%; display: grid; grid-template-columns: 34px 1fr; color: #edf5ff; border: 1px solid rgba(171,203,255,.42); border-radius: 8px; background: #071631; box-shadow: 0 28px 72px rgba(0,0,0,.48); }
-.peek-side { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 13px; background: #0e1932; }
-.peek-side b { display:grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#4d7dff;font-size:8px; }
-.peek-side i { width: 9px; height: 2px; border-radius: 8px; background: rgba(255,255,255,.28); }
-.peek-dashboard { display: grid; align-content: start; gap: 15px; padding: 15px; }
-.peek-dashboard > small { font: 8px var(--font-mono); color: #bdd0ef; }
-.peek-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
-.peek-stats b { display:grid;gap:4px;padding:10px;border:1px solid rgba(170,199,255,.25);border-radius:5px;background:#0d2145;font-size:18px; }
-.peek-stats small { color:#a9bfe1;font-size:7px;font-weight:600; }
-.peek-dashboard svg { width:100%; color:#5d8dff; }
-
-.peek-creative { display: grid; place-items: center; }
-.peek-orbit, .peek-core { position:absolute;left:50%;top:48%;border-radius:50%;transform:translate(-50%,-50%); }
-.peek-orbit { width:210px;height:210px;border:1px solid rgba(152,221,255,.42);animation:gateway-spin 12s linear infinite; }
-.peek-orbit:nth-child(2) { width:145px;height:145px;border-style:dashed;animation-direction:reverse;animation-duration:8s; }
-.peek-core { width:74px;height:74px;background:radial-gradient(circle at 35% 30%,#d4f7ff,#3b93e4 43%,#08234d);box-shadow:0 0 55px #5fbaff; }
-.peek-creative span { position:absolute;left:0;bottom:0;display:grid;gap:5px;max-width:250px;padding:14px 17px;border:1px solid rgba(155,220,255,.22);border-radius:6px;background:rgba(3,15,41,.76);box-shadow:0 16px 34px rgba(0,0,0,.24);backdrop-filter:blur(8px);color:white; }
-.peek-creative small { font:7px var(--font-mono);letter-spacing:.14em;color:#91d5ff; }
-.peek-creative b { font:21px/1.05 Georgia,serif; }
-.peek-creative em { font-size:8px;font-style:normal;color:#a8bfd6; }
-
-.peek-robotics { perspective:800px; }
+.peek-robotics { perspective: 800px; }
 .peek-robotics > i {
   --x: calc((var(--part) - 2) * 38px);
   position:absolute;
@@ -463,7 +369,7 @@
   transition:transform 800ms cubic-bezier(.22,1,.36,1);
 }
 .world[data-active="true"] .peek-robotics > i { transform:translate(calc(-50% + var(--x) * 1.38),-50%) rotate(calc(var(--part) * 22deg)); }
-.peek-robotics span { position:absolute;left:0;bottom:0;display:grid;gap:5px;min-width:220px;padding:13px 16px;border:1px solid rgba(178,216,232,.26);border-radius:5px;background:rgba(9,28,39,.82);box-shadow:0 15px 34px rgba(0,0,0,.3);backdrop-filter:blur(8px);color:white; }
+.peek-robotics span { position:absolute;left:0;bottom:0;display:grid;gap:5px;min-width:220px;padding:13px 16px;border:1px solid rgba(178,216,232,.26);border-radius:5px;background:#091c27;box-shadow:0 15px 34px rgba(0,0,0,.3);color:white; }
 .peek-robotics small { font:7px var(--font-mono);letter-spacing:.14em;color:#9ac6d8; }
 .peek-robotics b { font:21px Georgia,serif; }
 .peek-robotics em { color:#a6bec8;font-size:8px;font-style:normal; }

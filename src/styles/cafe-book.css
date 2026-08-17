@@ -87,14 +87,6 @@
 }
 .cafe-page-head i { font-weight: 500; font-style: normal; }
 
-.cafe-book-kicker {
-  margin-top: clamp(22px, 2.6vw, 34px);
-  color: #2f6b4f;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
 .cafe-page h3 { color: #1e2a23; font-family: Georgia, serif; }
 
 .cafe-page-profile > h3 {
@@ -219,13 +211,6 @@
   border-radius: 6px;
 }
 .cafe-cover-inner { position: relative; z-index: 1; display: grid; justify-items: center; gap: 18px; }
-.cafe-cover-kicker {
-  color: #d8e9d2;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-}
 .cafe-cover-inner h3 {
   color: #fffdf7;
   font: clamp(38px, 4vw, 62px)/.95 Georgia, serif;

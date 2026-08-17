@@ -99,7 +99,6 @@ export default function CafePortfolioBook() {
         <div className="cafe-book-flip" ref={host}>
           <article className="cafe-page cafe-page-cover" data-density="hard">
             <div className="cafe-cover-inner">
-              <span className="cafe-cover-kicker">Hospitality · Portfolio 2026</span>
               <h3>Café websites<br /><em>people can actually use.</em></h3>
               <p>For cafés, bakeries, and neighbourhood food spots. I live in Kuala Lumpur.</p>
               <span className="cafe-cover-sticker">Can they<br />find you?</span>
@@ -109,7 +108,6 @@ export default function CafePortfolioBook() {
 
           <article className="cafe-page cafe-page-profile">
             <div className="cafe-page-head"><span>THE HOSPITALITY STANDARD</span><i>01 · Approach</i></div>
-            <p className="cafe-book-kicker">What the website should do</p>
             <h3>Answer the boring questions. Keep the personality.</h3>
             <p className="cafe-book-bio">They found you on Google or Instagram. Menu, hours, how far the walk is. I put those first. The rest is why this café is worth the trip.</p>
             <dl className="cafe-book-details">
@@ -126,7 +124,6 @@ export default function CafePortfolioBook() {
 
           <article className="cafe-page cafe-page-work">
             <div className="cafe-page-head"><span>THE CUSTOMER JOURNEY</span><i>02 · From browse to visit</i></div>
-            <p className="cafe-book-kicker">A useful path through the site</p>
             <div className="cafe-book-projects">
               {journey.map(([number, title, text]) => (
                 <div key={number}>
@@ -141,7 +138,6 @@ export default function CafePortfolioBook() {
 
           <article className="cafe-page cafe-page-skills">
             <div className="cafe-page-head"><span>CONCEPT DIRECTIONS</span><i>03 · Different cafés</i></div>
-            <p className="cafe-book-kicker">One practical foundation, different personalities</p>
             <div className="cafe-skills-list">
               {concepts.map(([number, title, text]) => (
                 <article key={number}>
@@ -158,7 +154,6 @@ export default function CafePortfolioBook() {
 
           <article className="cafe-page cafe-page-contact">
             <div className="cafe-page-head"><span>WHAT I BUILD FOR HOSPITALITY</span><i>04 · Services</i></div>
-            <p className="cafe-book-kicker">Useful first. Then it should look like your place.</p>
             <div className="cafe-book-projects">
               {services.map(([number, title, text]) => (
                 <div key={number}>
@@ -172,7 +167,6 @@ export default function CafePortfolioBook() {
 
           <article className="cafe-page cafe-page-back" data-density="hard">
             <div className="cafe-cover-inner">
-              <span className="cafe-cover-kicker">Concept case study · Neighbourhood café</span>
               <h3>If they hunt for the map,<br /><em>they leave.</em></h3>
               <p>Menu first. Hours and WhatsApp close. Built around the decision to walk over.</p>
               <span className="cafe-cover-sticker">Write to<br />Tuan ↗</span>

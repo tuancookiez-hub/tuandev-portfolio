@@ -45,8 +45,7 @@
   padding: 0 clamp(18px, 4vw, 58px);
   color: var(--ink);
   border-bottom: 1px solid rgba(30,42,35,.13);
-  background: rgba(255,249,236,.91);
-  backdrop-filter: blur(14px);
+  background: #fff9ec;
 }
 .cafe-brand { display: flex; align-items: baseline; gap: 9px; color: var(--ink); text-decoration: none; cursor: pointer; }
 .cafe-brand b { font: 32px/1 Georgia, serif; letter-spacing: -.05em; }
@@ -82,8 +81,7 @@
   border: 1px solid rgba(255,255,255,.34);
   border-radius: 999px;
   background: #173f2c;
-  box-shadow: 0 14px 34px rgba(13,37,24,.34), 0 0 0 3px rgba(255,255,255,.38);
-  backdrop-filter: blur(13px);
+  box-shadow: 0 14px 34px rgba(13,37,24,.34);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: .14em;
