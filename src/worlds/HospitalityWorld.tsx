@@ -32,6 +32,7 @@ export default function HospitalityWorld({
   return (
     <motion.div
       className="cafe"
+      data-ready={String(showReturn || embed)}
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 1 }}
@@ -64,7 +65,7 @@ export default function HospitalityWorld({
         <section className="cafe-hero" data-sync="hero">
           <img src="./assets/cafe/hero.webp" alt="Bright independent neighbourhood café demonstrating Tuan's café website direction" />
           <div className="cafe-hero-tint" />
-          <motion.div className="cafe-hero-copy" initial={{ y: "-50%", opacity: 1 }} animate={{ y: "-50%", opacity: 1 }}>
+          <motion.div className="cafe-hero-copy">
             <p>Café websites from Kuala Lumpur</p>
             <h1>Can they find you,<br /><em>and do they want to come?</em></h1>
             <span>I build sites for small cafés, bakeries, and neighbourhood places. Menu, hours, WhatsApp. Then whatever makes that room feel like itself.</span>

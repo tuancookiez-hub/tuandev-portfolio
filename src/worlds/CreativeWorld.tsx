@@ -37,7 +37,7 @@ const videos = [
   },
 ] as const;
 
-export default function CreativeWorld() {
+export default function CreativeWorld({ ready = true }: { ready?: boolean }) {
   const ctx = useActiveWorld();
   const [step, setStep] = useState(0);
   const [narrow, setNarrow] = useState(false);
@@ -173,7 +173,7 @@ export default function CreativeWorld() {
   const done = step === stops.length - 1;
 
   return (
-    <div className="creative" data-narrow={String(narrow)} data-step={step}>
+    <div className="creative" data-narrow={String(narrow)} data-step={step} data-ready={String(ready)}>
       <RaymarchedBlackHole />
 
       <div className="creative-grade" aria-hidden="true" />

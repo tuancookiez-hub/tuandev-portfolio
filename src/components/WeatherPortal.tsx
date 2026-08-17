@@ -92,7 +92,7 @@ export default function WeatherPortal({
         animate={full ? { left: 0, top: 0 } : { left: -from.left, top: -from.top }}
         transition={{ duration: dur, ease: EASE }}
       >
-        {children(true)}
+        {children(phase === "open")}
       </motion.div>
     </motion.div>
   );

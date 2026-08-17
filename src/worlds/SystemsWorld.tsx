@@ -57,9 +57,11 @@ const spark = {
 export default function SystemsWorld({
   onClose,
   embed = false,
+  ready = true,
 }: {
   onClose?: () => void;
   embed?: boolean;
+  ready?: boolean;
 }) {
   const ctx = useActiveWorld();
   const stageRef = useRef<HTMLElement>(null);
@@ -106,7 +108,7 @@ export default function SystemsWorld({
   const card = theme === "light" ? "rgba(255,255,255,.9)" : theme === "mid" ? "rgba(232,236,236,.82)" : "rgba(10,10,16,.74)";
 
   return (
-    <div className="sys" data-stage={stageName} data-theme={theme}>
+    <div className="sys" data-stage={stageName} data-theme={theme} data-ready={String(ready || embed)}>
       {!embed && (
         <button type="button" className="world-return sys-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
           <i aria-hidden="true">←</i> Main menu

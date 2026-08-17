@@ -60,11 +60,11 @@ function Shell() {
       </WeatherPortal>
 
       <WeatherPortal world="systems">
-        {() => <SystemsWorld />}
+        {(ready) => <SystemsWorld ready={ready} />}
       </WeatherPortal>
 
       <WeatherPortal world="creative">
-        {() => <CreativeWorld />}
+        {(ready) => <CreativeWorld ready={ready} />}
       </WeatherPortal>
     </div>
   );
