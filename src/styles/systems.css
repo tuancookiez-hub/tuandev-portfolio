@@ -470,6 +470,7 @@
   border-radius: 14px;
   background: var(--sys-card);
   box-shadow: 0 24px 60px rgba(16, 36, 58, .13);
+  transition: background 800ms ease, border-color 800ms ease;
 }
 .sys-face[data-face="dark"] .sys-face-panel {
   background: #0b1622;
@@ -932,6 +933,7 @@ text.ax-v {
   border-radius: 12px;
   background: rgba(255,255,255,.72);
   box-shadow: 0 12px 30px rgba(16,36,58,.08);
+  transition: background 800ms ease, border-color 800ms ease, box-shadow 800ms ease;
 }
 .sys[data-theme="dark"] .sys-kpi { background: rgba(9,24,38,.6); border-color: rgba(159,208,240,.14); }
 .sys-kpi-top { display: flex; align-items: center; justify-content: space-between; }
@@ -959,6 +961,7 @@ text.ax-v {
   border-radius: 12px;
   background: rgba(255,255,255,.72);
   box-shadow: 0 12px 30px rgba(16,36,58,.08);
+  transition: background 800ms ease, border-color 800ms ease;
 }
 .sys[data-theme="dark"] .sys-panel { background: rgba(9,24,38,.6); border-color: rgba(159,208,240,.14); }
 .sys-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -1374,15 +1377,16 @@ text.ax-v {
   .sg-graph-area { height: 360px; }
 }
 
-/* ── Built-in PDF viewer (react-pdf) ── */
-.sys-pdf-panel {
+/* ── Built-in PDF viewer (StPageFlip) ── */
+.sys-pdf {
   margin-top: 26px;
   border: 1px solid var(--sys-line);
   border-radius: 16px;
   background: rgba(255, 255, 255, .72);
   overflow: hidden;
+  transition: background 800ms ease, border-color 800ms ease;
 }
-.sys[data-theme="dark"] .sys-pdf-panel {
+.sys[data-theme="dark"] .sys-pdf {
   background: rgba(6, 18, 32, .6);
   border-color: rgba(159, 208, 240, .14);
 }
@@ -1408,7 +1412,7 @@ text.ax-v {
   cursor: pointer;
 }
 .sys-pdf-controls button:disabled { opacity: .35; cursor: default; }
-.sys-pdf-count, .sys-pdf-zoom { font: 9px var(--font-mono); min-width: 44px; text-align: center; }
+.sys-pdf-count { font: 9px var(--font-mono); min-width: 44px; text-align: center; }
 .sys-pdf-stage {
   display: flex;
   justify-content: center;
@@ -1419,7 +1423,6 @@ text.ax-v {
 }
 .sys-pdf-loading { color: var(--sys-soft); font: 10px var(--font-mono); margin: auto; }
 .sys-pdf-error { color: var(--d-bad); font: 11px var(--font-mono); margin: auto; }
-.sys-pdf-stage canvas { box-shadow: 0 10px 30px rgba(16, 36, 58, .18); border-radius: 4px; background: #fff; }
 .sys-pdf-foot {
   display: flex;
   justify-content: space-between;
@@ -1431,24 +1434,29 @@ text.ax-v {
   text-transform: uppercase;
 }
 
-/* Flip-book sheet — 3D page-turn + responsive cap (fixes mobile overflow) */
-.sys-pdf-stage { perspective: 2200px; overflow: hidden; }
-.sys-pdf-sheet {
-  max-width: 96%;
-  transform-style: preserve-3d;
-  will-change: transform;
-  display: flex;
-  justify-content: center;
+/* StPageFlip host — the library stretches to fill this box */
+.sys-pdf-flip {
+  width: 100%;
+  max-width: 100%;
 }
-.sys-pdf-sheet canvas,
-.sys-pdf-sheet .react-pdf__Page { max-width: 100% !important; height: auto !important; }
-.sys-pdf-sheet .react-pdf__Page__canvas { max-width: 100% !important; }
-.sys-pdf-fold { font-size: 20px !important; line-height: 1; }
+.sys-pdf-flip .stf__parent {
+  position: relative;
+  width: 100% !important;
+}
+.sys-pdf-flip .stf__parent > div {
+  width: 100% !important;
+}
+.sys-pdf-page {
+  background: white;
+  overflow: hidden;
+}
+.sys-pdf-page canvas,
+.sys-pdf-page .react-pdf__Page { max-width: 100% !important; height: auto !important; }
+.sys-pdf-page .react-pdf__Page__canvas { max-width: 100% !important; }
 
-/* Mobile: shrink the sheet to the viewport so it never overflows */
+/* Mobile: shrink the book to the viewport */
 @media (max-width: 760px) {
   .sys-pdf-stage { padding: 10px 4px; }
-  .sys-pdf-sheet { max-width: 100%; transform: scale(0.94); }
   .sys-pdf-controls { gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
   .sys-pdf-controls button { min-width: 26px; height: 26px; }
   .sys-pdf-foot { flex-direction: column; gap: 4px; }
