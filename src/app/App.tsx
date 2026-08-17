@@ -35,7 +35,13 @@ function Shell() {
 
   return (
     <div className="portal-stage">
-      <div className="landing" aria-hidden={cover} data-entered={cover} data-cover={String(cover)}>
+      <div
+        className="landing"
+        aria-hidden={cover}
+        data-entered={cover}
+        data-cover={String(cover)}
+        style={cover ? { pointerEvents: "none" } : undefined}
+      >
         <Header />
         <main className="landing-main" aria-label="Select a world">
           <WorldSelector />

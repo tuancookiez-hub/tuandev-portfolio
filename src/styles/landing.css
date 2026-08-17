@@ -56,9 +56,9 @@
    on return it reappears immediately (the closing cover is opaque,
    so the gateway is not visible until the cover shrinks away). */
 .landing[data-entered="true"] {
-  visibility: hidden;
+  visibility: visible;
+  pointer-events: none;
   transition:
-    visibility 0s linear 0.82s,
     --page 780ms cubic-bezier(.22,1,.36,1),
     --ink 650ms cubic-bezier(.22,1,.36,1),
     --soft 650ms cubic-bezier(.22,1,.36,1),
@@ -71,17 +71,8 @@
 
 
 .landing[data-entered="true"][data-cover="false"] {
-  visibility: hidden;
-  transition:
-    visibility 0s linear 0s,
-    --page 780ms cubic-bezier(.22,1,.36,1),
-    --ink 650ms cubic-bezier(.22,1,.36,1),
-    --soft 650ms cubic-bezier(.22,1,.36,1),
-    --accent 780ms cubic-bezier(.22,1,.36,1),
-    --deep 780ms cubic-bezier(.22,1,.36,1),
-    --wash 780ms cubic-bezier(.22,1,.36,1),
-    background-color 780ms cubic-bezier(.22,1,.36,1),
-    color 650ms ease;
+  visibility: visible;
+  pointer-events: none;
 }
 
 .header {

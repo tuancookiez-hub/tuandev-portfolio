@@ -31,7 +31,13 @@ export default function WorldPanel({ world, index }: Props) {
       data-entered={entered}
       aria-pressed={active}
       aria-label={`Explore ${world.label}`}
-      onClick={() => { if (available) state.enter(world.id); }}
+      onClick={() => {
+        if (!available) return;
+        const box = ref.current?.getBoundingClientRect();
+        state.enter(world.id, box
+          ? { x: box.left, y: box.top, w: box.width, h: box.height }
+          : undefined);
+      }}
       aria-disabled={disabled}
       data-available={available}
       data-wip={disabled}
