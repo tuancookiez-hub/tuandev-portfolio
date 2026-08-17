@@ -248,13 +248,12 @@ export default function KernelViz() {
   const rf = useRef<ReactFlowInstance | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Always-present nodes — smooth opacity fade instead of `hidden` (React Flow removes hidden from DOM)
+  // Visible nodes per pass — instant swap, no fade
   const visNodes: Node[] = useMemo(() => {
     const vis = PASS_VISIBLE[index];
     return MASTER_NODES.map((n) => ({
       ...n,
-      style: { ...n.style, opacity: vis.nodes.has(n.id) ? 1 : 0 },
-      selectable: false,
+      hidden: !vis.nodes.has(n.id),
     }));
   }, [index]);
 
@@ -266,10 +265,10 @@ export default function KernelViz() {
     setAllEdges(MASTER_EDGES.map((e) => ({ ...e, hidden: true })));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When pass changes: opacity fade + smooth-setCenter
+  // When pass changes: swap nodes + pan camera to keyframe position
   useEffect(() => {
     const vis = PASS_VISIBLE[index];
-    setAllNodes(MASTER_NODES.map((n) => ({ ...n, style: { ...n.style, opacity: vis.nodes.has(n.id) ? 1 : 0 } })));
+    setAllNodes(MASTER_NODES.map((n) => ({ ...n, hidden: !vis.nodes.has(n.id) })));
     setAllEdges(MASTER_EDGES.map((e) => ({ ...e, animated: vis.edges.has(e.id) })));
 
     const inst = rf.current;
