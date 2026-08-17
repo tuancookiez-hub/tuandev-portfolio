@@ -1071,7 +1071,7 @@ text.ax-v {
 }
 .kv-flow { position: absolute; inset: 0; z-index: 1; background: transparent; }
 
-/* Node strip — layered soft pill */
+/* Node strip — layered soft pill + smooth crossfade when hidden prop changes */
 .kv-node {
   display: flex;
   align-items: center;
@@ -1081,8 +1081,10 @@ text.ax-v {
   border-radius: 10px;
   border: 1px solid rgba(120,140,160,.22);
   background: linear-gradient(180deg, rgba(18,26,38,.9), rgba(10,16,26,.9));
-  transition: box-shadow 500ms, border-color 500ms, transform 300ms;
+  transition: box-shadow 500ms, border-color 500ms, transform 300ms, opacity 900ms ease;
 }
+.kv-flow .react-flow__node { transition: opacity 900ms ease, transform 900ms ease; }
+.kv-flow .react-flow__node[hidden] { opacity: 0; transform: scale(0.85); pointer-events: none; display: block !important; }
 .kv-node:hover { transform: translateY(-2px); }
 .kv-node-chip { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 .kv-node-meta {

@@ -1,17 +1,14 @@
 "use client";
 
 /**
- * Xenova-style agentic kernel optimization visualizer.
+ * Kernel optimization visualizer — smooth pan-right through fusion passes.
  *
- * A live React Flow canvas where a computation graph morphs through a timeline
- * of "passes" — fusions merge nodes, edges rewire, particles stream along the
- * connections, and a metrics panel updates. Inspired by Xenova's Kimi Linear
- * animation: soft layered nodes, neon glow on fusion, flowing particle edges.
+ * Key technique: ALL nodes from ALL passes always exist in the graph.
+ * React Flow's `hidden` property hides/shows nodes per pass without removing
+ * them from the tree. This means the viewport NEVER resets — `setCenter`
+ * pans smoothly across a stable node layout.
  *
- * Based on the react-flow-kernel-viz-tutorial.md spec:
- *  - custom OpNode (pill, glow, fused highlight)
- *  - ParticleEdge (glowing dots travelling along bezier paths)
- *  - GraphState timeline + auto-play player advancing through fusion passes
+ * Counters interpolate between pass metrics using spring-like easing.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -56,7 +53,7 @@ function OpNode({ data }: NodeProps) {
       className="kv-node"
       style={{
         boxShadow: d.fused ? `0 0 34px ${t.glow}` : undefined,
-        borderColor: d.fused ? t.border : 'rgba(120,140,160,.22)',
+        borderColor: d.fused ? t.border : "rgba(120,140,160,.22)",
       }}
     >
       <span className="kv-node-chip" style={{ background: t.chip }} />
@@ -82,49 +79,18 @@ function ParticleEdge({
   style,
 }: EdgeProps) {
   const [edgePath] = useMemo(
-    () =>
-      getBezierPath({
-        sourceX,
-        sourceY,
-        sourcePosition,
-        targetX,
-        targetY,
-        targetPosition,
-      }),
+    () => getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition }),
     [sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition],
   );
-
   const pid = useMemo(() => `p-${id}`, [id]);
 
   return (
     <>
-      <path
-        id={id}
-        d={edgePath}
-        fill="none"
-        stroke="rgba(200,215,235,.28)"
-        strokeWidth={1.2}
-        style={style}
-        markerEnd={markerEnd}
-      />
-      <path
-        id={`${pid}-phantom`}
-        d={edgePath}
-        fill="none"
-        stroke="transparent"
-      />
+      <path id={id} d={edgePath} fill="none" stroke="rgba(200,215,235,.28)" strokeWidth={1.2} style={style} markerEnd={markerEnd} />
+      <path id={`${pid}-phantom`} d={edgePath} fill="none" stroke="transparent" />
       {[0, 1, 2].map((k) => (
-        <circle
-          key={k}
-          r="3"
-          fill="rgba(224,242,254,.9)"
-          opacity="0.85"
-        >
-          <animateMotion
-            dur={`${2.2 + k * 0.7}s`}
-            begin={`${k * 0.35}s`}
-            repeatCount="indefinite"
-          >
+        <circle key={k} r="3" fill="rgba(224,242,254,.9)" opacity="0.85">
+          <animateMotion dur={`${2.2 + k * 0.7}s`} begin={`${k * 0.35}s`} repeatCount="indefinite">
             <mpath href={`#${pid}-phantom`} />
           </animateMotion>
         </circle>
@@ -136,151 +102,191 @@ function ParticleEdge({
 const nodeTypes = { op: OpNode };
 const edgeTypes = { particle: ParticleEdge };
 
-// ─── Graph state timeline ─────────────────────────────────────
+// ─── Master graph (ALL nodes, ALL edges — visibility toggled per pass) ───
 
-type GraphState = {
-  id: string;
-  label: string;
-  nodes: Node[];
-  edges: Edge[];
-  metrics: { throughput: number; dispatches: number; nodeCount: number; fusion: number };
-  // Camera target — pan right through the graph as passes advance (flow coords to center on).
-  center?: { x: number; y: number; zoom: number };
+// Every node that appears in any pass. Positions are fixed.
+const MASTER_NODES: Node[] = [
+  // Pass 1 decomposed ops
+  { id: "a", type: "op", position: { x: 40, y: 200 }, data: { label: "load", subtitle: "input", tone: "teal" } },
+  { id: "b", type: "op", position: { x: 220, y: 155 }, data: { label: "embed", subtitle: "tok", tone: "blue" } },
+  { id: "c", type: "op", position: { x: 400, y: 210 }, data: { label: "rms_norm", subtitle: "norm", tone: "teal" } },
+  { id: "d", type: "op", position: { x: 580, y: 150 }, data: { label: "attn_q", subtitle: "q", tone: "blue" } },
+  { id: "e", type: "op", position: { x: 580, y: 270 }, data: { label: "attn_k", subtitle: "k", tone: "blue" } },
+  { id: "f", type: "op", position: { x: 760, y: 200 }, data: { label: "attn_v", subtitle: "v", tone: "blue" } },
+  { id: "g", type: "op", position: { x: 960, y: 200 }, data: { label: "attn_out", subtitle: "out", tone: "magenta" } },
+  { id: "h", type: "op", position: { x: 1160, y: 160 }, data: { label: "fc_up", subtitle: "mlp", tone: "teal" } },
+  { id: "i", type: "op", position: { x: 1360, y: 210 }, data: { label: "fc_down", subtitle: "mlp", tone: "teal" } },
+  { id: "j", type: "op", position: { x: 1580, y: 185 }, data: { label: "unembed", subtitle: "logits", tone: "magenta" } },
+  // Pass 2 fused nodes
+  { id: "bc", type: "op", position: { x: 320, y: 185 }, data: { label: "embed+norm", subtitle: "fused", tone: "teal", fused: true } },
+  { id: "eq", type: "op", position: { x: 620, y: 240 }, data: { label: "attn_qk", subtitle: "fused", tone: "blue", fused: true } },
+  // Pass 3 fused nodes
+  { id: "qkv", type: "op", position: { x: 600, y: 200 }, data: { label: "attn_qkv", subtitle: "fused", tone: "blue", fused: true } },
+  { id: "ghi", type: "op", position: { x: 1200, y: 200 }, data: { label: "mlp_fused", subtitle: "fused", tone: "magenta", fused: true } },
+  // Pass 4 fully fused
+  { id: "embed", type: "op", position: { x: 340, y: 200 }, data: { label: "embed+norm", subtitle: "fused", tone: "teal", fused: true } },
+  { id: "attn", type: "op", position: { x: 680, y: 200 }, data: { label: "attn_qkv+out", subtitle: "fused", tone: "blue", fused: true } },
+  { id: "mlp", type: "op", position: { x: 1020, y: 200 }, data: { label: "mlp_fused", subtitle: "fused", tone: "magenta", fused: true } },
+];
+
+// Every possible edge. Visibility toggled per pass.
+const MASTER_EDGES: Edge[] = [
+  // Pass 1 edges
+  { id: "e-ab", source: "a", target: "b", type: "particle" },
+  { id: "e-bc", source: "b", target: "c", type: "particle" },
+  { id: "e-cd", source: "c", target: "d", type: "particle" },
+  { id: "e-ce", source: "c", target: "e", type: "particle" },
+  { id: "e-cf", source: "c", target: "f", type: "particle" },
+  { id: "e-dg", source: "d", target: "g", type: "particle" },
+  { id: "e-eg", source: "e", target: "g", type: "particle" },
+  { id: "e-fg", source: "f", target: "g", type: "particle" },
+  { id: "e-gh", source: "g", target: "h", type: "particle" },
+  { id: "e-hi", source: "h", target: "i", type: "particle" },
+  { id: "e-ij", source: "i", target: "j", type: "particle" },
+  // Pass 2 edges (bc replaces b+c; eq replaces d+e)
+  { id: "e-a-bc", source: "a", target: "bc", type: "particle" },
+  { id: "e-bc-d", source: "bc", target: "d", type: "particle" },
+  { id: "e-bc-eq", source: "bc", target: "eq", type: "particle" },
+  { id: "e-bc-f", source: "bc", target: "f", type: "particle" },
+  { id: "e-dg2", source: "d", target: "g", type: "particle" },
+  { id: "e-eq-g", source: "eq", target: "g", type: "particle" },
+  { id: "e-fg2", source: "f", target: "g", type: "particle" },
+  { id: "e-gh2", source: "g", target: "h", type: "particle" },
+  { id: "e-hi2", source: "h", target: "i", type: "particle" },
+  { id: "e-ij2", source: "i", target: "j", type: "particle" },
+  // Pass 3 edges (qkv replaces eq+d+e+f; ghi replaces h+i)
+  { id: "e-a-bc3", source: "a", target: "bc", type: "particle" },
+  { id: "e-bc-qkv", source: "bc", target: "qkv", type: "particle" },
+  { id: "e-qkv-g", source: "qkv", target: "g", type: "particle" },
+  { id: "e-g-ghi", source: "g", target: "ghi", type: "particle" },
+  { id: "e-ghi-j", source: "ghi", target: "j", type: "particle" },
+  // Pass 4 edges (fully fused chain)
+  { id: "e-a-embed", source: "a", target: "embed", type: "particle" },
+  { id: "e-embed-attn", source: "embed", target: "attn", type: "particle" },
+  { id: "e-attn-mlp", source: "attn", target: "mlp", type: "particle" },
+  { id: "e-mlp-j2", source: "mlp", target: "j", type: "particle" },
+];
+
+// Which nodes/edges are visible per pass (all others hidden)
+const PASS_VISIBLE: Record<number, { nodes: Set<string>; edges: Set<string> }> = {
+  0: {
+    nodes: new Set(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]),
+    edges: new Set(["e-ab", "e-bc", "e-cd", "e-ce", "e-cf", "e-dg", "e-eg", "e-fg", "e-gh", "e-hi", "e-ij"]),
+  },
+  1: {
+    nodes: new Set(["a", "bc", "d", "eq", "f", "g", "h", "i", "j"]),
+    edges: new Set(["e-a-bc", "e-bc-d", "e-bc-eq", "e-bc-f", "e-dg2", "e-eq-g", "e-fg2", "e-gh2", "e-hi2", "e-ij2"]),
+  },
+  2: {
+    nodes: new Set(["a", "bc", "qkv", "g", "ghi", "j"]),
+    edges: new Set(["e-a-bc3", "e-bc-qkv", "e-qkv-g", "e-g-ghi", "e-ghi-j"]),
+  },
+  3: {
+    nodes: new Set(["a", "embed", "attn", "mlp", "j"]),
+    edges: new Set(["e-a-embed", "e-embed-attn", "e-attn-mlp", "e-mlp-j2"]),
+  },
 };
 
-type Op = { id: string; label: string; subtitle?: string; tone?: OpNodeData["tone"]; x: number; y: number; fused?: boolean; parent?: string };
+// Camera center targets per pass (flow coords)
+const PASS_CENTER = [
+  { x: 420, y: 250, zoom: 0.75 },   // pass 1: wide view of decomposed graph
+  { x: 560, y: 240, zoom: 0.75 },   // pass 2: drifts right
+  { x: 740, y: 230, zoom: 0.75 },   // pass 3: further right
+  { x: 680, y: 210, zoom: 0.88 },   // pass 4: zooms in on compact fused kernel
+];
 
-function buildState(ops: Op[]): GraphState["nodes"] {
-  return ops.map((o) => ({
-    id: o.id,
-    type: "op",
-    position: { x: o.x, y: o.y },
-    data: { label: o.label, subtitle: o.subtitle, fused: o.fused, tone: o.tone } as OpNodeData,
-  }));
+// Metrics per pass (interpolated smoothly)
+const PASS_METRICS = [
+  { throughput: 65, dispatches: 331, nodeCount: 10, fusion: 0 },
+  { throughput: 82.3, dispatches: 190, nodeCount: 9, fusion: 2 },
+  { throughput: 91.4, dispatches: 98, nodeCount: 6, fusion: 4 },
+  { throughput: 97.8, dispatches: 32, nodeCount: 5, fusion: 6 },
+];
+
+const PASS_LABELS = [
+  "PASS 01 · graph construction",
+  "PASS 02 · first fusion wave",
+  "PASS 03 · attention fusion",
+  "PASS 04 · fused kernel",
+];
+
+// ─── Smooth counter component ────────────────────────────────
+
+function AnimatedMetric({ value, decimals = 1, prefix = "", suffix = "" }: { value: number; decimals?: number; prefix?: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const target = useRef(value);
+  const current = useRef(value);
+
+  useEffect(() => { target.current = value; }, [value]);
+
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const diff = target.current - current.current;
+      if (Math.abs(diff) < 0.05) {
+        current.current = target.current;
+      } else {
+        current.current += diff * 0.08; // smooth lerp
+      }
+      if (ref.current) {
+        ref.current.textContent = prefix + current.current.toFixed(decimals) + suffix;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [decimals, prefix, suffix]);
+
+  return <span ref={ref}>{prefix}{value.toFixed(decimals)}{suffix}</span>;
 }
-function buildEdges(edges: [string, string][]): Edge[] {
-  return edges.map(([s, t], i) => ({ id: `e${i}-${s}-${t}`, source: s, target: t, type: "particle" }));
-}
-
-// Pass 1 — decomposed graph (many small ops)
-const p1Ops: Op[] = [
-  { id: "a", label: "load", subtitle: "input", tone: "teal", x: 40, y: 200 },
-  { id: "b", label: "embed", subtitle: "tok", tone: "blue", x: 220, y: 160 },
-  { id: "c", label: "rms_norm", subtitle: "norm", tone: "teal", x: 420, y: 210 },
-  { id: "d", label: "attn_q", subtitle: "q", tone: "blue", x: 620, y: 150 },
-  { id: "e", label: "attn_k", subtitle: "k", tone: "blue", x: 620, y: 260 },
-  { id: "f", label: "attn_v", subtitle: "v", tone: "blue", x: 820, y: 200 },
-  { id: "g", label: "attn_out", subtitle: "out", tone: "magenta", x: 1020, y: 200 },
-  { id: "h", label: "fc_up", subtitle: "mlp", tone: "teal", x: 1220, y: 160 },
-  { id: "i", label: "fc_down", subtitle: "mlp", tone: "teal", x: 1400, y: 210 },
-  { id: "j", label: "unembed", subtitle: "logits", tone: "magenta", x: 1580, y: 180 },
-];
-
-// Pass 2 — rms_norm fused into embed; q/k into attn
-const p2Ops: Op[] = [
-  { id: "a", label: "load", subtitle: "input", tone: "teal", x: 40, y: 200 },
-  { id: "bc", label: "embed+norm", subtitle: "fused", tone: "teal", fused: true, x: 260, y: 180 },
-  { id: "d", label: "attn_q", subtitle: "q", tone: "blue", x: 500, y: 150 },
-  { id: "eq", label: "attn_qk", subtitle: "fused", tone: "blue", fused: true, x: 500, y: 270 },
-  { id: "f", label: "attn_v", subtitle: "v", tone: "blue", x: 760, y: 200 },
-  { id: "g", label: "attn_out", subtitle: "out", tone: "magenta", x: 960, y: 200 },
-  { id: "h", label: "fc_up", subtitle: "mlp", tone: "teal", x: 1160, y: 160 },
-  { id: "i", label: "fc_down", subtitle: "mlp", tone: "teal", x: 1360, y: 210 },
-  { id: "j", label: "unembed", subtitle: "logits", tone: "magenta", x: 1580, y: 180 },
-];
-
-// Pass 3 — qk+v fused together, fc_up+down fused
-const p3Ops: Op[] = [
-  { id: "a", label: "load", subtitle: "input", tone: "teal", x: 40, y: 200 },
-  { id: "bc", label: "embed+norm", subtitle: "fused", tone: "teal", fused: true, x: 280, y: 190 },
-  { id: "qkv", label: "attn_qkv", subtitle: "fused", tone: "blue", fused: true, x: 580, y: 200 },
-  { id: "g", label: "attn_out", subtitle: "out", tone: "magenta", x: 880, y: 200 },
-  { id: "ghi", label: "mlp_fused", subtitle: "fused", tone: "magenta", fused: true, x: 1180, y: 200 },
-  { id: "j", label: "unembed", subtitle: "logits", tone: "magenta", x: 1500, y: 180 },
-];
-
-// Pass 4 — final fused kernel
-const p4Ops: Op[] = [
-  { id: "a", label: "load", subtitle: "input", tone: "teal", x: 60, y: 200 },
-  { id: "embed", label: "embed+norm", subtitle: "fused", tone: "teal", fused: true, x: 320, y: 200 },
-  { id: "attn", label: "attn_qkv+out", subtitle: "fused", tone: "blue", fused: true, x: 660, y: 200 },
-  { id: "mlp", label: "mlp_fused", subtitle: "fused", tone: "magenta", fused: true, x: 1000, y: 200 },
-  { id: "j", label: "unembed", subtitle: "logits", tone: "magenta", x: 1360, y: 190 },
-];
-
-const timeline: GraphState[] = [
-  {
-    id: "pass-01",
-    label: "PASS 01 · graph construction",
-    nodes: buildState(p1Ops),
-    edges: buildEdges([["a", "b"], ["b", "c"], ["c", "d"], ["c", "e"], ["c", "f"], ["d", "g"], ["e", "g"], ["f", "g"], ["g", "h"], ["h", "i"], ["i", "j"]]),
-    metrics: { throughput: 65, dispatches: 331, nodeCount: 10, fusion: 0 },
-    center: { x: 340, y: 250, zoom: 0.8 },
-  },
-  {
-    id: "pass-02",
-    label: "PASS 02 · first fusion wave",
-    nodes: buildState(p2Ops),
-    edges: buildEdges([["a", "bc"], ["bc", "d"], ["bc", "eq"], ["bc", "f"], ["d", "g"], ["eq", "g"], ["f", "g"], ["g", "h"], ["h", "i"], ["i", "j"]]),
-    metrics: { throughput: 82.3, dispatches: 190, nodeCount: 9, fusion: 2 },
-    center: { x: 540, y: 240, zoom: 0.8 },
-  },
-  {
-    id: "pass-03",
-    label: "PASS 03 · attention fusion",
-    nodes: buildState(p3Ops),
-    edges: buildEdges([["a", "bc"], ["bc", "qkv"], ["qkv", "g"], ["g", "ghi"], ["ghi", "j"]]),
-    metrics: { throughput: 91.4, dispatches: 98, nodeCount: 6, fusion: 4 },
-    center: { x: 760, y: 230, zoom: 0.8 },
-  },
-  {
-    id: "pass-04",
-    label: "PASS 04 · fused kernel",
-    nodes: buildState(p4Ops),
-    edges: buildEdges([["a", "embed"], ["embed", "attn"], ["attn", "mlp"], ["mlp", "j"]]),
-    metrics: { throughput: 97.8, dispatches: 32, nodeCount: 5, fusion: 6 },
-    center: { x: 620, y: 230, zoom: 0.9 },
-  },
-];
 
 // ─── Main component ───────────────────────────────────────────
 
 export default function KernelViz() {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [nodes, setNodes, onNodesChange] = useNodesState(timeline[0].nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(timeline[0].edges);
   const rf = useRef<ReactFlowInstance | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Pan right through the graph as passes advance (smooth camera tracking).
-  const applyPass = useCallback((i: number) => {
-    const s = timeline[i];
-    setNodes(s.nodes);
-    setEdges(s.edges);
-    const inst = rf.current;
-    if (inst && s.center) {
-      inst.setCenter(s.center.x, s.center.y, { zoom: s.center.zoom, duration: 1400 });
-    }
-  }, [setNodes, setEdges]);
-
-  const next = useCallback(() => {
-    setIndex((i) => (i + 1) % timeline.length);
-  }, []);
-
-  // When index changes, apply the new pass + pan.
-  useEffect(() => {
-    applyPass(index);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Always-present nodes — smooth opacity fade instead of `hidden` (React Flow removes hidden from DOM)
+  const visNodes: Node[] = useMemo(() => {
+    const vis = PASS_VISIBLE[index];
+    return MASTER_NODES.map((n) => ({
+      ...n,
+      style: { ...n.style, opacity: vis.nodes.has(n.id) ? 1 : 0 },
+      selectable: false,
+    }));
   }, [index]);
 
+  const [allNodes, setAllNodes, onNodesChange] = useNodesState(visNodes);
+  const [allEdges, setAllEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  // Populate edges once on mount
+  useEffect(() => {
+    setAllEdges(MASTER_EDGES.map((e) => ({ ...e, hidden: true })));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // When pass changes: opacity fade + smooth-setCenter
+  useEffect(() => {
+    const vis = PASS_VISIBLE[index];
+    setAllNodes(MASTER_NODES.map((n) => ({ ...n, style: { ...n.style, opacity: vis.nodes.has(n.id) ? 1 : 0 } })));
+    setAllEdges(MASTER_EDGES.map((e) => ({ ...e, animated: vis.edges.has(e.id) })));
+
+    const inst = rf.current;
+    const c = PASS_CENTER[index];
+    if (inst && c) {
+      inst.setCenter(c.x, c.y, { zoom: c.zoom, duration: 1800 });
+    }
+  }, [index, setAllNodes, setAllEdges]);
+
+  // Auto-advance
+  const next = useCallback(() => setIndex((i) => (i + 1) % PASS_CENTER.length), []);
   useEffect(() => {
     if (!playing) return;
     timer.current = setTimeout(next, 4200);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [playing, next, index]);
 
-  const current = timeline[index];
   const reduced = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   return (
@@ -289,12 +295,12 @@ export default function KernelViz() {
         <button type="button" className="kv-play" onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause" : "Play"}>
           {playing ? "❚❚" : "▶"}
         </button>
-        {timeline.map((s, i) => (
+        {PASS_LABELS.map((_label, i) => (
           <button
-            key={s.id}
+            key={i}
             type="button"
             className={`kv-step ${i === index ? "is-active" : ""} ${i < index ? "is-done" : ""}`}
-            onClick={() => { setIndex(i); applyPass(i); setPlaying(false); }}
+            onClick={() => { setIndex(i); setPlaying(false); }}
           >
             {i < index ? "✓" : String(i + 1).padStart(2, "0")}
           </button>
@@ -302,19 +308,19 @@ export default function KernelViz() {
         <button type="button" className="kv-next" onClick={next} aria-label="Next pass">→</button>
       </div>
 
-      <div className={`kv-canvas ${reduced ? "is-reduced" : ""}`} data-state={current.id}>
+      <div className={`kv-canvas ${reduced ? "is-reduced" : ""}`}>
         {!reduced && <div className="kv-glow-field" />}
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={allNodes}
+          edges={allEdges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           onInit={(inst) => {
-            rf.current = inst;
-            const c0 = timeline[0].center;
-            if (c0) inst.setCenter(c0.x, c0.y, { zoom: c0.zoom, duration: 0 });
+            rf.current = inst as unknown as ReactFlowInstance;
+            const c = PASS_CENTER[0];
+            inst.setCenter(c.x, c.y, { zoom: c.zoom, duration: 0 });
           }}
           minZoom={0.3}
           maxZoom={1.6}
@@ -330,17 +336,17 @@ export default function KernelViz() {
         </ReactFlow>
 
         <div className="kv-label">
-          <span className="kv-label-id">{current.id}</span>
-          <span className="kv-label-title">{current.label}</span>
+          <span className="kv-label-id">pass {String(index + 1).padStart(2, "0")}</span>
+          <span className="kv-label-title">{PASS_LABELS[index]}</span>
         </div>
 
         <div className="kv-counter">
           <div className="kv-counter-head">SEC/BLOCK</div>
           <div className="kv-counter-body">
-            <div><b>{current.metrics.throughput.toFixed(1)}</b><span>throughput %</span></div>
-            <div><b>{current.metrics.dispatches}</b><span>dispatches</span></div>
-            <div><b>{current.metrics.nodeCount}</b><span>live nodes</span></div>
-            <div><b>+{current.metrics.fusion}</b><span>fusions</span></div>
+            <div><b><AnimatedMetric value={PASS_METRICS[index].throughput} /></b><span>throughput %</span></div>
+            <div><b><AnimatedMetric value={PASS_METRICS[index].dispatches} decimals={0} /></b><span>dispatches</span></div>
+            <div><b><AnimatedMetric value={PASS_METRICS[index].nodeCount} decimals={0} /></b><span>live nodes</span></div>
+            <div><b><AnimatedMetric value={PASS_METRICS[index].fusion} decimals={0} prefix="+" /></b><span>fusions</span></div>
           </div>
         </div>
       </div>
