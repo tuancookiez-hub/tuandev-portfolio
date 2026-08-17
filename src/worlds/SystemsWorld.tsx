@@ -88,12 +88,12 @@ export default function SystemsWorld({
 
   // Smooth text colors driven by scroll progress (no hard threshold)
   const textColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
-  const softColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#40596c", "#40596c", "#a9c9db", "#a9c9db"]);
+  const softColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
 
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
   const [ink, setInk] = useState("#10243a");
-  const [soft, setSoft] = useState("#40596c");
+  const [soft, setSoft] = useState("#2a3a4a");
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);

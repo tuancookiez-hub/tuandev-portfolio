@@ -125,8 +125,14 @@ function RunLog({ lines }: { lines: string[] }) {
   );
 }
 
-function AccessLedger() {
-  const data = [{ name: "google", pct: 78 }, { name: "stripe", pct: 62 }, { name: "notion", pct: 45 }, { name: "calendar", pct: 88 }, { name: "slack", pct: 34 }];
+function AccessLedger({ stageIdx }: { stageIdx: number }) {
+  const stageData = [
+    [{ name: "google", pct: 30 }, { name: "stripe", pct: 20 }, { name: "notion", pct: 15 }, { name: "calendar", pct: 40 }, { name: "slack", pct: 10 }],
+    [{ name: "google", pct: 55 }, { name: "stripe", pct: 40 }, { name: "notion", pct: 30 }, { name: "calendar", pct: 65 }, { name: "slack", pct: 22 }],
+    [{ name: "google", pct: 78 }, { name: "stripe", pct: 62 }, { name: "notion", pct: 45 }, { name: "calendar", pct: 88 }, { name: "slack", pct: 34 }],
+    [{ name: "google", pct: 50 }, { name: "stripe", pct: 38 }, { name: "notion", pct: 28 }, { name: "calendar", pct: 55 }, { name: "slack", pct: 20 }],
+  ];
+  const data = stageData[stageIdx];
   return (
     <div className="sh-ledger">
       <div className="sh-ledger-head">Access Ledger</div>
@@ -156,8 +162,14 @@ function ThroughputChart({ value }: { value: number }) {
   );
 }
 
-function ActionHeat() {
-  const items = [{ label: "calendar", value: 78, color: COLORS.magenta }, { label: "inbox", value: 92, color: COLORS.cyan }, { label: "invoice", value: 54, color: COLORS.purple }, { label: "outreach", value: 66, color: COLORS.pink }, { label: "leads", value: 41, color: COLORS.teal }];
+function ActionHeat({ stageIdx }: { stageIdx: number }) {
+  const stageItems = [
+    [{ label: "calendar", value: 30, color: COLORS.magenta }, { label: "inbox", value: 45, color: COLORS.cyan }, { label: "invoice", value: 20, color: COLORS.purple }, { label: "outreach", value: 25, color: COLORS.pink }, { label: "leads", value: 15, color: COLORS.teal }],
+    [{ label: "calendar", value: 55, color: COLORS.magenta }, { label: "inbox", value: 70, color: COLORS.cyan }, { label: "invoice", value: 40, color: COLORS.purple }, { label: "outreach", value: 50, color: COLORS.pink }, { label: "leads", value: 30, color: COLORS.teal }],
+    [{ label: "calendar", value: 78, color: COLORS.magenta }, { label: "inbox", value: 92, color: COLORS.cyan }, { label: "invoice", value: 54, color: COLORS.purple }, { label: "outreach", value: 66, color: COLORS.pink }, { label: "leads", value: 41, color: COLORS.teal }],
+    [{ label: "calendar", value: 50, color: COLORS.magenta }, { label: "inbox", value: 60, color: COLORS.cyan }, { label: "invoice", value: 35, color: COLORS.purple }, { label: "outreach", value: 42, color: COLORS.pink }, { label: "leads", value: 28, color: COLORS.teal }],
+  ];
+  const items = stageItems[stageIdx];
   return (
     <div className="sh-heat">
       <div className="sh-heat-head">Action Heat</div>
@@ -171,9 +183,15 @@ function ActionHeat() {
   );
 }
 
-function BlastRadius() {
+function BlastRadius({ stageIdx }: { stageIdx: number }) {
   const dims = ["scope", "speed", "cost", "risk", "impact"];
-  const values = [0.7, 0.85, 0.4, 0.3, 0.9];
+  const stageValues = [
+    [0.4, 0.5, 0.2, 0.2, 0.3],  // s1: initial
+    [0.6, 0.7, 0.35, 0.25, 0.6], // s2: connection wave
+    [0.85, 0.9, 0.6, 0.5, 0.95], // s3: peak activity
+    [0.55, 0.6, 0.4, 0.3, 0.7],  // s4: settling
+  ];
+  const values = stageValues[stageIdx];
   const cx = 50, cy = 50, r = 38;
   const points = dims.map((_, i) => {
     const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
@@ -183,7 +201,14 @@ function BlastRadius() {
     <div className="sh-blast">
       <div className="sh-blast-head">Blast Radius</div>
       <svg viewBox="0 0 100 100" className="sh-blast-svg">
-        <polygon points={points} fill="rgba(94,234,212,.15)" stroke="#5eead4" strokeWidth="1" />
+        <motion.polygon
+          points={points}
+          fill="rgba(94,234,212,.15)"
+          stroke="#5eead4"
+          strokeWidth="1"
+          animate={{ points }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        />
         {dims.map((d, i) => {
           const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
           return <text key={d} x={cx + Math.cos(a) * (r + 10)} y={cy + Math.sin(a) * (r + 10)} textAnchor="middle" fill="#a9c9db" fontSize="6" fontFamily="monospace">{d}</text>;
@@ -237,6 +262,7 @@ function SpendGauge({ value, max }: { value: number; max: number }) {
 
 function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const fgRef = useRef<any>(null);
 
   // Custom node: glowing sphere + halo
   const nodeThreeObject = useMemo(() => (node: SN) => {
@@ -268,20 +294,30 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   }, []);
 
-  // Resize handler
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => {
-      // Resize is handled by the canvas auto-resize
+  // Camera: after engine settles, zoom to fit the graph
+  const handleEngineStop = useMemo(() => () => {
+    const fg = fgRef.current;
+    if (!fg) return;
+    // Compute bounding box of all nodes
+    const nodes = stage.nodes;
+    if (!nodes.length) return;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    nodes.forEach((n) => {
+      const x = n.fx ?? 0, y = n.fy ?? 0, z = n.fz ?? 0;
+      minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+      minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
     });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
+    const spanX = maxX - minX, spanY = maxY - minY;
+    const dist = Math.max(spanX, spanY) * 1.2 + 50;
+    fg.cameraPosition({ x: cx, y: cy, z: cz + dist }, undefined, 1500);
+  }, [stage]);
 
   return (
     <div className="sg-canvas-wrap" ref={containerRef}>
       <ForceGraph3D
+        ref={fgRef}
         graphData={{ nodes: stage.nodes, links: stage.links }}
         backgroundColor="#0a0a0f"
         showNavInfo={false}
@@ -301,6 +337,7 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
         cooldownTicks={100}
         enablePointerInteraction
         enableNavigationControls
+        onEngineStop={handleEngineStop}
       />
     </div>
   );
@@ -359,10 +396,10 @@ export default function SwarmGraph() {
 
       <div className="sg-hud">
         <RunLog lines={current.log} />
-        <AccessLedger />
+        <AccessLedger stageIdx={index} />
         <ThroughputChart value={current.metrics.throughput} />
-        <ActionHeat />
-        <BlastRadius />
+        <ActionHeat stageIdx={index} />
+        <BlastRadius stageIdx={index} />
         <BotStatusList />
         <SpendGauge value={current.metrics.spend} max={60} />
       </div>
