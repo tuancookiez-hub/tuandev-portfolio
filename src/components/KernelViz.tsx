@@ -2,14 +2,15 @@
 
 /**
  * L3 — Xenova kernel fusion visualizer.
- * Discrete GraphState passes. Custom glass nodes. Particle edges.
- * Play / step through fusion. Camera pans via setCenter only.
+ * Discrete GraphState passes. Glass nodes. Visible BaseEdge + particles.
+ * Fit-view on every pass. Page scroll is never stolen.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Background,
   BackgroundVariant,
+  BaseEdge,
   getBezierPath,
   Handle,
   Position,
@@ -25,10 +26,10 @@ import "@xyflow/react/dist/style.css";
 import { PASSES, type OpData, type Tone } from "../data/kernelPasses";
 
 const TONE: Record<Tone, { glow: string; border: string; chip: string; wash: string }> = {
-  violet: { glow: "rgba(167,139,250,.72)", border: "rgba(167,139,250,.85)", chip: "#c4b5fd", wash: "rgba(91,33,182,.28)" },
-  cyan:   { glow: "rgba(34,211,238,.62)",  border: "rgba(34,211,238,.78)",  chip: "#67e8f9", wash: "rgba(8,47,73,.34)" },
-  teal:   { glow: "rgba(94,234,212,.58)",  border: "rgba(94,234,212,.74)",  chip: "#5eead4", wash: "rgba(13,46,48,.34)" },
-  blue:   { glow: "rgba(96,165,250,.58)",  border: "rgba(96,165,250,.74)",  chip: "#93c5fd", wash: "rgba(15,23,42,.4)" },
+  violet: { glow: "rgba(167,139,250,.72)", border: "rgba(167,139,250,.9)", chip: "#c4b5fd", wash: "rgba(91,33,182,.28)" },
+  cyan:   { glow: "rgba(34,211,238,.62)",  border: "rgba(34,211,238,.85)", chip: "#67e8f9", wash: "rgba(8,47,73,.34)" },
+  teal:   { glow: "rgba(94,234,212,.58)",  border: "rgba(94,234,212,.82)", chip: "#5eead4", wash: "rgba(13,46,48,.34)" },
+  blue:   { glow: "rgba(96,165,250,.58)",  border: "rgba(96,165,250,.82)", chip: "#93c5fd", wash: "rgba(15,23,42,.4)" },
 };
 
 function OpNode({ data }: NodeProps) {
@@ -38,13 +39,13 @@ function OpNode({ data }: NodeProps) {
     <div
       className={`kv-node${d.fused ? " is-fused" : ""}`}
       style={{
-        borderColor: d.fused ? t.border : "rgba(148,163,184,.22)",
+        borderColor: d.fused ? t.border : "rgba(186,200,220,.38)",
         boxShadow: d.fused
           ? `0 0 0 1px ${t.border}, 0 0 28px ${t.glow}, inset 0 0 18px ${t.wash}`
-          : "inset 0 1px 0 rgba(255,255,255,.05)",
+          : "inset 0 1px 0 rgba(255,255,255,.06)",
         background: d.fused
           ? `linear-gradient(180deg, ${t.wash}, rgba(8,8,14,.88))`
-          : "linear-gradient(180deg, rgba(22,22,32,.86), rgba(8,8,14,.92))",
+          : "linear-gradient(180deg, rgba(22,22,32,.92), rgba(8,8,14,.94))",
       }}
     >
       <span className="kv-node-chip" style={{ background: t.chip, boxShadow: d.fused ? `0 0 10px ${t.chip}` : undefined }} />
@@ -65,15 +66,18 @@ function ParticleEdge({
     () => getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition }),
     [sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition],
   );
-  const pid = `kv-path-${id}`;
+  const pid = `kv-edge-${id}`;
   return (
     <>
-      <path d={edgePath} fill="none" stroke="rgba(167,139,250,.22)" strokeWidth={1.15} />
-      <path d={edgePath} fill="none" stroke="rgba(94,234,212,.16)" strokeWidth={4} />
+      <BaseEdge
+        id={id}
+        path={edgePath}
+        style={{ stroke: "#d8b4fe", strokeWidth: 2.6 }}
+      />
       <path id={pid} d={edgePath} fill="none" stroke="transparent" />
-      {[0, 1, 2].map((k) => (
-        <circle key={k} r={k === 0 ? 3.2 : 2.2} fill={k === 0 ? "#e9d5ff" : "#67e8f9"} opacity={0.92}>
-          <animateMotion dur={`${2.6 + k * 0.85}s`} begin={`${k * 0.45}s`} repeatCount="indefinite">
+      {[0, 1].map((k) => (
+        <circle key={k} r={k === 0 ? 3.4 : 2.3} fill={k === 0 ? "#f5d0fe" : "#67e8f9"}>
+          <animateMotion dur={`${2.4 + k * 0.9}s`} begin={`${k * 0.55}s`} repeatCount="indefinite">
             <mpath href={`#${pid}`} />
           </animateMotion>
         </circle>
@@ -85,10 +89,14 @@ function ParticleEdge({
 const nodeTypes = { op: OpNode };
 const edgeTypes = { particle: ParticleEdge };
 
+function fit(inst: ReactFlowInstance | null) {
+  if (!inst) return;
+  inst.fitView({ padding: 0.18, duration: 700, minZoom: 0.35, maxZoom: 1.15 });
+}
+
 export default function KernelViz() {
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [armed, setArmed] = useState(false);
   const rf = useRef<ReactFlowInstance | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shell = useRef<HTMLDivElement>(null);
@@ -99,8 +107,8 @@ export default function KernelViz() {
     const el = shell.current;
     if (!el) return;
     const io = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setArmed(true); setPlaying(true); }
-    }, { threshold: 0.35 });
+      if (entry.isIntersecting) setPlaying(true);
+    }, { threshold: 0.4 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -109,15 +117,16 @@ export default function KernelViz() {
     const s = PASSES[index];
     setNodes(s.nodes);
     setEdges(s.edges);
-    rf.current?.setCenter(s.center.x, s.center.y, { zoom: s.center.zoom, duration: armed ? 1600 : 0 });
-  }, [index, setEdges, setNodes, armed]);
+    const t = window.setTimeout(() => fit(rf.current), 40);
+    return () => window.clearTimeout(t);
+  }, [index, setEdges, setNodes]);
 
   const next = useCallback(() => setIndex((i) => (i + 1) % PASSES.length), []);
   const prev = useCallback(() => setIndex((i) => (i - 1 + PASSES.length) % PASSES.length), []);
 
   useEffect(() => {
     if (!playing) return;
-    timer.current = setTimeout(next, 4200);
+    timer.current = setTimeout(next, 3800);
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [playing, next, index]);
 
@@ -153,13 +162,13 @@ export default function KernelViz() {
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
+          defaultEdgeOptions={{ type: "particle" }}
           onInit={(inst) => {
             rf.current = inst as unknown as ReactFlowInstance;
-            const c = PASSES[0].center;
-            inst.setCenter(c.x, c.y, { zoom: c.zoom, duration: 0 });
+            fit(inst as unknown as ReactFlowInstance);
           }}
-          minZoom={0.28}
-          maxZoom={1.7}
+          minZoom={0.25}
+          maxZoom={1.4}
           proOptions={{ hideAttribution: true }}
           nodesConnectable={false}
           elementsSelectable={false}
@@ -169,10 +178,10 @@ export default function KernelViz() {
           zoomOnScroll={false}
           zoomOnDoubleClick={false}
           zoomOnPinch={false}
-          preventScrolling
+          preventScrolling={false}
           className="kv-flow"
         >
-          <Background variant={BackgroundVariant.Dots} gap={28} size={1.1} color="rgba(167,139,250,.16)" />
+          <Background variant={BackgroundVariant.Dots} gap={26} size={1.15} color="rgba(196,181,253,.22)" />
         </ReactFlow>
 
         <div className="kv-label">

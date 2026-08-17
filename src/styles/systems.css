@@ -77,7 +77,7 @@
 .sys > .device-preview-restore { position: fixed; z-index: 80; }
 .sys-main {
   isolation: isolate;
-  overflow: clip;
+  overflow: visible;
   --sys-paper: #c8cdcc;
   --sys-teal: #14b8a6;
   --sys-blue: #477da2;
@@ -86,6 +86,7 @@
   min-height: 100dvh;
   color: var(--sys-ink);
   font-family: "Segoe UI", system-ui, sans-serif;
+  transition: --sys-ink 550ms ease, --sys-soft 550ms ease, --sys-card 550ms ease;
 }
 /* Technical grid — an isolated layer above the wash, faded out by scroll */
 .sys-grid-bg {
@@ -93,6 +94,7 @@
   inset: 0;
   z-index: 0 !important;
   pointer-events: none;
+  transition: opacity 550ms ease;
 }
 .sys-grid-pattern {
   position: absolute;
@@ -905,8 +907,8 @@ text.ax-v {
 
 .sys-stage {
   position: relative;
-  min-height: 100svh;
-  padding: clamp(78px, 8vw, 104px) clamp(18px, 5vw, 84px) clamp(40px, 4vw, 60px);
+  min-height: auto;
+  padding: clamp(78px, 8vw, 104px) clamp(18px, 5vw, 84px) clamp(48px, 6vw, 80px);
 }
 
 /* ── Stage 1: Overview (professional dashboard) ── */
@@ -1095,7 +1097,7 @@ text.ax-v {
 
 .kv-canvas {
   position: relative;
-  height: clamp(460px, 64vh, 620px);
+  height: clamp(380px, 56vh, 560px);
   border: 1px solid rgba(167,139,250,.18);
   border-radius: 16px;
   background: #0a0a0f;
@@ -1111,6 +1113,8 @@ text.ax-v {
 }
 .kv-flow { position: absolute; inset: 0; z-index: 1; background: transparent; }
 .kv-flow .react-flow__attribution { display: none; }
+.kv-flow .react-flow__edge-path { stroke: #d8b4fe !important; stroke-width: 2.6 !important; }
+.kv-flow .react-flow__edges { overflow: visible; }
 
 .kv-node {
   display: flex;
@@ -1173,8 +1177,12 @@ text.ax-v {
 .kv-metric span { color: #94a3b8; font: 700 8px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 
 @media (max-width: 720px) {
-  .kv-metrics { left: 12px; right: 12px; min-width: 0; grid-template-columns: repeat(3, 1fr); }
-  .kv-canvas { height: 420px; }
+  .kv-metrics { left: 10px; right: 10px; min-width: 0; grid-template-columns: repeat(3, 1fr); padding: 10px; }
+  .kv-metric b { font-size: 16px; }
+  .kv-canvas { height: 340px; }
+  .kv-player { gap: 6px; }
+  .kv-play, .kv-next, .kv-step { min-width: 28px; height: 28px; }
+  .kv-label { top: 10px; left: 10px; }
 }
 
 /* ── AIClient2API console (L2) ── */
@@ -1275,7 +1283,7 @@ text.ax-v {
 .on-byte b { color: #d6e6f5; font-size: 11px; font-weight: 600; }
 
 @media (max-width: 760px) {
-  .acl-signals, .acl-pool { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .acl-signals, .acl-pool { grid-template-columns: 1fr; }
   .acl-footer { grid-template-columns: 1fr; }
   .acl-route-row { grid-template-columns: 44px 1fr 30px; }
   .acl-route-path { display: none; }
@@ -1424,11 +1432,11 @@ text.ax-v {
 @media (max-width: 620px) {
   .sys-ov-head { flex-direction: column; align-items: flex-start; }
   .sys-ov-uptime { text-align: left; }
-  .sys-kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .sys-kpi-grid { grid-template-columns: 1fr; }
   .sys-kpi-value { font-size: 26px; }
   .sys-stage { padding: 72px 14px 32px; }
   .sys-chart.card { padding: 12px; }
-  .sys-story { min-height: 470svh; }
+  .sys-story { min-height: auto; }
   .sys-scene { padding: 94px 18px 42px; }
   .sys-scene-copy h1 { font-size: 48px; }
   .sys-scene-copy > span { font-size: 12px; }

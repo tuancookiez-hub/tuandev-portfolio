@@ -5,8 +5,8 @@
  * L1 white overview · L2 grey console · L3 dark kernel graph · L4 reports.
  */
 
-import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
-import { useRef, useState } from "react";
+import { motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRow } from "../components/SystemsWidgets";
@@ -62,44 +62,48 @@ export default function SystemsWorld({
   embed?: boolean;
 }) {
   const ctx = useActiveWorld();
-  const reduced = useReducedMotion();
   const stageRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end end"] });
+  const l1 = useRef<HTMLDivElement>(null);
+  const l2 = useRef<HTMLDivElement>(null);
+  const l3 = useRef<HTMLDivElement>(null);
+  const l4 = useRef<HTMLDivElement>(null);
   usePreviewReceiver(embed);
 
-  // L1 white · L2 grey · L3 dark (theme flips at L3, holds through L4)
-  const wash = useTransform(scrollYProgress,
-    [0, 0.18, 0.28, 0.42, 0.55, 1],
-    ["#eef0f2", "#eef0f2", "#c8cdcc", "#c8cdcc", "#0a0a0f", "#0a0a0f"],
-  );
-  const gridFade = useTransform(scrollYProgress, [0, 0.18, 0.42, 0.55, 1], [1, 0.9, 0.35, 0, 0]);
-
-  const textColor = useTransform(scrollYProgress, [0, 0.42, 0.55, 1], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
-  const softColor = useTransform(scrollYProgress, [0, 0.42, 0.55, 1], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
-
-  const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
-  const [ink, setInk] = useState("#10243a");
-  const [soft, setSoft] = useState("#2a3a4a");
+  const [progress, setProgress] = useState(0);
 
-  // Card background: white → dark at the same thresholds as ink
-  const cardColorLight = useTransform(
-    scrollYProgress,
-    [0, 0.18, 0.28, 0.42, 0.55, 1],
-    ["rgba(255,255,255,.88)", "rgba(255,255,255,.88)", "rgba(232,236,236,.78)", "rgba(232,236,236,.78)", "rgba(10,10,16,.72)", "rgba(10,10,16,.72)"],
-  );
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root) return;
+    const map = new Map<Element, string>();
+    if (l1.current) map.set(l1.current, "overview");
+    if (l2.current) map.set(l2.current, "aiclient");
+    if (l3.current) map.set(l3.current, "flow");
+    if (l4.current) map.set(l4.current, "reports");
+    const io = new IntersectionObserver((entries) => {
+      const hit = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (hit) setStageName(map.get(hit.target) ?? "overview");
+    }, { root: null, threshold: [0.25, 0.45, 0.65], rootMargin: "-12% 0px -28% 0px" });
+    map.forEach((_, el) => io.observe(el));
+    const onScroll = () => {
+      const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      setProgress(window.scrollY / max);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setProgress(v);
-    if (v < 0.22) setStageName("overview");
-    else if (v < 0.46) setStageName("aiclient");
-    else if (v < 0.72) setStageName("flow");
-    else setStageName("reports");
-  });
-  useMotionValueEvent(textColor, "change", setInk);
-  useMotionValueEvent(softColor, "change", setSoft);
-
-  const theme = progress < 0.28 ? "light" : progress < 0.50 ? "mid" : "dark";
+  const theme = stageName === "overview" ? "light" : stageName === "aiclient" ? "mid" : "dark";
+  const wash = theme === "light" ? "#eef0f2" : theme === "mid" ? "#c8cdcc" : "#0a0a0f";
+  const ink = theme === "dark" ? "#eaf3f9" : "#10243a";
+  const soft = theme === "dark" ? "#a9c9db" : "#2a3a4a";
+  const card = theme === "light" ? "rgba(255,255,255,.9)" : theme === "mid" ? "rgba(232,236,236,.82)" : "rgba(10,10,16,.74)";
 
   return (
     <div className="sys" data-stage={stageName} data-theme={theme}>
@@ -116,17 +120,23 @@ export default function SystemsWorld({
         </span>
       </div>
 
-      <motion.main className="sys-main" data-theme={theme} style={{ backgroundColor: wash, ["--sys-ink" as string]: ink, ["--sys-soft" as string]: soft, ["--sys-card" as string]: cardColorLight } as any}>
-        <motion.div className="sys-grid-bg" style={reduced ? undefined : { opacity: gridFade }} aria-hidden="true">
+      <motion.main
+        className="sys-main"
+        data-theme={theme}
+        animate={{ backgroundColor: wash, color: ink }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        style={{ ["--sys-ink" as string]: ink, ["--sys-soft" as string]: soft, ["--sys-card" as string]: card } as React.CSSProperties}
+      >
+        <div className="sys-grid-bg" aria-hidden="true" style={{ opacity: theme === "dark" ? 0 : theme === "mid" ? 0.35 : 0.9 }}>
           <div className="sys-grid-pattern" />
-        </motion.div>
+        </div>
 
-        <section ref={stageRef} className="sys-story" data-sync="journey" data-progress={progress.toFixed(3)} data-stage={stageName} data-theme={theme} style={reduced ? undefined : { color: ink } as React.CSSProperties}>
+        <section ref={stageRef} className="sys-story" data-sync="journey" data-progress={progress.toFixed(3)} data-stage={stageName} data-theme={theme} style={{ color: ink }}>
           <div className="sys-story-sticky">
             <div className="sys-story-progress" aria-hidden="true"><i style={{ transform: `scaleX(${progress})` }} /></div>
 
             {/* ── LEVEL 1: OPERATIONS OVERVIEW ── */}
-            <div className="sys-stage sys-stage-overview">
+            <div ref={l1} className="sys-stage sys-stage-overview">
               <header className="sys-ov-head">
                 <div>
                   <span className="sys-ov-eyebrow">System overview · L1</span>
@@ -170,7 +180,7 @@ export default function SystemsWorld({
             </div>
 
             {/* ── LEVEL 2: AICLIENT2API CONSOLE ── */}
-            <div className="sys-stage sys-stage-aiclient">
+            <div ref={l2} className="sys-stage sys-stage-aiclient">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">AIClient2API · L2</span>
                 <h2>Route once. Swap providers later.</h2>
@@ -180,7 +190,7 @@ export default function SystemsWorld({
             </div>
 
             {/* ── LEVEL 3: FLOW (React Flow kernel visualization) ── */}
-            <div className="sys-stage sys-stage-flow">
+            <div ref={l3} className="sys-stage sys-stage-flow">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">kernel fusion · L3</span>
                 <h2>65 tok/s → 406. One graph.</h2>
@@ -190,7 +200,7 @@ export default function SystemsWorld({
             </div>
 
             {/* ── LEVEL 4: REPORTS (flip-page PDF) ── */}
-            <div className="sys-stage sys-stage-reports">
+            <div ref={l4} className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection · reporting · L4</span>
                 <h2>Four pages. No download.</h2>

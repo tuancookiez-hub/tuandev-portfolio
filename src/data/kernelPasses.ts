@@ -35,7 +35,7 @@ function n(
   return {
     id,
     type: "op",
-    position: { x, y },
+    position: { x: x * 0.62, y: y * 0.86 },
     data: { label, subtitle, tone, fused },
     draggable: false,
     selectable: false,
