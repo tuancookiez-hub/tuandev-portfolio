@@ -32,9 +32,10 @@
   left: var(--vx, 0px);
   top: var(--vy, 0px);
   width: 100vw;
-  height: 100dvh;
+  height: auto;
   max-width: none;
-  object-fit: fill;
+  aspect-ratio: 1440 / 900;
+  object-fit: unset;
   object-position: top left;
 }
 
