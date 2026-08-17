@@ -21,7 +21,7 @@ import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRo
 import AiClientConsole from "../components/AiClientConsole";
 import KernelViz from "../components/KernelViz";
 import PdfViewer from "../components/PdfViewer";
-import OrganicNetwork from "../components/OrganicNetwork";
+import SwarmGraph from "../components/SwarmGraph";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -78,10 +78,10 @@ export default function SystemsWorld({
 
   // 5-level wash: light field → dark → very dark
   const wash = useTransform(scrollYProgress,
-    [0, 0.14, 0.28, 0.44, 0.62, 0.82, 1],
-    ["#eef0f2", "#eef0f2", "#0f172a", "#081124", "#040a14", "#020617", "#020617"],
+    [0, 0.10, 0.22, 0.38, 0.52, 0.68, 1],
+    ["#eef0f2", "#eef0f2", "#c8cdcc", "#1a2435", "#0c1420", "#020617", "#020617"],
   );
-  const gridFade = useTransform(scrollYProgress, [0, 0.08, 0.35, 1], [1, 1, 0, 0]);
+  const gridFade = useTransform(scrollYProgress, [0, 0.10, 0.30, 0.55, 1], [1, 0.85, 0.3, 0, 0]);
 
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
@@ -194,14 +194,14 @@ export default function SystemsWorld({
               <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
             </div>
 
-            {/* ── LEVEL 5: ORGANIC NETWORK ── */}
+            {/* ── LEVEL 5: 3D SWARM NETWORK ── */}
             <div className="sys-stage sys-stage-network">
               <header className="sys-r-head">
-                <span className="sys-r-eyebrow">agentic network · L5</span>
+                <span className="sys-r-eyebrow">agentic swarm · L5</span>
                 <h2>The system watches itself.</h2>
-                <p>Organic drifting clusters, particles streaming along edges, panels sliding in. The graph fades in slowly as you scroll.</p>
+                <p>A 3D force-directed graph of living neural clusters, dense glowing connections, and a live HUD. The graph morphs through stages of agent activity.</p>
               </header>
-              <OrganicNetwork />
+              <SwarmGraph />
             </div>
 
             <div className="sys-story-step"><b>{stageName}</b><span>scroll to unfold</span></div>
