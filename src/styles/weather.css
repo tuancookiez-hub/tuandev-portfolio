@@ -1,17 +1,8 @@
 .wx-portal {
   isolation: isolate;
-  box-shadow: 0 28px 80px rgba(8, 12, 18, .28);
 }
 .wx-page {
-  position: relative;
   z-index: 4;
-  width: 100%;
-  min-height: 100%;
-}
-.wx-portal[data-phase="entering"] .wx-page,
-.wx-portal[data-phase="closing"] .wx-page {
-  max-height: 100dvh;
-  overflow: hidden;
 }
 
 .landing[data-entered="true"] {
@@ -21,6 +12,40 @@
   visibility: hidden;
 }
 
+.world[data-face="true"] .world-art,
+.world[data-face="true"][data-active="true"] .world-art,
+.world[data-world="systems"][data-face="true"][data-active="true"] .world-art {
+  transform: none !important;
+  filter: none !important;
+}
+.world[data-face="true"] .world-shade {
+  opacity: 0;
+}
+.world[data-face="true"] .world-copy,
+.world[data-face="true"] .world-topline,
+.world[data-face="true"] .world-enter {
+  text-shadow: 0 1px 10px rgba(0,0,0,.55);
+}
+.world[data-face="true"] .gateway-image {
+  position: absolute;
+  left: var(--vx, 0px);
+  top: var(--vy, 0px);
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  object-fit: fill;
+  object-position: top left;
+}
+
+.wx-portal[data-phase="entering"] .world-return,
+.wx-portal[data-phase="closing"] .world-return,
+.wx-portal[data-phase="entering"] .device-preview,
+.wx-portal[data-phase="closing"] .device-preview,
+.wx-portal[data-phase="entering"] .device-preview-restore,
+.wx-portal[data-phase="closing"] .device-preview-restore {
+  visibility: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .wx-portal { box-shadow: none; }
+  .wx-portal { transition: none !important; }
 }

@@ -1,9 +1,8 @@
 "use client";
 
 /**
- * The clicked card IS the door. It lifts from its slot to fill
- * the viewport. The world lives inside that same surface.
- * Leave shrinks the same card back into its slot.
+ * The card is a crop of the page top. Click opens that crop
+ * to the full page. The page never scales — only the window grows.
  */
 
 import { useEffect, useState } from "react";
@@ -18,16 +17,14 @@ const EASE = [0.22, 1, 0.32, 1] as const;
 
 const HOLD: Record<Exclude<WorldId, "robotics">, string> = {
   hospitality: "#fff9ec",
-  systems: "#c8cdcc",
+  systems: "#eef0f2",
   creative: "#07060a",
 };
 
 function box(origin: Origin | null) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  if (!origin) {
-    return { left: vw * 0.25, top: vh * 0.2, width: vw * 0.5, height: vh * 0.6 };
-  }
+  if (!origin) return { left: vw * 0.25, top: vh * 0.18, width: vw * 0.5, height: vh * 0.64 };
   return { left: origin.x, top: origin.y, width: origin.w, height: origin.h };
 }
 
@@ -60,7 +57,7 @@ export default function WeatherPortal({
   if (phase === "hidden") return null;
 
   const full = phase === "open" || phase === "entering";
-  const dur = reduced ? 0.2 : 0.88;
+  const dur = reduced ? 0.01 : 0.62;
 
   const frame: CSSProperties = {
     position: "fixed",
@@ -68,9 +65,8 @@ export default function WeatherPortal({
     overflow: phase === "open" ? "auto" : "hidden",
     overscrollBehavior: "contain",
     background: HOLD[world],
-    pointerEvents: "auto",
+    pointerEvents: phase === "open" ? "auto" : "none",
     WebkitOverflowScrolling: "touch",
-    transformOrigin: "top left",
   };
 
   return (
@@ -91,11 +87,12 @@ export default function WeatherPortal({
     >
       <motion.div
         className="wx-page"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "closing" ? 0 : 1 }}
-        transition={{ duration: reduced ? 0.16 : 0.42, delay: full && !reduced ? 0.28 : 0, ease: EASE }}
+        style={{ position: "absolute", width: "100vw", minHeight: "100dvh" }}
+        initial={{ left: -from.left, top: -from.top }}
+        animate={full ? { left: 0, top: 0 } : { left: -from.left, top: -from.top }}
+        transition={{ duration: dur, ease: EASE }}
       >
-        {children(phase === "open")}
+        {children(true)}
       </motion.div>
     </motion.div>
   );

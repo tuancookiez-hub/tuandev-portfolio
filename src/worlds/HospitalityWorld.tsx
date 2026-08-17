@@ -18,7 +18,7 @@ const concepts = [
 /* HospitalityWorld: cafe page only. WeatherPortal owns enter/leave weather. */
 export default function HospitalityWorld({
   embed = false,
-  shared = true,
+  shared: _shared = true,
   showReturn = false,
   onClose,
 }: {
@@ -32,10 +32,10 @@ export default function HospitalityWorld({
   return (
     <motion.div
       className="cafe"
-      initial={{ opacity: shared ? 1 : 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 1 }}
-      transition={{ opacity: { duration: 0.25 } }}
+      transition={{ opacity: { duration: 0 } }}
     >
       {showReturn && (
         <button type="button" className="world-return" onClick={onClose}>
@@ -64,7 +64,7 @@ export default function HospitalityWorld({
         <section className="cafe-hero" data-sync="hero">
           <img src="./assets/cafe/hero.webp" alt="Bright independent neighbourhood café demonstrating Tuan's café website direction" />
           <div className="cafe-hero-tint" />
-          <motion.div className="cafe-hero-copy" initial={{ y: "calc(-50% + 28px)", opacity: 0 }} animate={{ y: "-50%", opacity: 1 }} transition={{ delay: 0.35, duration: 0.75 }}>
+          <motion.div className="cafe-hero-copy" initial={{ y: "-50%", opacity: 1 }} animate={{ y: "-50%", opacity: 1 }}>
             <p>Café websites from Kuala Lumpur</p>
             <h1>Can they find you,<br /><em>and do they want to come?</em></h1>
             <span>I build sites for small cafés, bakeries, and neighbourhood places. Menu, hours, WhatsApp. Then whatever makes that room feel like itself.</span>

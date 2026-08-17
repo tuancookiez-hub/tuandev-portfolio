@@ -36,17 +36,13 @@ export function CountUp({
   format?: (n: number) => string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
   const mv = useMotionValue(0);
   const spring = useSpring(mv, { stiffness: 60, damping: 22 });
-  const [display, setDisplay] = useState("0");
+  const [display, setDisplay] = useState(() => format ? format(value) : value.toFixed(decimals));
 
   useEffect(() => {
-    if (inView) {
-      const t = setTimeout(() => mv.set(value), 80);
-      return () => clearTimeout(t);
-    }
-  }, [inView, value, mv]);
+    mv.set(value);
+  }, [value, mv]);
 
   useEffect(() => {
     const unsub = spring.on("change", (v) => {

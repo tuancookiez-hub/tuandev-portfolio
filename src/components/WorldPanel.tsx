@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import { motion } from "motion/react";
 import type { World } from "../data/worlds";
@@ -17,6 +17,27 @@ export default function WorldPanel({ world, index }: Props) {
   const available = world.id === "hospitality" || world.id === "creative" || world.id === "systems";
   const disabled = !available;
   const entered = state.entered !== null;
+  const face = available;
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || !face) return;
+    const pin = () => {
+      const box = node.getBoundingClientRect();
+      node.style.setProperty("--vx", `${-box.left}px`);
+      node.style.setProperty("--vy", `${-box.top}px`);
+    };
+    pin();
+    const ro = new ResizeObserver(pin);
+    ro.observe(node);
+    window.addEventListener("resize", pin);
+    window.addEventListener("scroll", pin, true);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", pin);
+      window.removeEventListener("scroll", pin, true);
+    };
+  }, [face, active, muted]);
 
   return (
     <motion.button
@@ -29,6 +50,7 @@ export default function WorldPanel({ world, index }: Props) {
       data-active={active}
       data-muted={muted}
       data-entered={entered}
+      data-face={face}
       aria-pressed={active}
       aria-label={`Explore ${world.label}`}
       onClick={() => {
@@ -79,12 +101,12 @@ export default function WorldPanel({ world, index }: Props) {
         <span className="world-line">{world.line}</span>
       </span>
       {available ? (
+        <span className="world-enter" aria-hidden="true"><i /> Come in <b>↗</b></span>
+      ) : (
         <>
           <WorldPeek id={world.id} />
-          <span className="world-enter" aria-hidden="true"><i /> Come in <b>↗</b></span>
+          <span className="world-wip" aria-hidden="true"><i /> Under construction</span>
         </>
-      ) : (
-        <span className="world-wip" aria-hidden="true"><i /> Under construction</span>
       )}
     </motion.button>
   );
