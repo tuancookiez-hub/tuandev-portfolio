@@ -19,7 +19,9 @@
   filter: none !important;
 }
 .world[data-face="true"] .world-shade {
-  opacity: 0;
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(4,10,14,.22), transparent 34%),
+    linear-gradient(0deg, rgba(3,8,12,.78), rgba(3,8,12,.08) 58%);
 }
 .world[data-face="true"] .world-copy,
 .world[data-face="true"] .world-topline,
@@ -94,13 +96,12 @@
 
 @media (max-width: 720px) {
   .world[data-face="true"] .world-shade {
-    opacity: 1;
-    background: linear-gradient(180deg, rgba(8,12,16,.18) 0%, rgba(8,12,16,.55) 100%);
+    background: linear-gradient(180deg, rgba(8,12,16,.28) 0%, rgba(8,12,16,.62) 100%);
   }
   .world[data-face="true"] .world-copy,
   .world[data-face="true"] .world-topline,
   .world[data-face="true"] .world-enter {
-    text-shadow: 0 1px 12px rgba(0,0,0,.7);
+    text-shadow: 0 1px 12px rgba(0,0,0,.75);
     color: #fff;
   }
 }

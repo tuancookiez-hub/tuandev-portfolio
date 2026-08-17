@@ -231,7 +231,7 @@
   .cafe-hero-copy > span { max-width: 34ch; color: #35483d; }
   .cafe-actions { gap: 15px; }
   .cafe-actions a:first-child { padding: 12px 16px; }
-  .cafe-sticker { right: 20px; top: auto; bottom: 28px; width: 94px; height: 94px; font-size: 14px; }
+  .cafe-sticker { display: none; }
   .cafe-fast-strip { grid-template-columns: 1fr; }
   .cafe-fast-strip > span { grid-column: auto; }
   .cafe-fast-strip a { border-top: 1px solid rgba(30,42,35,.16); border-left: 0; }
