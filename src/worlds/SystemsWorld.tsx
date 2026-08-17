@@ -10,7 +10,7 @@
  *   2 · aiclient — AIClient2API routing console (provider pool + golden signals)
  *   3 · flow — React Flow kernel optimization graph (markdown tutorial)
  *   4 · reports — flip-page PDF viewer
- *   5 · network — organic agentic network (video reference)
+ *   5 · removed — was organic agentic network
  */
 
 import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
@@ -21,10 +21,6 @@ import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRo
 import AiClientConsole from "../components/AiClientConsole";
 import KernelViz from "../components/KernelViz";
 import PdfViewer from "../components/PdfViewer";
-import React from "react";
-
-// Lazy-load SwarmGraph to avoid pulling Three.js into the main bundle
-const SwarmGraph = React.lazy(() => import("../components/SwarmGraph"));
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -210,18 +206,7 @@ export default function SystemsWorld({
               <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
             </div>
 
-              {/* ── LEVEL 5: 3D SWARM NETWORK ── */}
-            <div className="sys-stage sys-stage-network">
-              <header className="sys-r-head">
-                <span className="sys-r-eyebrow">agentic swarm · L5</span>
-                <h2>Every cluster. Every connection. Live.</h2>
-                <p>A 3D force-directed graph of autonomous bots, dense glowing edges, and a real-time HUD tracking throughput, spend, and blast radius.</p>
-              </header>
-              <React.Suspense fallback={<div style={{height:500, background:"#0a0a0f", borderRadius:16, border:"1px solid rgba(159,208,240,.16)", display:"flex", alignItems:"center", justifyContent:"center", color:"#5eead4", fontFamily:"var(--font-mono)", fontSize:14}}>Loading 3D swarm…</div>}>
-                <SwarmGraph />
-              </React.Suspense>
-            </div>
-
+              
             <div className="sys-story-step"><b>{stageName}</b><span>scroll to unfold</span></div>
           </div>
         </section>
