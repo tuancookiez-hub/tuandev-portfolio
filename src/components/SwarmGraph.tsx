@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useMotionValue, useMotionValueEvent, useScroll } from "motion/react";
+import { motion } from "motion/react";
 import ForceGraph3D from "react-force-graph-3d";
 import * as THREE from "three";
 
@@ -153,7 +153,9 @@ function ThroughputChart({ value }: { value: number }) {
   return (
     <div className="sh-throughput">
       <div className="sh-throughput-head">Throughput</div>
-      <div className="sh-throughput-value">{value.toLocaleString()}</div>
+      <motion.div className="sh-throughput-value"
+        key={value} initial={{ scale: 1.1, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}>{value.toLocaleString()}</motion.div>
       <div className="sh-throughput-sub">actions / min</div>
       <svg viewBox="0 0 200 40" className="sh-throughput-spark">
         <polyline points={spark.map((v, i) => `${(i / 19) * 200},${40 - (v / max) * 36}`).join(" ")} fill="none" stroke="#5eead4" strokeWidth="1.5" strokeLinecap="round" />
@@ -186,10 +188,10 @@ function ActionHeat({ stageIdx }: { stageIdx: number }) {
 function BlastRadius({ stageIdx }: { stageIdx: number }) {
   const dims = ["scope", "speed", "cost", "risk", "impact"];
   const stageValues = [
-    [0.4, 0.5, 0.2, 0.2, 0.3],  // s1: initial
-    [0.6, 0.7, 0.35, 0.25, 0.6], // s2: connection wave
-    [0.85, 0.9, 0.6, 0.5, 0.95], // s3: peak activity
-    [0.55, 0.6, 0.4, 0.3, 0.7],  // s4: settling
+    [0.4, 0.5, 0.2, 0.2, 0.3],
+    [0.6, 0.7, 0.35, 0.25, 0.6],
+    [0.85, 0.9, 0.6, 0.5, 0.95],
+    [0.55, 0.6, 0.4, 0.3, 0.7],
   ];
   const values = stageValues[stageIdx];
   const cx = 50, cy = 50, r = 38;
@@ -202,12 +204,8 @@ function BlastRadius({ stageIdx }: { stageIdx: number }) {
       <div className="sh-blast-head">Blast Radius</div>
       <svg viewBox="0 0 100 100" className="sh-blast-svg">
         <motion.polygon
-          points={points}
-          fill="rgba(94,234,212,.15)"
-          stroke="#5eead4"
-          strokeWidth="1"
-          animate={{ points }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+          points={points} fill="rgba(94,234,212,.15)" stroke="#5eead4" strokeWidth="1"
+          animate={{ points }} transition={{ duration: 1.2, ease: "easeOut" }}
         />
         {dims.map((d, i) => {
           const a = (i / dims.length) * Math.PI * 2 - Math.PI / 2;
@@ -218,15 +216,36 @@ function BlastRadius({ stageIdx }: { stageIdx: number }) {
   );
 }
 
-function BotStatusList() {
-  const bots = [
-    { name: "calendar-sync", status: "active" as const, tasks: 12 },
-    { name: "inbox-triage", status: "active", tasks: 8 },
-    { name: "invoice-run", status: "idle", tasks: 0 },
-    { name: "lead-scrape", status: "active", tasks: 5 },
-    { name: "report-build", status: "active", tasks: 3 },
-    { name: "outreach", status: "idle", tasks: 0 },
+function BotStatusList({ stageIdx }: { stageIdx: number }) {
+  const stageBots = [
+    [
+      { name: "calendar-sync", status: "active" as const, tasks: 6 },
+      { name: "inbox-triage", status: "active", tasks: 4 },
+      { name: "invoice-run", status: "idle", tasks: 0 },
+      { name: "lead-scrape", status: "active", tasks: 3 },
+    ],
+    [
+      { name: "calendar-sync", status: "active" as const, tasks: 12 },
+      { name: "inbox-triage", status: "active", tasks: 8 },
+      { name: "invoice-run", status: "active", tasks: 4 },
+      { name: "lead-scrape", status: "active", tasks: 5 },
+    ],
+    [
+      { name: "calendar-sync", status: "active" as const, tasks: 18 },
+      { name: "inbox-triage", status: "active", tasks: 14 },
+      { name: "invoice-run", status: "active", tasks: 9 },
+      { name: "lead-scrape", status: "active", tasks: 8 },
+      { name: "report-build", status: "active", tasks: 5 },
+      { name: "outreach", status: "active", tasks: 3 },
+    ],
+    [
+      { name: "calendar-sync", status: "active" as const, tasks: 8 },
+      { name: "inbox-triage", status: "active", tasks: 5 },
+      { name: "invoice-run", status: "idle", tasks: 0 },
+      { name: "lead-scrape", status: "active", tasks: 2 },
+    ],
   ];
+  const bots = stageBots[stageIdx];
   return (
     <div className="sh-bots">
       <div className="sh-bots-head">Bot Status</div>
@@ -249,8 +268,9 @@ function SpendGauge({ value, max }: { value: number; max: number }) {
       <div className="sh-spend-head">Spend</div>
       <svg viewBox="0 0 70 70" className="sh-spend-gauge">
         <circle cx="35" cy="35" r="28" fill="none" stroke="rgba(150,170,200,.15)" strokeWidth="5" />
-        <circle cx="35" cy="35" r="28" fill="none" stroke="#c98a12" strokeWidth="5" strokeLinecap="round"
-          strokeDasharray={c} strokeDashoffset={c * (1 - pct)} transform="rotate(-90 35 35)" />
+        <motion.circle cx="35" cy="35" r="28" fill="none" stroke="#c98a12" strokeWidth="5" strokeLinecap="round"
+          strokeDasharray={c} strokeDashoffset={c * (1 - pct)} transform="rotate(-90 35 35)"
+          initial={false} animate={{ strokeDashoffset: c * (1 - pct) }} transition={{ duration: 1.2, ease: "easeOut" }} />
         <text x="35" y="33" textAnchor="middle" fill="#eaf3f9" fontSize="11" fontWeight="700" fontFamily="Georgia, serif">${value.toFixed(2)}</text>
         <text x="35" y="44" textAnchor="middle" fill="#a9c9db" fontSize="7" fontFamily="monospace">of ${max.toFixed(2)}</text>
       </svg>
@@ -260,11 +280,12 @@ function SpendGauge({ value, max }: { value: number; max: number }) {
 
 // ─── 3D Canvas ─────────────────────────────────────────────────
 
-function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
+function Swarm3DCanvas({ stage, playing }: { stage: typeof STAGES[0]; playing: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
+  const angleRef = useRef(0);
 
-  // Custom node: glowing sphere + halo
+  // Custom node: glowing sphere + halo (with pulsing via uniform time)
   const nodeThreeObject = useMemo(() => (node: SN) => {
     const g = new THREE.Group();
     const main = new THREE.Mesh(
@@ -287,7 +308,6 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
     return new THREE.Line(geo, mat);
   }, []);
 
-  // Update link positions
   const linkPositionUpdate = useMemo(() => (_line: any, coords: { start: { x: number; y: number; z: number }; end: { x: number; y: number; z: number } }) => {
     const geo = _line.geometry as THREE.BufferGeometry;
     const pos = new Float32Array([coords.start.x, coords.start.y, coords.start.z, coords.end.x, coords.end.y, coords.end.z]);
@@ -298,7 +318,6 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
   const handleEngineStop = useMemo(() => () => {
     const fg = fgRef.current;
     if (!fg) return;
-    // Compute bounding box of all nodes
     const nodes = stage.nodes;
     if (!nodes.length) return;
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
@@ -311,8 +330,37 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
     const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
     const spanX = maxX - minX, spanY = maxY - minY;
     const dist = Math.max(spanX, spanY) * 1.2 + 50;
-    fg.cameraPosition({ x: cx, y: cy, z: cz + dist }, undefined, 1500);
+    fg.cameraPosition({ x: cx + dist * 0.3, y: cy + dist * 0.15, z: cz + dist }, undefined, 1500);
   }, [stage]);
+
+  // Continuous camera orbit when playing
+  useEffect(() => {
+    if (!playing) return;
+    let raf: number;
+    const orbit = () => {
+      const fg = fgRef.current;
+      if (!fg) { raf = requestAnimationFrame(orbit); return; }
+      angleRef.current += 0.003;
+      const a = angleRef.current;
+      const nodes = stage.nodes;
+      if (!nodes.length) { raf = requestAnimationFrame(orbit); return; }
+      // Compute center from node positions
+      let sx = 0, sy = 0, sz = 0;
+      nodes.forEach((n) => { sx += n.fx ?? 0; sy += n.fy ?? 0; sz += n.fz ?? 0; });
+      const cx = sx / nodes.length, cy = sy / nodes.length, cz = sz / nodes.length;
+      // Orbit radius based on spread
+      let mxx = 0, myy = 0;
+      nodes.forEach((n) => { mxx = Math.max(mxx, Math.abs((n.fx ?? 0) - cx)); myy = Math.max(myy, Math.abs((n.fy ?? 0) - cy)); });
+      const r = Math.max(mxx, myy) * 1.4 + 40;
+      const camX = cx + Math.cos(a) * r;
+      const camY = cy + Math.sin(a * 0.7) * r * 0.3;
+      const camZ = cz + Math.sin(a) * r;
+      fg.cameraPosition({ x: camX, y: camY, z: camZ }, { x: cx, y: cy, z: cz }, 0);
+      raf = requestAnimationFrame(orbit);
+    };
+    raf = requestAnimationFrame(orbit);
+    return () => cancelAnimationFrame(raf);
+  }, [playing, stage]);
 
   return (
     <div className="sg-canvas-wrap" ref={containerRef}>
@@ -326,14 +374,14 @@ function Swarm3DCanvas({ stage }: { stage: typeof STAGES[0] }) {
         nodeThreeObject={nodeThreeObject}
         linkThreeObject={linkThreeObject}
         linkPositionUpdate={linkPositionUpdate}
-        linkDirectionalParticles={2}
-        linkDirectionalParticleWidth={1.5}
-        linkDirectionalParticleSpeed={0.005}
+        linkDirectionalParticles={4}
+        linkDirectionalParticleWidth={2}
+        linkDirectionalParticleSpeed={0.008}
         linkDirectionalParticleColor={() => "#5eead4"}
-        linkOpacity={0.2}
+        linkOpacity={0.25}
         nodeOpacity={0.9}
         d3VelocityDecay={0.3}
-        warmupTicks={20}
+        warmupTicks={30}
         cooldownTicks={100}
         enablePointerInteraction
         enableNavigationControls
@@ -351,15 +399,6 @@ export default function SwarmGraph() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const current = STAGES[index];
 
-  // Scroll-based progress for camera orbit
-  const { scrollYProgress } = useScroll();
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    x.set(Math.sin(v * Math.PI * 2) * 50);
-    y.set(Math.cos(v * Math.PI * 3) * 20);
-  });
-
   const next = () => setIndex((i) => (i + 1) % STAGES.length);
 
   useEffect(() => {
@@ -371,7 +410,7 @@ export default function SwarmGraph() {
   return (
     <div className="sg-shell">
       <div className="sg-graph-area">
-        <Swarm3DCanvas stage={current} />
+        <Swarm3DCanvas stage={current} playing={playing} />
 
         <motion.div className="sg-stage-label" key={current.id}
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -400,7 +439,7 @@ export default function SwarmGraph() {
         <ThroughputChart value={current.metrics.throughput} />
         <ActionHeat stageIdx={index} />
         <BlastRadius stageIdx={index} />
-        <BotStatusList />
+        <BotStatusList stageIdx={index} />
         <SpendGauge value={current.metrics.spend} max={60} />
       </div>
     </div>

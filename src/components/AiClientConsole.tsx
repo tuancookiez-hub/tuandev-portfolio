@@ -147,7 +147,7 @@ export default function AiClientConsole() {
         >
           <span className="acl-callout-kicker">one client · many models</span>
           <h3>Plug the model in,<br />swap the provider later.</h3>
-          <p>Representative routing patterns from the AIClient2API console — a proxy that keeps the client stable while the pool of models rotates.</p>
+          <p>How AIClient2API works — a proxy that keeps the client stable while the pool of models rotates underneath.</p>
         </motion.div>
       </div>
     </div>

@@ -138,7 +138,7 @@ export default function SystemsWorld({
               <header className="sys-ov-head">
                 <div>
                   <span className="sys-ov-eyebrow">System overview · L1</span>
-                  <h1 className="sys-ov-title">Operations at a glance.</h1>
+                  <h1 className="sys-ov-title">I run this in production.</h1>
                 </div>
                 <div className="sys-ov-uptime">
                   <span className="sys-ov-uptime-label">uptime · 30d</span>
@@ -181,8 +181,8 @@ export default function SystemsWorld({
             <div className="sys-stage sys-stage-aiclient">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">AIClient2API · L2</span>
-                <h2>One client, many models.</h2>
-                <p>The provider pool, golden routing signals, and a live workflow — representative AIClient2API patterns. Drag the router around or let it stream.</p>
+                <h2>Route once. Swap providers later.</h2>
+                <p>The provider pool, golden routing signals, and a live workflow — how AIClient2API keeps the client stable while the model pool rotates underneath.</p>
               </header>
               <AiClientConsole />
             </div>
@@ -191,8 +191,8 @@ export default function SystemsWorld({
             <div className="sys-stage sys-stage-flow">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">compute graph · L3</span>
-                <h2>Watch the graph optimize itself.</h2>
-                <p>Operator fusion: nodes merge, edges rewire, particles stream. Toggle the pass or let it auto-run.</p>
+                <h2>Operator fusion in real time.</h2>
+                <p>Nodes merge, edges rewrite, particles stream through the graph. Step through each pass or let the optimization run.</p>
               </header>
               <KernelViz />
             </div>
@@ -201,8 +201,8 @@ export default function SystemsWorld({
             <div className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection · reporting · L4</span>
-                <h2>Reports, read inline.</h2>
-                <p>A flip-book PDF reader — the way a client sees their report on a business site. No download required.</p>
+                <h2>Four pages. No download.</h2>
+                <p>A flip-book PDF rendered inline — the way a client reads their inspection report on a business site. Cover, summary, findings, and timeline.</p>
               </header>
               <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
             </div>
@@ -211,8 +211,8 @@ export default function SystemsWorld({
             <div className="sys-stage sys-stage-network">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">agentic swarm · L5</span>
-                <h2>The system watches itself.</h2>
-                <p>A 3D force-directed graph of living neural clusters, dense glowing connections, and a live HUD.</p>
+                <h2>Every cluster. Every connection. Live.</h2>
+                <p>A 3D force-directed graph of autonomous bots, dense glowing edges, and a real-time HUD tracking throughput, spend, and blast radius.</p>
               </header>
               <React.Suspense fallback={<div style={{height:500, background:"#0a0a0f", borderRadius:16, border:"1px solid rgba(159,208,240,.16)", display:"flex", alignItems:"center", justifyContent:"center", color:"#5eead4", fontFamily:"var(--font-mono)", fontSize:14}}>Loading 3D swarm…</div>}>
                 <SwarmGraph />

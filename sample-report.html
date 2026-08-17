@@ -1,0 +1,411 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root {
+    --ink: #0f172a;
+    --soft: #64748b;
+    --line: #e2e8f0;
+    --accent: #10243a;
+    --accent-light: #477da2;
+    --success: #16a34a;
+    --warning: #d97706;
+    --danger: #dc2626;
+    --paper: #f8fafc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--ink);
+    font-size: 11px;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    position: relative;
+    width: 100%;
+    height: 297mm;
+    padding: 0;
+    overflow: hidden;
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ── Cover page ──────────────────────── */
+  .cover {
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30mm;
+  }
+  .cover-brand {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 18mm;
+  }
+  .cover-mark {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(255,255,255,.12); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px; font-family: 'DM Serif Display', serif;
+  }
+  .cover-brand-name {
+    font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  }
+  .cover-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px; font-weight: 400; line-height: 1.15;
+    margin-bottom: 5mm; max-width: 130mm;
+  }
+  .cover-subtitle {
+    font-size: 14px; color: rgba(255,255,255,.6); max-width: 110mm;
+    line-height: 1.6; margin-bottom: 14mm;
+  }
+  .cover-meta {
+    display: flex; gap: 28px; font-size: 10px; color: rgba(255,255,255,.5);
+  }
+  .cover-meta b { color: rgba(255,255,255,.85); font-weight: 600; }
+  .cover-badge {
+    position: absolute; top: 14mm; right: 14mm;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+    color: rgba(255,255,255,.7); font-size: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .1em; padding: 4px 14px; border-radius: 20px;
+  }
+  .cover-footer {
+    position: absolute; bottom: 14mm; left: 0; right: 0;
+    text-align: center; font-size: 9px; color: rgba(255,255,255,.35);
+  }
+
+  /* ── Content pages ───────────────────── */
+  .content {
+    padding: 16mm 18mm 20mm;
+  }
+  .content-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 2px solid var(--accent); padding-bottom: 5mm; margin-bottom: 7mm;
+  }
+  .ch-brand { display: flex; gap: 8px; align-items: center; }
+  .ch-mark {
+    width: 28px; height: 28px; border-radius: 6px; background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px; font-family: 'DM Serif Display', serif;
+  }
+  .ch-text { font-weight: 600; font-size: 9px; letter-spacing: .05em; }
+  .ch-badge {
+    background: #fef3c7; color: #92400e; font-size: 8px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em; padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* Summary cards */
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin-bottom: 7mm; }
+  .sum-card { border: 1px solid var(--line); border-radius: 8px; padding: 4mm 4mm 3mm; }
+  .sum-label { color: var(--soft); font-size: 8px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .sum-value { font-size: 24px; font-weight: 700; margin: 1px 0; font-family: 'JetBrains Mono', monospace; }
+  .sum-trend { font-size: 8px; font-weight: 600; }
+  .trend-up { color: var(--success); }
+  .trend-down { color: var(--warning); }
+  .trend-danger { color: var(--danger); }
+
+  /* Section */
+  .section { margin-bottom: 6mm; }
+  .section-label {
+    color: var(--soft); font-size: 8px; text-transform: uppercase;
+    letter-spacing: .1em; font-weight: 700; margin-bottom: 3mm;
+  }
+
+  /* Progress table */
+  .progress-table { width: 100%; border-collapse: collapse; }
+  .progress-table th {
+    text-align: left; color: var(--soft); font-size: 8px; text-transform: uppercase;
+    letter-spacing: .04em; padding: 2mm 3mm; border-bottom: 1px solid var(--line); font-weight: 600;
+  }
+  .progress-table td { padding: 2.5mm 3mm; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
+  .row-label { font-weight: 600; }
+  .row-owner { color: var(--soft); font-size: 9px; }
+  .bar-track { height: 7px; background: #f1f5f9; border-radius: 6px; overflow: hidden; width: 100%; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .risk { font-size: 8px; font-weight: 700; padding: 1px 8px; border-radius: 12px; }
+  .risk-low { color: var(--success); background: #dcfce7; }
+  .risk-medium { color: var(--warning); background: #fef3c7; }
+  .risk-high { color: var(--danger); background: #fee2e2; }
+  .status { font-size: 9px; font-weight: 600; color: var(--success); }
+  .status-atrisk { color: var(--warning); }
+
+  /* Bar graph */
+  .graph { border: 1px solid var(--line); border-radius: 8px; padding: 4mm; }
+  .graph-title { font-weight: 600; font-size: 11px; margin-bottom: 1mm; }
+  .graph-sub { color: var(--soft); font-size: 8px; margin-bottom: 3mm; }
+  .bar-rows { display: flex; flex-direction: column; gap: 1.4mm; }
+  .graph-row { display: grid; grid-template-columns: 100px 1fr 32px; align-items: center; gap: 3mm; }
+  .graph-row .glabel { font-size: 9px; color: var(--soft); }
+  .graph-row .gbar-track { height: 10px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
+  .graph-row .gbar-fill { height: 100%; border-radius: 6px; background: var(--accent-light); }
+  .graph-row .gval { font-size: 9px; font-weight: 700; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+  /* Timeline */
+  .timeline { display: flex; flex-direction: column; gap: 3mm; }
+  .tl-row { display: flex; gap: 4mm; align-items: flex-start; }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-light); margin-top: 2px; flex-shrink: 0; }
+  .tl-date { font-size: 8px; color: var(--soft); font-family: 'JetBrains Mono', monospace; min-width: 42mm; }
+  .tl-text { font-size: 10px; line-height: 1.45; }
+
+  /* Two-col grid */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+
+  /* Callout */
+  .callout {
+    border: 1px solid var(--line); border-radius: 8px; padding: 4mm;
+    background: var(--paper);
+  }
+  .callout-title { font-weight: 700; font-size: 11px; margin-bottom: 2mm; }
+  .callout-text { font-size: 10px; line-height: 1.55; color: var(--soft); }
+
+  /* Methodology */
+  .method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .method-card { border: 1px solid var(--line); border-radius: 8px; padding: 3.5mm; }
+  .method-num { font-size: 20px; font-weight: 700; color: var(--accent-light); font-family: 'JetBrains Mono', monospace; }
+  .method-name { font-weight: 600; font-size: 10px; margin: 1mm 0; }
+  .method-desc { font-size: 9px; color: var(--soft); line-height: 1.4; }
+
+  /* Footer */
+  .page-footer {
+    position: absolute; bottom: 10mm; left: 18mm; right: 18mm;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--line); padding-top: 3mm;
+    color: var(--soft); font-size: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── PAGE 1: COVER ──────────────────────── -->
+<div class="page cover">
+  <div class="cover-badge">CONFIDENTIAL · SAMPLE</div>
+  <div class="cover-brand">
+    <div class="cover-mark">S</div>
+    <div class="cover-brand-name">Tuan Dev · Systems</div>
+  </div>
+  <div class="cover-title">Security &amp; Operations<br>Inspection Report</div>
+  <div class="cover-subtitle">Kwasa Damansara — Mechanical &amp; Electrical infrastructure assessment. A portfolio sample demonstrating automated report generation from inspection data pipelines.</div>
+  <div class="cover-meta">
+    <span>Inspector: <b>Tuan Dev</b></span>
+    <span>Site: <b>Kwasa Damansara</b></span>
+    <span>Duration: <b>Aug 2026</b></span>
+    <span>SLA: <b>96.1%</b></span>
+  </div>
+  <div class="cover-footer">This is a generic portfolio sample — no client, site, or operational data represented.</div>
+</div>
+
+<!-- ─── PAGE 2: EXECUTIVE SUMMARY ──────────── -->
+<div class="page content">
+  <div class="content-header">
+    <div class="ch-brand"><div class="ch-mark">S</div><div class="ch-text">TUAN DEV · SYSTEMS</div></div>
+    <div class="ch-badge">CONFIDENTIAL · SAMPLE</div>
+  </div>
+
+  <div class="section-label">Executive Summary</div>
+  <div class="summary">
+    <div class="sum-card">
+      <div class="sum-label">Inspections</div>
+      <div class="sum-value" style="color:var(--accent)">142</div>
+      <div class="sum-trend trend-up">▲ +9.8% MoM</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">SLA Hit Rate</div>
+      <div class="sum-value" style="color:var(--success)">96.1%</div>
+      <div class="sum-trend trend-up">▲ +1.4 pts</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Findings</div>
+      <div class="sum-value" style="color:var(--warning)">214</div>
+      <div class="sum-trend trend-up">▲ +6.0%</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Escalations</div>
+      <div class="sum-value" style="color:var(--success)">17</div>
+      <div class="sum-trend trend-up">▼ −18.5%</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="two-col">
+      <div class="callout">
+        <div class="callout-title">Key Findings</div>
+        <div class="callout-text">
+          SLA improved after rebalancing inspection routing and incident triage. Access-control queue grew this month; remediation plan has budget and sponsorship. No critical safety findings — two minor housekeeping observations remain open.
+        </div>
+      </div>
+      <div class="callout">
+        <div class="callout-title">Risk Summary</div>
+        <div class="callout-text">
+          <b style="color:var(--danger)">High:</b> Access Control — wiring compliance gaps in zones C–D.<br>
+          <b style="color:var(--warning)">Medium:</b> Lighting &amp; Safety — deferred luminaire replacement.<br>
+          <b style="color:var(--success)">Low:</b> Electrical Distribution and Cable Routing on track.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Findings Resolved by Week</div>
+    <div class="graph">
+      <div class="graph-title">Weekly resolution throughput</div>
+      <div class="graph-sub">Resolved findings across all inspection areas</div>
+      <div class="bar-rows">
+        <div class="graph-row"><span class="glabel">Week 1</span><div class="gbar-track"><div class="gbar-fill" style="width:45%"></div></div><span class="gval">24</span></div>
+        <div class="graph-row"><span class="glabel">Week 2</span><div class="gbar-track"><div class="gbar-fill" style="width:68%"></div></div><span class="gval">36</span></div>
+        <div class="graph-row"><span class="glabel">Week 3</span><div class="gbar-track"><div class="gbar-fill" style="width:82%"></div></div><span class="gval">44</span></div>
+        <div class="graph-row"><span class="glabel">Week 4</span><div class="gbar-track"><div class="gbar-fill" style="width:95%"></div></div><span class="gval">51</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>TUAN DEV · SYSTEMS — inspection report (sample)</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+<!-- ─── PAGE 3: FINDINGS DETAIL ───────────── -->
+<div class="page content">
+  <div class="content-header">
+    <div class="ch-brand"><div class="ch-mark">S</div><div class="ch-text">TUAN DEV · SYSTEMS</div></div>
+    <div class="ch-badge">CONFIDENTIAL · SAMPLE</div>
+  </div>
+
+  <div class="section-label">Finding Progress by Area</div>
+  <table class="progress-table">
+    <thead><tr><th>Area</th><th>Owner</th><th>Progress</th><th>Risk</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="row-label">Electrical Distribution</td><td class="row-owner">N. Mehta</td>
+        <td><div class="bar-track"><div class="bar-fill" style="width:91%;background:#16a34a"></div></div></td>
+        <td><span class="risk risk-low">Low</span></td><td class="status">On Track</td>
+      </tr>
+      <tr>
+        <td class="row-label">Cable Routing</td><td class="row-owner">D. Chen</td>
+        <td><div class="bar-track"><div class="bar-fill" style="width:85%;background:#16a34a"></div></div></td>
+        <td><span class="risk risk-low">Low</span></td><td class="status">On Track</td>
+      </tr>
+      <tr>
+        <td class="row-label">Access Control</td><td class="row-owner">R. Walker</td>
+        <td><div class="bar-track"><div class="bar-fill" style="width:66%;background:#d97706"></div></div></td>
+        <td><span class="risk risk-high">High</span></td><td class="status status-atrisk">At Risk</td>
+      </tr>
+      <tr>
+        <td class="row-label">Lighting &amp; Safety</td><td class="row-owner">M. Roy</td>
+        <td><div class="bar-track"><div class="bar-fill" style="width:77%;background:#2563eb"></div></div></td>
+        <td><span class="risk risk-medium">Medium</span></td><td class="status">On Track</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section">
+    <div class="section-label">Inspection Methodology</div>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-num">01</div>
+        <div class="method-name">Visual Survey</div>
+        <div class="method-desc">Systematic walkthrough of all zones with photographic documentation and anomaly tagging.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-num">02</div>
+        <div class="method-name">Compliance Check</div>
+        <div class="method-desc">Verification against local electrical codes, fire safety standards, and tenant fit-out guidelines.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-num">03</div>
+        <div class="method-name">Risk Scoring</div>
+        <div class="method-desc">Each finding rated on severity, likelihood, and impact. Escalations trigger automated alerts.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Findings by Category</div>
+    <div class="graph">
+      <div class="bar-rows">
+        <div class="graph-row"><span class="glabel">Electrical</span><div class="gbar-track"><div class="gbar-fill" style="width:91%"></div></div><span class="gval">91%</span></div>
+        <div class="graph-row"><span class="glabel">Cable Routing</span><div class="gbar-track"><div class="gbar-fill" style="width:85%"></div></div><span class="gval">85%</span></div>
+        <div class="graph-row"><span class="glabel">Lighting &amp; Safety</span><div class="gbar-track"><div class="gbar-fill" style="width:77%"></div></div><span class="gval">77%</span></div>
+        <div class="graph-row"><span class="glabel">Access Control</span><div class="gbar-track"><div class="gbar-fill" style="width:66%"></div></div><span class="gval">66%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>TUAN DEV · SYSTEMS — inspection report (sample)</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+<!-- ─── PAGE 4: TIMELINE + NEXT STEPS ─────── -->
+<div class="page content">
+  <div class="content-header">
+    <div class="ch-brand"><div class="ch-mark">S</div><div class="ch-text">TUAN DEV · SYSTEMS</div></div>
+    <div class="ch-badge">CONFIDENTIAL · SAMPLE</div>
+  </div>
+
+  <div class="section-label">Inspection Timeline</div>
+  <div class="timeline">
+    <div class="tl-row"><div class="tl-dot"></div><div class="tl-date">04 Aug 2026</div><div class="tl-text">Initial site access granted. Zones A–B surveyed. 18 findings logged.</div></div>
+    <div class="tl-row"><div class="tl-dot"></div><div class="tl-date">07 Aug 2026</div><div class="tl-text">Zones C–D survey completed. Access-control wiring issues identified in zones C–D.</div></div>
+    <div class="tl-row"><div class="tl-dot"></div><div class="tl-date">11 Aug 2026</div><div class="tl-text">Electrical distribution audit. Cable routing verified. 4 findings escalated.</div></div>
+    <div class="tl-row"><div class="tl-dot"></div><div class="tl-date">14 Aug 2026</div><div class="tl-text">Lighting and safety walkthrough. Luminaire replacement deferred to Phase 2.</div></div>
+    <div class="tl-row"><div class="tl-dot"></div><div class="tl-date">18 Aug 2026</div><div class="tl-text">Final review. 155 of 214 findings resolved. Remaining 59 in progress.</div></div>
+  </div>
+
+  <div class="section" style="margin-top:6mm">
+    <div class="section-label">Next Steps</div>
+    <div class="two-col">
+      <div class="callout">
+        <div class="callout-title">Immediate (Week 5)</div>
+        <div class="callout-text">
+          • Complete access-control remediation in zones C–D<br>
+          • Schedule luminaire replacement for Phase 2<br>
+          • Close remaining 59 findings with area owners
+        </div>
+      </div>
+      <div class="callout">
+        <div class="callout-title">Quarter 2 Outlook</div>
+        <div class="callout-text">
+          • Expand inspection coverage to parking infrastructure<br>
+          • Integrate automated compliance scoring into the pipeline<br>
+          • Target 98% SLA by end of Q2 2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:6mm">
+    <div class="section-label">Approvals</div>
+    <div style="display:flex;gap:20mm;margin-top:4mm">
+      <div>
+        <div style="border-bottom:1px solid var(--ink);width:60mm;margin-bottom:2mm;padding-bottom:1mm">
+          <span style="font-size:14px;font-family:'DM Serif Display',serif">Tuan Dev</span>
+        </div>
+        <div style="font-size:8px;color:var(--soft)">Lead Inspector</div>
+      </div>
+      <div>
+        <div style="border-bottom:1px solid var(--ink);width:60mm;margin-bottom:2mm;padding-bottom:1mm">
+          <span style="font-size:14px;font-family:'DM Serif Display',serif">N. Mehta</span>
+        </div>
+        <div style="font-size:8px;color:var(--soft)">Site Manager</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>TUAN DEV · SYSTEMS — inspection report (sample)</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+</body>
+</html>
