@@ -54,15 +54,16 @@ export default function WeatherPortal({
 
   const open = phase === "open" || phase === "entering";
   const wrap: CSSProperties = {
-    position: phase === "open" ? "relative" : "fixed",
-    inset: phase === "open" ? "auto" : 0,
+    position: "fixed",
+    inset: 0,
     zIndex: 120,
     width: "100%",
-    minHeight: "100dvh",
-    overflow: phase === "open" ? "visible" : "hidden",
+    height: "100dvh",
+    overflow: phase === "open" ? "auto" : "hidden",
     overscrollBehavior: "contain",
     background: sky.hold,
     pointerEvents: "auto",
+    WebkitOverflowScrolling: "touch",
   };
   const dur = reduced ? 0.2 : phase === "closing" ? 0.72 : 0.86;
 

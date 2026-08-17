@@ -33,6 +33,11 @@
   width: 100%;
   min-height: 100dvh;
 }
+.wx-portal[data-phase="entering"] .wx-page,
+.wx-portal[data-phase="closing"] .wx-page {
+  max-height: 100dvh;
+  overflow: hidden;
+}
 .wx-portal[data-phase="open"] .wx-photo,
 .wx-portal[data-phase="open"] .wx-wash,
 .wx-portal[data-phase="open"] .wx-fog,
