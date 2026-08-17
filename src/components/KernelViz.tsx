@@ -255,8 +255,12 @@ export default function KernelViz() {
           proOptions={{ hideAttribution: true }}
           nodesConnectable={false}
           elementsSelectable={false}
-          panOnDrag
-          zoomOnScroll
+          panOnDrag={false}
+          panOnScroll={false}
+          zoomOnScroll={false}
+          zoomOnDoubleClick={false}
+          zoomOnPinch={false}
+          preventScrolling={true}
           className="kv-flow"
         >
           <Background variant={BackgroundVariant.Dots} gap={36} size={1.4} color="rgba(150,170,200,.12)" />

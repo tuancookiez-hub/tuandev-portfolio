@@ -33,7 +33,14 @@
   transition: color 800ms ease;
 }
 
-/* Dark theme overrides — text must adapt when background transitions to dark */
+/* Smooth mid theme — between light and dark */
+.sys[data-theme="mid"] {
+  --sys-ink: #1a2a3a;
+  --sys-soft: #5a6f82;
+  --sys-blue: #3a6a8a;
+}
+
+/* Dark theme overrides */
 .sys[data-theme="dark"] {
   --sys-paper: #020617;
   --sys-card: #0b1020;

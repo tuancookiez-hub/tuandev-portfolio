@@ -86,8 +86,14 @@ export default function SystemsWorld({
   );
   const gridFade = useTransform(scrollYProgress, [0, 0.10, 0.30, 0.55, 1], [1, 0.85, 0.3, 0, 0]);
 
+  // Smooth text colors driven by scroll progress (no hard threshold)
+  const textColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
+  const softColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#40596c", "#40596c", "#a9c9db", "#a9c9db"]);
+
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
+  const [ink, setInk] = useState("#10243a");
+  const [soft, setSoft] = useState("#40596c");
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
     setProgress(v);
@@ -97,7 +103,11 @@ export default function SystemsWorld({
     else if (v < 0.72) setStageName("reports");
     else setStageName("network");
   });
-  const theme = progress < 0.5 ? "light" : "dark";
+  useMotionValueEvent(textColor, "change", setInk);
+  useMotionValueEvent(softColor, "change", setSoft);
+
+  // Theme is now smooth, not a hard switch
+  const theme = progress < 0.22 ? "light" : progress < 0.45 ? "mid" : "dark";
 
   return (
     <div className="sys" data-stage={stageName} data-theme={theme}>
@@ -114,12 +124,12 @@ export default function SystemsWorld({
         </span>
       </div>
 
-      <motion.main className="sys-main" data-theme={theme} style={reduced ? undefined : { backgroundColor: wash }}>
+      <motion.main className="sys-main" data-theme={theme} style={{ backgroundColor: wash, ["--sys-ink" as string]: ink, ["--sys-soft" as string]: soft } as any}>
         <motion.div className="sys-grid-bg" style={reduced ? undefined : { opacity: gridFade }} aria-hidden="true">
           <div className="sys-grid-pattern" />
         </motion.div>
 
-        <section ref={stageRef} className="sys-story" data-sync="journey" data-progress={progress.toFixed(3)} data-stage={stageName} data-theme={theme}>
+        <section ref={stageRef} className="sys-story" data-sync="journey" data-progress={progress.toFixed(3)} data-stage={stageName} data-theme={theme} style={reduced ? undefined : { color: ink } as React.CSSProperties}>
           <div className="sys-story-sticky">
             <div className="sys-story-progress" aria-hidden="true"><i style={{ transform: `scaleX(${progress})` }} /></div>
 
