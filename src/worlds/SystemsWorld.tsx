@@ -86,9 +86,9 @@ export default function SystemsWorld({
   );
   const gridFade = useTransform(scrollYProgress, [0, 0.10, 0.30, 0.55, 1], [1, 0.85, 0.3, 0, 0]);
 
-  // Smooth text colors driven by scroll progress (no hard threshold)
-  const textColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
-  const softColor = useTransform(scrollYProgress, [0, 0.15, 0.38, 0.6], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
+  // Smooth text colors — stay dark through the grey zone, only lighten when bg is dark
+  const textColor = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["#10243a", "#10243a", "#eaf3f9", "#eaf3f9"]);
+  const softColor = useTransform(scrollYProgress, [0, 0.35, 0.45, 0.6], ["#2a3a4a", "#2a3a4a", "#a9c9db", "#a9c9db"]);
 
   const [progress, setProgress] = useState(0);
   const [stageName, setStageName] = useState("overview");
