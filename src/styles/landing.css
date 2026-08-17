@@ -58,7 +58,7 @@
 .landing[data-entered="true"] {
   visibility: hidden;
   transition:
-    visibility 0s linear 1.25s,
+    visibility 0s linear 0.82s,
     --page 780ms cubic-bezier(.22,1,.36,1),
     --ink 650ms cubic-bezier(.22,1,.36,1),
     --soft 650ms cubic-bezier(.22,1,.36,1),

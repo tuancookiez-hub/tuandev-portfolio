@@ -7,6 +7,7 @@ import "./styles/cafe-book.css";
 import "./styles/device-preview.css";
 import "./styles/creative.css";
 import "./styles/systems.css";
+import "./styles/weather.css";
 
 const root = document.getElementById("root");
 if (root === null) {

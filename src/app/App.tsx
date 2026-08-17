@@ -1,7 +1,7 @@
 import { ActiveWorldProvider } from "../context/ActiveWorldProvider";
 import Header from "../components/Header";
 import WorldSelector from "../components/WorldSelector";
-import HospitalityPortal from "../components/HospitalityPortal";
+import WeatherPortal from "../components/WeatherPortal";
 import HospitalityWorld from "../worlds/HospitalityWorld";
 import CreativeWorld from "../worlds/CreativeWorld";
 import SystemsWorld from "../worlds/SystemsWorld";
@@ -13,33 +13,53 @@ function Shell() {
   const direct = query.get("world");
   const embed = query.get("embed") === "1";
 
-  if (direct === "hospitality" && embed) {
-    return <HospitalityWorld embed shared />;
-  }
-
+  if (direct === "hospitality" && embed) return <HospitalityWorld embed shared />;
   if (direct === "hospitality") {
-    return <HospitalityPortal />;
+    return (
+      <HospitalityWorld
+        embed={false}
+        shared={false}
+        showReturn
+        onClose={() => window.location.assign(window.location.pathname)}
+      />
+    );
   }
-
-  if (direct === "systems" && embed) {
-    return <SystemsWorld embed />;
-  }
-
+  if (direct === "systems" && embed) return <SystemsWorld embed />;
   if (direct === "systems") {
     return <SystemsWorld onClose={() => window.location.assign(window.location.pathname)} />;
   }
+  if (direct === "creative" && embed) return <CreativeWorld />;
+  if (direct === "creative") return <CreativeWorld />;
+
+  const cover = state.entered !== null;
 
   return (
     <div className="portal-stage">
-      <div className="landing" aria-hidden={state.entered !== null} data-entered={state.entered !== null} data-cover={String(state.entered === "hospitality")}>
+      <div className="landing" aria-hidden={cover} data-entered={cover} data-cover={String(cover)}>
         <Header />
         <main className="landing-main" aria-label="Select a world">
           <WorldSelector />
         </main>
       </div>
-      {state.entered === "creative" && <CreativeWorld />}
-      {state.entered === "systems" && <SystemsWorld />}
-      <HospitalityPortal />
+
+      <WeatherPortal world="hospitality">
+        {(ready) => (
+          <HospitalityWorld
+            embed={false}
+            shared={false}
+            showReturn={ready}
+            onClose={() => state.leave()}
+          />
+        )}
+      </WeatherPortal>
+
+      <WeatherPortal world="systems">
+        {() => <SystemsWorld />}
+      </WeatherPortal>
+
+      <WeatherPortal world="creative">
+        {() => <CreativeWorld />}
+      </WeatherPortal>
     </div>
   );
 }

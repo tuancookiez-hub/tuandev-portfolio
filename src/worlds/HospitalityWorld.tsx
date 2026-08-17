@@ -15,12 +15,7 @@ const concepts = [
   { number: "03", label: "Bakery & takeaway", color: "orange", text: "What is in the case today, pre-order, pickup. Cakes when someone is celebrating." },
 ];
 
-/* HospitalityWorld: the full cafe page. Used both as the gateway peek
-   (scaled inside the Hospitality card) and as the entered page (full
-   viewport). The wrapping HospitalityPortal handles the scale/position
-   animation; this component just renders the cafe content with no portal
-   cover or "Main menu" auto-hide complexity — the wrapper itself decides
-   when to show the return button (showReturn). */
+/* HospitalityWorld: cafe page only. WeatherPortal owns enter/leave weather. */
 export default function HospitalityWorld({
   embed = false,
   shared = true,
