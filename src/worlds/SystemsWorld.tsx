@@ -13,6 +13,7 @@ import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRo
 import AiClientConsole from "../components/AiClientConsole";
 import KernelViz from "../components/KernelViz";
 import PdfViewer from "../components/PdfViewer";
+import BklitShowcase from "../components/BklitShowcase";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -181,7 +182,7 @@ export default function SystemsWorld({
               </div>
             </div>
 
-            {/* ── LEVEL 2: AICLIENT2API CONSOLE ── */}
+            {/* ── LEVEL 2: AICLIENT2API CONSOLE + REPORT ── */}
             <div ref={l2} className="sys-stage sys-stage-aiclient">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">AIClient2API · L2</span>
@@ -189,6 +190,10 @@ export default function SystemsWorld({
                 <p>The provider pool, golden routing signals, and a live workflow — how AIClient2API keeps the client stable while the model pool rotates underneath.</p>
               </header>
               <AiClientConsole />
+              <div className="sys-l2-report">
+                <span className="sys-r-eyebrow">Inspection · report</span>
+                <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
+              </div>
             </div>
 
             {/* ── LEVEL 3: FLOW (React Flow kernel visualization) ── */}
@@ -201,14 +206,14 @@ export default function SystemsWorld({
               <KernelViz />
             </div>
 
-            {/* ── LEVEL 4: REPORTS (flip-page PDF) ── */}
+            {/* ── LEVEL 4: INSPECTION DATA (bklit charts) ── */}
             <div ref={l4} className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
-                <span className="sys-rep-eyebrow">Inspection · reporting · L4</span>
-                <h2>The report, as a client reads it.</h2>
-                <p>Cover, summary, findings, timeline.</p>
+                <span className="sys-rep-eyebrow">Inspection data · L4</span>
+                <h2>Every signal, one glance.</h2>
+                <p>Volume, reach, capacity — animated with the bklit chart engine.</p>
               </header>
-              <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
+              <BklitShowcase />
             </div>
 
               

@@ -11,7 +11,11 @@
 import { motion, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Panel } from "./SystemsWidgets";
-import { AnimatedChart } from "./bklit/AnimatedChart";
+import { LineChart } from "./charts/line-chart";
+import { Line } from "./charts/line";
+import { Grid } from "./charts/grid";
+import { XAxis } from "./charts/x-axis";
+import { ChartTooltip } from "./charts/tooltip";
 
 // ─── Provider pool ────────────────────────────────────────────
 
@@ -37,6 +41,13 @@ const sparkData: Record<string, number[]> = {
   latency: [298, 262, 306, 240, 258, 232, 245, 220, 236, 222, 232, 215, 226, 208, 232],
   tokens: [120, 180, 260, 320, 410, 520, 640, 780, 900, 1040, 1220, 1380, 1560, 1740, 1842],
   cost: [3.2, 3.1, 3.4, 3.0, 3.3, 2.9, 3.2, 2.8, 3.1, 2.9, 3.0, 2.7, 2.9, 2.8, 2.6],
+};
+
+const HOUR = 3600_000;
+const signalData = {
+  latency: sparkData.latency.map((v, i) => ({ date: new Date(Date.now() - (14 - i) * HOUR), value: v })),
+  tokens: sparkData.tokens.map((v, i) => ({ date: new Date(Date.now() - (14 - i) * HOUR), value: v })),
+  cost: sparkData.cost.map((v, i) => ({ date: new Date(Date.now() - (14 - i) * HOUR), value: v })),
 };
 
 const routes = [
@@ -69,10 +80,25 @@ export default function AiClientConsole() {
 
   return (
     <div className="acl-shell" ref={root}>
-      <div className="acl-top sys-ov-charts">
-        <AnimatedChart label="Latency p50" series={sparkData.latency} color="#14b8a6" unit=" ms" />
-        <AnimatedChart label="Tokens / min" series={sparkData.tokens} color="#477da2" unit="k" />
-        <AnimatedChart label="Routing cost" series={sparkData.cost} color="#c98a12" unit=" $/1k" />
+      <div className="acl-top sys-ov-charts bklit-ui">
+        <LineChart data={signalData.latency}>
+          <Grid horizontal />
+          <Line dataKey="value" stroke="var(--chart-line-primary)" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </LineChart>
+        <LineChart data={signalData.tokens}>
+          <Grid horizontal />
+          <Line dataKey="value" stroke="var(--chart-line-secondary)" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </LineChart>
+        <LineChart data={signalData.cost}>
+          <Grid horizontal />
+          <Line dataKey="value" stroke="var(--chart-3)" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </LineChart>
       </div>
 
       <div className="acl-providers">

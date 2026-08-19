@@ -951,6 +951,20 @@ text.ax-v {
 
 .sys-ov-mid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; margin-bottom: 16px; }
 
+/* L2 report below the console */
+.sys-l2-report { margin-top: 18px; }
+.sys-l2-report .sys-r-eyebrow { display: block; margin-bottom: 8px; }
+
+/* L4 bklit showcase layout */
+.sys-bklit { display: flex; flex-direction: column; gap: 16px; }
+.sys-bklit-bar { width: 100%; }
+.sys-bklit-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.sys-bklit-map { min-width: 0; }
+.sys-bklit-gauge { display: flex; align-items: center; justify-content: center; }
+@media (max-width: 920px) {
+  .sys-bklit-row { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Bklit animated chart row */
 .sys-ov-charts { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
 .sys-chart.card { padding: 16px; border: 1px solid var(--sys-line); border-radius: 12px; background: var(--sys-card); box-shadow: 0 12px 30px rgba(16,36,58,.08); }

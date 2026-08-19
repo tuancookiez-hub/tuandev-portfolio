@@ -1,0 +1,180 @@
+/* bklit-charts.css — support sheet for the REAL @bklit registry components.
+   Defines the Tailwind utility classes the charts reference (scoped under
+   .bklit-ui so nothing leaks) plus the --chart-* theme tokens per stage theme. */
+
+/* ─── theme tokens: light / mid stages ─── */
+.bklit-ui {
+  --chart-background: #f4f6f7;
+  --chart-foreground: #10243a;
+  --chart-foreground-muted: #8fa3b5;
+  --chart-label: #5b7285;
+  --chart-line-primary: #14b8a6;
+  --chart-line-secondary: #477da2;
+  --chart-crosshair: #b9c6d2;
+  --chart-grid: rgba(16, 36, 58, 0.14);
+  --chart-indicator-color: #10243a;
+  --chart-indicator-secondary-color: #dfe6ec;
+  --chart-marker-background: #ffffff;
+  --chart-marker-border: #d6dfe6;
+  --chart-marker-foreground: #10243a;
+  --chart-marker-badge-background: #0a0a0f;
+  --chart-marker-badge-foreground: #f1f5f9;
+  --chart-segment-background: rgba(16, 36, 58, 0.06);
+  --chart-segment-line: rgba(16, 36, 58, 0.25);
+  --chart-brush-border: rgba(16, 36, 58, 0.3);
+  --chart-tooltip-background: #0b1420;
+  --chart-tooltip-foreground: #eaf3f9;
+  --chart-tooltip-muted: #a9c9db;
+  --chart-1: #14b8a6;
+  --chart-2: #477da2;
+  --chart-3: #c98a12;
+  --chart-4: #7c9bb8;
+  --chart-5: #3f5d75;
+  --chart-scale-01: #eef1f3;
+  --chart-scale-02: #d3dce3;
+  --chart-scale-03: #a9bccb;
+  --chart-scale-04: #5b7285;
+  --chart-scale-05: #10243a;
+  --chart-scale-pattern-color: #ffffff;
+  --muted: #e2e8ed;
+  --muted-foreground: #5b7285;
+  --popover: #ffffff;
+  --popover-foreground: #10243a;
+  --foreground: #10243a;
+  --background: #c8cdcc;
+  --border: #d6dfe6;
+}
+
+/* ─── theme tokens: dark stage (L3/L4) ─── */
+.sys[data-theme="dark"] .bklit-ui {
+  --chart-background: #0a0a0f;
+  --chart-foreground: #eaf3f9;
+  --chart-foreground-muted: #3a4a58;
+  --chart-label: #a9c9db;
+  --chart-line-primary: #14b8a6;
+  --chart-line-secondary: #67e8f9;
+  --chart-crosshair: #5a7080;
+  --chart-grid: rgba(159, 208, 240, 0.14);
+  --chart-indicator-color: #eaf3f9;
+  --chart-indicator-secondary-color: #1c2834;
+  --chart-marker-background: #16222e;
+  --chart-marker-border: #2c3e4e;
+  --chart-marker-foreground: #eaf3f9;
+  --chart-marker-badge-background: #ffffff;
+  --chart-marker-badge-foreground: #0a0a0f;
+  --chart-segment-background: rgba(159, 208, 240, 0.08);
+  --chart-segment-line: rgba(159, 208, 240, 0.25);
+  --chart-brush-border: rgba(159, 208, 240, 0.3);
+  --chart-tooltip-background: #101b26;
+  --chart-tooltip-foreground: #eaf3f9;
+  --chart-tooltip-muted: #8fa8ba;
+  --chart-1: #14b8a6;
+  --chart-2: #477da2;
+  --chart-3: #c98a12;
+  --chart-4: #67e8f9;
+  --chart-5: #a78bfa;
+  --chart-scale-01: #12161d;
+  --chart-scale-02: #1e2732;
+  --chart-scale-03: #33445a;
+  --chart-scale-04: #6e8aa5;
+  --chart-scale-05: #dce9f5;
+  --chart-scale-pattern-color: #0a0a0f;
+  --muted: #1c2834;
+  --muted-foreground: #8fa8ba;
+  --popover: #16222e;
+  --popover-foreground: #eaf3f9;
+  --foreground: #eaf3f9;
+  --background: #0a0a0f;
+  --border: rgba(159, 208, 240, 0.14);
+}
+
+/* ─── layout ─── */
+.bklit-ui .flex { display: flex; }
+.bklit-ui .flex-col { flex-direction: column; }
+.bklit-ui .flex-1 { flex: 1 1 0%; }
+.bklit-ui .items-center { align-items: center; }
+.bklit-ui .justify-center { justify-content: center; }
+.bklit-ui .justify-between { justify-content: space-between; }
+.bklit-ui .justify-end { justify-content: flex-end; }
+.bklit-ui .gap-1 { gap: 4px; }
+.bklit-ui .gap-2 { gap: 8px; }
+.bklit-ui .gap-4 { gap: 16px; }
+.bklit-ui .space-y-1\.5 > * + * { margin-top: 6px; }
+.bklit-ui .w-full { width: 100%; }
+.bklit-ui .h-full { height: 100%; }
+.bklit-ui .w-12 { width: 48px; }
+.bklit-ui .h-12 { height: 48px; }
+.bklit-ui .w-2\.5 { width: 10px; }
+.bklit-ui .h-2\.5 { height: 10px; }
+.bklit-ui .h-6 { height: 24px; }
+.bklit-ui .min-w-0 { min-width: 0; }
+.bklit-ui .shrink-0 { flex-shrink: 0; }
+.bklit-ui .mx-auto { margin-inline: auto; }
+.bklit-ui .max-w-\[560px\] { max-width: 560px; }
+.bklit-ui .aspect-\[21\/16\] { aspect-ratio: 21 / 16; }
+.bklit-ui .block { display: block; }
+.bklit-ui .inline-block { display: inline-block; }
+.bklit-ui .relative { position: relative; }
+.bklit-ui .absolute { position: absolute; }
+.bklit-ui .inset-0 { inset: 0; }
+.bklit-ui .top-0 { top: 0; }
+.bklit-ui .right-0 { right: 0; }
+.bklit-ui .bottom-0 { bottom: 0; }
+.bklit-ui .overflow-hidden { overflow: hidden; }
+.bklit-ui .overflow-visible { overflow: visible; }
+.bklit-ui .pointer-events-none { pointer-events: none; }
+.bklit-ui .z-50 { z-index: 50; }
+.bklit-ui .pr-2 { padding-right: 8px; }
+.bklit-ui .px-3 { padding-inline: 12px; }
+.bklit-ui .px-4 { padding-inline: 16px; }
+.bklit-ui .py-1 { padding-block: 4px; }
+.bklit-ui .py-2\.5 { padding-block: 10px; }
+.bklit-ui .mb-2 { margin-bottom: 8px; }
+.bklit-ui .mt-2 { margin-top: 8px; }
+.bklit-ui .rounded-full { border-radius: 9999px; }
+.bklit-ui .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+.bklit-ui .cursor-pointer { cursor: pointer; }
+
+/* ─── typography ─── */
+.bklit-ui .text-sm { font-size: 14px; line-height: 1.42857; }
+.bklit-ui .text-xs { font-size: 12px; line-height: 1.5; }
+.bklit-ui .font-medium { font-weight: 500; }
+.bklit-ui .tracking-wide { letter-spacing: 0.025em; }
+.bklit-ui .tabular-nums { font-variant-numeric: tabular-nums; }
+.bklit-ui .whitespace-nowrap { white-space: nowrap; }
+.bklit-ui .whitespace-pre { white-space: pre; }
+.bklit-ui .text-left { text-align: left; }
+.bklit-ui .leading-none { line-height: 1; }
+.bklit-ui .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.bklit-ui .text-white { color: #fff; }
+.bklit-ui .text-chart-tooltip-foreground { color: var(--chart-tooltip-foreground); }
+.bklit-ui .text-chart-tooltip-muted { color: var(--chart-tooltip-muted); }
+
+/* ─── colors / fx ─── */
+.bklit-ui .bg-muted\/50 { background-color: color-mix(in oklab, var(--muted) 50%, transparent); }
+.bklit-ui .bg-zinc-900 { background-color: #18181b; }
+.bklit-ui .dark\:bg-zinc-100 { background-color: #f4f4f5; }
+.bklit-ui .dark\:text-zinc-900 { color: #18181b; }
+.bklit-ui .duration-200 { transition-duration: 200ms; }
+.bklit-ui .ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+.bklit-ui .transition-opacity { transition-property: opacity; }
+
+/* arbitrary Tailwind property classes used by chart internals */
+.bklit-ui .\[--color\:var\(--muted-foreground\)\] { --color: var(--muted-foreground); }
+.bklit-ui .\[--shimmering-color\:var\(--foreground\)\] { --shimmering-color: var(--foreground); }
+
+/* dark stage flips the zinc date-ticker pill to the dark-mode look */
+.sys[data-theme="dark"] .bklit-ui .bg-zinc-900 { background-color: #f4f4f5; }
+.sys[data-theme="dark"] .bklit-ui .text-white { color: #18181b; }
