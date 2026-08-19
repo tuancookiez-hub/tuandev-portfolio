@@ -1067,6 +1067,15 @@ text.ax-v {
 }
 .kv-flow { position: absolute; inset: 0; z-index: 1; background: transparent; }
 .kv-flow .react-flow__attribution { display: none; }
+.kv-flow .react-flow__edges,
+.kv-flow .react-flow__edges svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+.kv-flow .react-flow__edges svg { overflow: visible; pointer-events: none; }
 .kv-flow .react-flow__edge-path { stroke: #d8b4fe !important; stroke-width: 2.6 !important; }
 .kv-flow .react-flow__edges { overflow: visible; }
 

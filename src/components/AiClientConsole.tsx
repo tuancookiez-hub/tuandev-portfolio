@@ -10,7 +10,8 @@
 
 import { motion, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { CountUp, Panel, Sparkline } from "./SystemsWidgets";
+import { Panel } from "./SystemsWidgets";
+import { AnimatedChart } from "./bklit/AnimatedChart";
 
 // ─── Provider pool ────────────────────────────────────────────
 
@@ -68,29 +69,10 @@ export default function AiClientConsole() {
 
   return (
     <div className="acl-shell" ref={root}>
-      <div className="acl-top">
-        <Panel title="Routing · golden signals" hint="p50 · representative">
-          <div className="acl-signals">
-            <div className="acl-signal">
-              <span className="acl-signal-label">latency p50</span>
-              <b className="acl-signal-num"><CountUp value={232} /> ms</b>
-              <Sparkline data={sparkData.latency} color="#14b8a6" />
-              <em className="acl-signal-foot">range 180–420 ms</em>
-            </div>
-            <div className="acl-signal">
-              <span className="acl-signal-label">tokens / min</span>
-              <b className="acl-signal-num"><CountUp value={1842} suffix="k" /></b>
-              <Sparkline data={sparkData.tokens} color="#477da2" />
-              <em className="acl-signal-foot">12k–180k range</em>
-            </div>
-            <div className="acl-signal">
-              <span className="acl-signal-label">routing cost /1k</span>
-              <b className="acl-signal-num">$<CountUp value={0.0027} decimals={4} /></b>
-              <Sparkline data={sparkData.cost} color="#c98a12" />
-              <em className="acl-signal-foot">$0.0008–$0.012</em>
-            </div>
-          </div>
-        </Panel>
+      <div className="acl-top sys-ov-charts">
+        <AnimatedChart label="Latency p50" series={sparkData.latency} color="#14b8a6" unit=" ms" />
+        <AnimatedChart label="Tokens / min" series={sparkData.tokens} color="#477da2" unit="k" />
+        <AnimatedChart label="Routing cost" series={sparkData.cost} color="#c98a12" unit=" $/1k" />
       </div>
 
       <div className="acl-providers">

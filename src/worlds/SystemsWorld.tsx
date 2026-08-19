@@ -13,7 +13,6 @@ import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRo
 import AiClientConsole from "../components/AiClientConsole";
 import KernelViz from "../components/KernelViz";
 import PdfViewer from "../components/PdfViewer";
-import { AnimatedChart } from "../components/bklit/AnimatedChart";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -51,7 +50,6 @@ const services = [
 const spark = {
   latency: [180, 190, 175, 205, 195, 220, 210, 232, 215, 208, 226, 232],
   throughput: [120, 240, 380, 520, 690, 860, 1020, 1180, 1360, 1540, 1710, 1842],
-  error: [0.52, 0.47, 0.44, 0.51, 0.39, 0.42, 0.36, 0.41, 0.33, 0.35, 0.40, 0.38],
 };
 
 // ─── TIER NARRATIVE ─────────────────────────────────────────
@@ -173,11 +171,6 @@ export default function SystemsWorld({
                     </div>
                   </div>
                 </Panel>
-              </div>
-              <div className="sys-ov-charts">
-                <AnimatedChart label="Latency p95" series={spark.latency} color="#14b8a6" unit=" ms" />
-                <AnimatedChart label="Throughput" series={spark.throughput} color="#477da2" unit=" rps" />
-                <AnimatedChart label="Error rate" series={spark.error} color="#c98a12" unit="%" />
               </div>
               <div className="sys-ov-bottom">
                 <Panel title="Service health" hint="real-time status">
