@@ -11,9 +11,9 @@ import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRow } from "../components/SystemsWidgets";
 import AiClientConsole from "../components/AiClientConsole";
-import KernelViz from "../components/KernelViz";
 import PdfViewer from "../components/PdfViewer";
-import BklitShowcase from "../components/BklitShowcase";
+import RoutingTopology from "../components/RoutingTopology";
+import BklitDashboard from "../components/BklitDashboard";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -196,24 +196,24 @@ export default function SystemsWorld({
               </div>
             </div>
 
-            {/* ── LEVEL 3: FLOW (React Flow kernel visualization) ── */}
+            {/* ── LEVEL 3: ROUTING TOPOLOGY (one graph) ── */}
             <div ref={l3} className="sys-stage sys-stage-flow">
               <header className="sys-r-head">
-                <span className="sys-r-eyebrow">kernel fusion · L3</span>
-                <h2>65 tok/s → 406. One graph.</h2>
-                <p>A decomposed compute DAG fuses across six passes. Nodes merge. Dispatches drop. Play it or step it.</p>
+                <span className="sys-r-eyebrow">routing topology · L3</span>
+                <h2>One graph. Every route.</h2>
+                <p>Client traffic enters the gateway, the router picks a provider, and failover keeps the request moving. Live particles trace each path.</p>
               </header>
-              <KernelViz />
+              <RoutingTopology />
             </div>
 
-            {/* ── LEVEL 4: INSPECTION DATA (bklit charts) ── */}
+            {/* ── LEVEL 4: INSPECTION DATA (bklit dashboard) ── */}
             <div ref={l4} className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection data · L4</span>
                 <h2>Every signal, one glance.</h2>
-                <p>Volume, reach, capacity — animated with the bklit chart engine.</p>
+                <p>One page, twelve panels — every chart type in the bklit engine, all animated.</p>
               </header>
-              <BklitShowcase />
+              <BklitDashboard />
             </div>
 
               
