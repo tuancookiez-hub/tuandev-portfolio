@@ -280,31 +280,86 @@
 .sys-story[data-theme="dark"] .sys-story-step { color: rgba(220, 234, 244, .72); }
 .sys-story-step b { color: inherit; }
 .sys > .sys-return {
+  position: fixed;
   top: 46px;
   left: 16px;
-  padding: 4px 8px;
-  color: rgba(16, 36, 58, .32);
-  border: 1px solid rgba(16, 36, 58, .06);
+  z-index: 130;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 10px;
+  color: rgba(16, 36, 58, .78);
+  border: 1px solid rgba(255, 255, 255, .78);
   border-radius: 999px;
-  background: rgba(255, 255, 255, .18);
-  backdrop-filter: blur(10px) saturate(1);
-  -webkit-backdrop-filter: blur(10px) saturate(1);
-  box-shadow: none;
+  background: rgba(255, 255, 255, .16);
+  backdrop-filter: blur(22px) saturate(1.9) brightness(1.09);
+  -webkit-backdrop-filter: blur(22px) saturate(1.9) brightness(1.09);
+  box-shadow:
+    0 8px 28px rgba(16, 36, 58, .16),
+    0 1px 0 rgba(255, 255, 255, .92) inset,
+    inset 0 0 0 1px rgba(255, 255, 255, .52),
+    inset 0 14px 22px rgba(255, 255, 255, .42);
   font: 700 7px var(--font-mono);
   letter-spacing: .13em;
   text-transform: uppercase;
-  opacity: .72;
+  opacity: 1;
+  isolation: isolate;
+  contain: layout paint;
+  will-change: transform;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
 }
-.sys > .sys-return:hover { background: rgba(255,255,255,.32); color: rgba(16,36,58,.58); opacity: 1; border-color: rgba(16,36,58,.09); }
+/* Liquid rim — bright top edge that reads as curved glass */
+.sys > .sys-return::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255,255,255,.9) 0%, rgba(255,255,255,.16) 52%, rgba(255,255,255,0) 74%);
+  opacity: .9;
+  pointer-events: none;
+}
+.sys > .sys-return::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,1), inset 0 -1px 12px rgba(16,36,58,.08);
+  pointer-events: none;
+}
+.sys > .sys-return:hover {
+  background: rgba(255, 255, 255, .22);
+  color: rgba(16,36,58,.9);
+  border-color: rgba(255,255,255,.88);
+  box-shadow:
+    0 10px 32px rgba(16, 36, 58, .2),
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    inset 0 0 0 1px rgba(255, 255, 255, .65),
+    inset 0 16px 26px rgba(255, 255, 255, .48);
+}
+.sys > .sys-return:active {
+  transform: translateY(0.5px) scale(.985);
+  box-shadow:
+    0 4px 14px rgba(16, 36, 58, .14),
+    inset 0 0 0 1px rgba(255,255,255,.55);
+}
+@supports (backdrop-filter: url("#x")) {
+  .sys > .sys-return {
+    backdrop-filter: url(#sys-liquid) blur(18px) saturate(1.9) brightness(1.1);
+    -webkit-backdrop-filter: url(#sys-liquid) blur(18px) saturate(1.9) brightness(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sys > .sys-return { transition: none; }
+  .sys > .sys-return::before { opacity: .55; }
+}
 @media (max-width: 620px) {
   .sys > .sys-return {
-    top: 34px; left: 10px; padding: 3px 7px; font-size: 6.5px;
-    background: rgba(255,255,255,.16); color: rgba(16,36,58,.34); border-color: rgba(16,36,58,.06);
-    box-shadow: none;
+    top: 34px; left: 10px; padding: 5px 10px 5px 9px; font-size: 6.5px;
+    background: rgba(255, 255, 255, .14);
+    backdrop-filter: blur(18px) saturate(1.7) brightness(1.07);
+    -webkit-backdrop-filter: blur(18px) saturate(1.7) brightness(1.07);
     letter-spacing: .12em;
-    opacity: .7;
   }
-  .sys > .sys-return:hover { background: rgba(255,255,255,.28); color: rgba(16,36,58,.52); }
 }
 
 .sys-utility {

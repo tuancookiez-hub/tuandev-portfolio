@@ -110,6 +110,21 @@ export default function SystemsWorld({
 
   return (
     <div className="sys" data-stage={stageName} data-theme={theme} data-ready={String(ready || embed)}>
+      {/* Liquid glass refraction filter — Chromium gets true optical bend via feDisplacementMap; others fall back to blur+saturate */}
+      <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
+        <defs>
+          <filter id="sys-liquid" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
+            <feImage
+              href={`data:image/svg+xml;utf8,${encodeURIComponent(
+                `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='56' viewBox='0 0 200 56'><defs><radialGradient id='g' cx='50%' cy='50%' r='50%'><stop offset='0%' stop-color='white' stop-opacity='0'/><stop offset='62%' stop-color='#808080' stop-opacity='1'/><stop offset='100%' stop-color='black' stop-opacity='1'/></radialGradient></defs><rect width='200' height='56' rx='28' fill='url(#g)'/></svg>`
+              )}`}
+              x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="sysDispMap" />
+            <feDisplacementMap in="SourceGraphic" in2="sysDispMap" scale={10} xChannelSelector="R" yChannelSelector="G" result="sysRefract" />
+            <feGaussianBlur in="sysRefract" stdDeviation={0.7} result="sysBlur" />
+            <feColorMatrix in="sysBlur" type="saturate" values="1.28" />
+          </filter>
+        </defs>
+      </svg>
       {!embed && (
         <button type="button" className="world-return sys-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
           <i aria-hidden="true">←</i> Main menu
