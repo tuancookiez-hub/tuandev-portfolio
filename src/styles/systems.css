@@ -1083,9 +1083,10 @@ text.ax-v {
 .sys-span-12 { grid-column: span 12; }
 .sys-dash-panel {
   padding: 16px;
-  border: 1px solid rgba(159, 208, 240, 0.14);
+  border: 1px solid rgba(255, 255, 255, .16);
   border-radius: 14px;
-  background: rgba(9, 24, 38, 0.6);
+  background: rgba(255, 255, 255, .94);
+  box-shadow: 0 14px 36px rgba(16,36,58,.1);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -1098,14 +1099,17 @@ text.ax-v {
   flex-shrink: 0;
 }
 .sys-dash-panel-title {
-  color: var(--sys-ink);
+  color: #10243a;
   font: 800 9px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .sys-dash-panel-hint {
-  color: var(--sys-soft);
-  font: 8px var(--font-mono);
+  color: #1d4a6b;
+  font: 800 8px var(--font-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .9;
 }
 .sys-dash-panel-body {
   flex: 1;
@@ -1144,7 +1148,7 @@ text.ax-v {
   .sys-incidents, .sys-alerts { grid-column: auto; }
 }
 
-/* L4 live KPI row */
+/* L4 live KPI row — light cards so labels don't wash out */
 .sys-live-kpis {
   grid-column: 1 / -1;
   display: grid;
@@ -1153,21 +1157,23 @@ text.ax-v {
 }
 .sys-live-kpi {
   padding: 12px 14px;
-  border: 1px solid rgba(159, 208, 240, 0.14);
+  border: 1px solid rgba(255, 255, 255, .18);
   border-radius: 12px;
-  background: rgba(9, 24, 38, 0.6);
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 10px 24px rgba(16,36,58,.08);
 }
 .sys-live-kpi-label {
   display: block;
-  color: var(--sys-soft);
-  font: 8px var(--font-mono);
+  color: #1d4a6b;
+  font: 800 8px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 4px;
+  opacity: .92;
 }
 .sys-live-kpi-value {
   display: block;
-  color: var(--sys-ink);
+  color: #10243a;
   font: 700 22px/1.1 Georgia, serif;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -1175,11 +1181,11 @@ text.ax-v {
 .sys-live-kpi-delta {
   display: inline-block;
   margin-top: 5px;
-  font: 8px var(--font-mono);
+  font: 800 8px var(--font-mono);
   letter-spacing: 0.05em;
 }
-.sys-live-kpi-delta.up { color: #34d399; }
-.sys-live-kpi-delta.down { color: #f87171; }
+.sys-live-kpi-delta.up { color: #1a7a52; }
+.sys-live-kpi-delta.down { color: #c2352e; }
 
 /* live dot (solid — no glow) */
 .sys-live-dot {
@@ -1194,17 +1200,18 @@ text.ax-v {
 
 /* live activity feed */
 .sys-live-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.sys-live-feed li { display: grid; grid-template-columns: 8px 1fr auto; gap: 9px; align-items: center; font-size: 11px; color: var(--sys-ink); }
+.sys-live-feed li { display: grid; grid-template-columns: 8px 1fr auto; gap: 9px; align-items: center; font-size: 11px; color: #10243a; }
 .sys-live-feed-dot { width: 6px; height: 6px; border-radius: 50%; background: #14b8a6; }
 .sys-live-feed-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sys-live-feed-time { color: var(--sys-soft); font: 8px var(--font-mono); white-space: nowrap; }
+.sys-live-feed-time { color: #1d4a6b; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .85; }
 
-/* incidents + alerts */
+/* incidents + alerts — light so text stays readable on the pale L4 wash */
 .sys-incidents, .sys-alerts {
   padding: 16px;
-  border: 1px solid rgba(159, 208, 240, 0.14);
+  border: 1px solid rgba(255,255,255,.18);
   border-radius: 14px;
-  background: rgba(9, 24, 38, 0.6);
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 10px 24px rgba(16,36,58,.08);
 }
 .sys-incident-list, .sys-alert-list { list-style: none; margin: 0; padding: 0; }
 .sys-incident {
@@ -1213,23 +1220,23 @@ text.ax-v {
   gap: 12px;
   align-items: center;
   padding: 10px 8px;
-  border-top: 1px solid rgba(159, 208, 240, 0.08);
+  border-top: 1px solid rgba(16,36,58,.08);
   font-size: 12px;
-  color: var(--sys-ink);
+  color: #10243a;
 }
 .sys-incident:first-child { border-top: 0; }
 .sys-incident-sev { font: 800 8px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
-.sys-incident.sev-high .sys-incident-sev { color: #f87171; }
-.sys-incident.sev-medium .sys-incident-sev { color: #fbbf24; }
-.sys-incident.sev-low .sys-incident-sev { color: #38bdf8; }
+.sys-incident.sev-high .sys-incident-sev { color: #c2352e; }
+.sys-incident.sev-medium .sys-incident-sev { color: #8a5a00; }
+.sys-incident.sev-low .sys-incident-sev { color: #1d6a8a; }
 .sys-incident-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sys-incident-meta { color: var(--sys-soft); font: 8px var(--font-mono); white-space: nowrap; }
+.sys-incident-meta { color: #1d4a6b; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .85; }
 .sys-alert-list { display: flex; flex-direction: column; gap: 7px; }
-.sys-alert-list li { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--sys-ink); }
+.sys-alert-list li { display: flex; align-items: center; gap: 9px; font-size: 12px; color: #10243a; }
 .sys-alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.sys-alert-dot.high { background: #f87171; }
-.sys-alert-dot.mid { background: #fbbf24; }
-.sys-alert-dot.low { background: #38bdf8; }
+.sys-alert-dot.high { background: #c2352e; }
+.sys-alert-dot.mid { background: #c98a12; }
+.sys-alert-dot.low { background: #1d6a8a; }
 
 @media (max-width: 1080px) {
   .sys-live-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
