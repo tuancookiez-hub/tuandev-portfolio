@@ -1044,10 +1044,15 @@ text.ax-v {
 .sys-l2-report { margin-top: 18px; }
 .sys-l2-report .sys-r-eyebrow { display: block; margin-bottom: 8px; }
 
-/* L4: keep bklit internals on light tokens inside the white cards */
-.sys-stage-reports .bklit-ui .bg-zinc-900 {
-  background-color: #f1f5f9;
-  border: 1px solid rgba(16,36,58,.08);
+/* L4 dark — keep the wall dark; just lift the one thing you flagged:
+   candlestick gradients default to var(--color-emerald-500/red-500) which
+   have no value in this app → render as black on the dark panel.
+   Per bklit docs the --chart-* scale is the source of truth for heatmaps/
+   choropleths; panels themselves define the wall color. */
+.sys-stage-reports .bklit-ui {
+  --chart-background: #121a2a;
+  --color-emerald-500: #34d399;
+  --color-red-500: #f87171;
 }
 
 /* On touch, don't let chart internals capture the scroll gesture.
@@ -1089,10 +1094,10 @@ text.ax-v {
 .sys-span-12 { grid-column: span 12; }
 .sys-dash-panel {
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, .16);
+  border: 1px solid rgba(159, 208, 240, .13);
   border-radius: 14px;
-  background: rgba(255, 255, 255, .94);
-  box-shadow: 0 14px 36px rgba(16,36,58,.1);
+  background: rgba(12, 20, 34, .82);
+  box-shadow: 0 14px 36px rgba(2, 6, 14, .45);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -1110,7 +1115,7 @@ text.ax-v {
   min-width: 0;
 }
 .sys-dash-panel-title {
-  color: #10243a;
+  color: #eaf3f9;
   font: 800 9px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1120,11 +1125,11 @@ text.ax-v {
   white-space: nowrap;
 }
 .sys-dash-panel-hint {
-  color: #1d4a6b;
+  color: #8fb0c7;
   font: 800 8px var(--font-mono);
   letter-spacing: .06em;
   text-transform: uppercase;
-  opacity: .9;
+  opacity: .95;
   min-width: 0;
   max-width: 52%;
   overflow: hidden;
@@ -1177,7 +1182,7 @@ text.ax-v {
   .sys-incidents, .sys-alerts { grid-column: auto; }
 }
 
-/* L4 live KPI row — light cards so labels don't wash out */
+/* L4 live KPI row — dark cards to match the night ops theme */
 .sys-live-kpis {
   grid-column: 1 / -1;
   display: grid;
@@ -1186,26 +1191,31 @@ text.ax-v {
 }
 .sys-live-kpi {
   padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, .18);
+  border: 1px solid rgba(159, 208, 240, .13);
   border-radius: 12px;
-  background: rgba(255, 255, 255, .96);
-  box-shadow: 0 10px 24px rgba(16,36,58,.08);
+  background: rgba(12, 20, 34, .82);
+  box-shadow: 0 10px 24px rgba(2,6,14,.42);
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .sys-live-kpi-label {
   display: block;
-  color: #1d4a6b;
+  color: #8fb0c7;
   font: 800 8px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 4px;
-  opacity: .92;
+  opacity: .95;
 }
 .sys-live-kpi-value {
   display: block;
-  color: #10243a;
+  color: #eaf3f9;
   font: 700 22px/1.1 Georgia, serif;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sys-live-kpi-delta {
   display: inline-block;
@@ -1213,8 +1223,8 @@ text.ax-v {
   font: 800 8px var(--font-mono);
   letter-spacing: 0.05em;
 }
-.sys-live-kpi-delta.up { color: #1a7a52; }
-.sys-live-kpi-delta.down { color: #c2352e; }
+.sys-live-kpi-delta.up { color: #34d399; }
+.sys-live-kpi-delta.down { color: #f87171; }
 
 /* live dot (solid — no glow) */
 .sys-live-dot {
@@ -1227,20 +1237,21 @@ text.ax-v {
   vertical-align: 1px;
 }
 
-/* live activity feed */
+/* live activity feed — dark cards */
 .sys-live-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.sys-live-feed li { display: grid; grid-template-columns: 8px 1fr auto; gap: 9px; align-items: center; font-size: 11px; color: #10243a; }
+.sys-live-feed li { display: grid; grid-template-columns: 8px 1fr auto; gap: 9px; align-items: center; font-size: 11px; color: #eaf3f9; min-width: 0; }
 .sys-live-feed-dot { width: 6px; height: 6px; border-radius: 50%; background: #14b8a6; }
 .sys-live-feed-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sys-live-feed-time { color: #1d4a6b; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .85; }
+.sys-live-feed-time { color: #8fb0c7; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .9; }
 
-/* incidents + alerts — light so text stays readable on the pale L4 wash */
+/* incidents + alerts — dark so the wall stays cohesive */
 .sys-incidents, .sys-alerts {
   padding: 16px;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid rgba(159, 208, 240, .13);
   border-radius: 14px;
-  background: rgba(255,255,255,.96);
-  box-shadow: 0 10px 24px rgba(16,36,58,.08);
+  background: rgba(12, 20, 34, .82);
+  box-shadow: 0 10px 24px rgba(2,6,14,.42);
+  overflow: hidden;
 }
 .sys-incident-list, .sys-alert-list { list-style: none; margin: 0; padding: 0; }
 .sys-incident {
@@ -1249,23 +1260,23 @@ text.ax-v {
   gap: 12px;
   align-items: center;
   padding: 10px 8px;
-  border-top: 1px solid rgba(16,36,58,.08);
+  border-top: 1px solid rgba(159, 208, 240, .09);
   font-size: 12px;
-  color: #10243a;
+  color: #eaf3f9;
 }
 .sys-incident:first-child { border-top: 0; }
 .sys-incident-sev { font: 800 8px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
-.sys-incident.sev-high .sys-incident-sev { color: #c2352e; }
-.sys-incident.sev-medium .sys-incident-sev { color: #8a5a00; }
-.sys-incident.sev-low .sys-incident-sev { color: #1d6a8a; }
+.sys-incident.sev-high .sys-incident-sev { color: #f87171; }
+.sys-incident.sev-medium .sys-incident-sev { color: #fbbf24; }
+.sys-incident.sev-low .sys-incident-sev { color: #38bdf8; }
 .sys-incident-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sys-incident-meta { color: #1d4a6b; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .85; }
+.sys-incident-meta { color: #8fb0c7; font: 700 8px var(--font-mono); white-space: nowrap; opacity: .9; }
 .sys-alert-list { display: flex; flex-direction: column; gap: 7px; }
-.sys-alert-list li { display: flex; align-items: center; gap: 9px; font-size: 12px; color: #10243a; }
+.sys-alert-list li { display: flex; align-items: center; gap: 9px; font-size: 12px; color: #eaf3f9; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .sys-alert-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.sys-alert-dot.high { background: #c2352e; }
-.sys-alert-dot.mid { background: #c98a12; }
-.sys-alert-dot.low { background: #1d6a8a; }
+.sys-alert-dot.high { background: #f87171; }
+.sys-alert-dot.mid { background: #fbbf24; }
+.sys-alert-dot.low { background: #38bdf8; }
 
 @media (max-width: 1080px) {
   .sys-live-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }

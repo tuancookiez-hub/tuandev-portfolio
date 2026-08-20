@@ -4,14 +4,14 @@
 
 /* ─── theme tokens: light / mid stages ─── */
 .bklit-ui {
-  --chart-background: #ffffff;
+  --chart-background: #f4f6f7;
   --chart-foreground: #10243a;
-  --chart-foreground-muted: #1d4a6b;
-  --chart-label: #1d4a6b;
+  --chart-foreground-muted: #5b7285;
+  --chart-label: #5b7285;
   --chart-line-primary: #14b8a6;
   --chart-line-secondary: #477da2;
-  --chart-crosshair: #8fa3b5;
-  --chart-grid: rgba(16, 36, 58, 0.13);
+  --chart-crosshair: #b9c6d2;
+  --chart-grid: rgba(16, 36, 58, 0.14);
   --chart-indicator-color: #10243a;
   --chart-indicator-secondary-color: #dfe6ec;
   --chart-marker-background: #ffffff;
@@ -36,13 +36,13 @@
   --chart-scale-04: #5b7285;
   --chart-scale-05: #10243a;
   --chart-scale-pattern-color: #ffffff;
-  --muted: #e8edf1;
-  --muted-foreground: #1d4a6b;
+  --muted: #e2e8ed;
+  --muted-foreground: #5b7285;
   --popover: #ffffff;
   --popover-foreground: #10243a;
   --foreground: #10243a;
-  --background: #ffffff;
-  --border: rgba(16,36,58,.13);
+  --background: #f4f6f7;
+  --border: rgba(16,36,58,.14);
 }
 
 /* ─── theme tokens: dark stage (L3/L4) ─── */
