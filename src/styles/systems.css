@@ -280,29 +280,30 @@
 .sys-story[data-theme="dark"] .sys-story-step { color: rgba(220, 234, 244, .72); }
 .sys-story-step b { color: inherit; }
 .sys > .sys-return {
-  top: 44px;
-  left: 14px;
-  padding: 6px 10px;
-  color: rgba(232, 241, 247, .88);
-  border: 1px solid rgba(232, 241, 247, .22);
+  top: 46px;
+  left: 16px;
+  padding: 5px 9px;
+  color: rgba(16, 36, 58, .52);
+  border: 1px solid rgba(16, 36, 58, .1);
   border-radius: 999px;
-  background: rgba(13, 42, 66, .38);
-  backdrop-filter: blur(10px) saturate(1.05);
-  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  background: rgba(255, 255, 255, .42);
+  backdrop-filter: blur(8px) saturate(1);
+  -webkit-backdrop-filter: blur(8px) saturate(1);
   box-shadow: none;
-  font: 700 9px var(--font-mono);
-  letter-spacing: .1em;
+  font: 700 8px var(--font-mono);
+  letter-spacing: .12em;
   text-transform: uppercase;
-  opacity: .9;
+  opacity: .88;
 }
-.sys > .sys-return:hover { background: rgba(13, 42, 66, .56); color: #f5f8fa; opacity: 1; }
+.sys > .sys-return:hover { background: rgba(255,255,255,.72); color: rgba(16,36,58,.78); opacity: 1; border-color: rgba(16,36,58,.14); }
 @media (max-width: 620px) {
   .sys > .sys-return {
-    top: 44px; left: 10px; padding: 5px 9px; font-size: 8px;
-    background: rgba(255,255,255,.58); color: var(--sys-blue-deep); border-color: rgba(16,36,58,.12);
-    box-shadow: 0 4px 14px rgba(16,36,58,.08);
+    top: 36px; left: 12px; padding: 4px 8px; font-size: 7px;
+    background: rgba(255,255,255,.38); color: rgba(16,36,58,.46); border-color: rgba(16,36,58,.08);
+    box-shadow: none;
+    letter-spacing: .1em;
   }
-  .sys > .sys-return:hover { background: rgba(255,255,255,.82); }
+  .sys > .sys-return:hover { background: rgba(255,255,255,.62); color: rgba(16,36,58,.68); }
 }
 
 .sys-utility {
@@ -986,6 +987,33 @@ text.ax-v {
 /* L2 report below the console */
 .sys-l2-report { margin-top: 18px; }
 .sys-l2-report .sys-r-eyebrow { display: block; margin-bottom: 8px; }
+
+/* On touch, don't let chart internals capture the scroll gesture.
+   The chart canvas is decorative — scroll should always win. Pinch/drag
+   stays disabled on L3 via React Flow props; below hands it to the page. */
+@media (hover: none) and (pointer: coarse) {
+  .sys-dash-panel-body,
+  .kv-flow,
+  .kv-canvas,
+  .bklit-ui svg,
+  .sys-face-panel svg,
+  .sys-hero-dash svg {
+    touch-action: pan-y;
+  }
+  .kv-flow .react-flow__pane,
+  .react-flow__pane {
+    touch-action: pan-y !important;
+  }
+  /* visx/ParentSize wrappers + map */
+  .sys-dash-panel-body canvas,
+  .sys-dash-panel-body svg {
+    pointer-events: none;
+  }
+  .sys-dash-panel-body.is-interactive canvas,
+  .sys-dash-panel-body.is-interactive svg {
+    pointer-events: auto;
+  }
+}
 
 /* L4 bklit dashboard layout — 12-col asymmetric mosaic */
 .sys-dash {

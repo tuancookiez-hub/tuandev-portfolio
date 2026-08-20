@@ -312,7 +312,7 @@ function Kpi({
   );
 }
 
-function Panel({ title, hint, live, span, h = 220, children }: { title: string; hint?: string; live?: boolean; span: number; h?: number; children: React.ReactNode }) {
+function Panel({ title, hint, live, span, h = 220, interactive = false, children }: { title: string; hint?: string; live?: boolean; span: number; h?: number; interactive?: boolean; children: React.ReactNode }) {
   return (
     <section className={`sys-dash-panel sys-span-${span}`}>
       <header className="sys-dash-panel-head">
@@ -322,7 +322,7 @@ function Panel({ title, hint, live, span, h = 220, children }: { title: string; 
         </span>
         {hint && <span className="sys-dash-panel-hint">{hint}</span>}
       </header>
-      <div className="sys-dash-panel-body" style={{ height: h }}>{children}</div>
+      <div className={`sys-dash-panel-body${interactive ? " is-interactive" : ""}`} style={{ height: h }}>{children}</div>
     </section>
   );
 }
