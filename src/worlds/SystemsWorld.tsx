@@ -142,43 +142,55 @@ export default function SystemsWorld({
             <div ref={l1} className="sys-stage sys-stage-overview">
               <header className="sys-ov-head">
                 <div>
-                  <span className="sys-ov-eyebrow">System overview · L1</span>
+                  <span className="sys-ov-eyebrow">TUAN — SYSTEMS · KUALA LUMPUR</span>
                   <h1 className="sys-ov-title">I run this in production.</h1>
+                  <p className="sys-ov-lede">I design and operate AI systems that stay readable under load. L1→L4 is my production loop — gateway + routing, provider observability, live topology, and a streamed bklit ops dashboard.</p>
                 </div>
                 <div className="sys-ov-uptime">
                   <span className="sys-ov-uptime-label">uptime · 30d</span>
                   <div className="sys-ov-uptime-num"><CountUp value={kpis.uptime} decimals={2} suffix="%" /></div>
                 </div>
               </header>
-              <div className="sys-kpi-grid">
-                <KpiTile label="Availability" value={kpis.availability} decimals={3} suffix="%" delta={0.01} tone="#14b8a6" delay={0} />
-                <KpiTile label="Latency p95" value={kpis.latencyP95} decimals={0} suffix=" ms" delta={-18} deltaUnit="ms" tone="#477da2" delay={0.08} />
-                <KpiTile label="Error rate" value={kpis.errorRate} decimals={2} suffix="%" delta={-0.2} tone="#c98a12" delay={0.16} />
-                <KpiTile label="Requests / sec" value={kpis.throughputRps} decimals={0} suffix="" delta={12.4} tone="#477da2" delay={0.24} />
-              </div>
-              <div className="sys-ov-mid">
-                <Panel title="Traffic by hour" hint="requests · 24h">
-                  <BarChart data={barData} color="#477da2" height={150} />
-                </Panel>
-                <Panel title="Resource utilization" hint="current load">
-                  <div className="sys-ov-usage-col">
-                    {usage.map((u, i) => <UsageRow key={u.label} label={u.label} value={u.value} color={u.color} delay={i * 0.12} />)}
-                    <div className="sys-ov-donut-row">
-                      <Donut value={87} label="capacity" color="#14b8a6" size={120} thickness={10} />
-                      <div className="sys-ov-spark-cols">
-                        <div className="sys-ov-spark"><span>latency p95</span><Sparkline data={spark.latency} color="#14b8a6" /></div>
-                        <div className="sys-ov-spark"><span>throughput</span><Sparkline data={spark.throughput} color="#477da2" /></div>
+              <div className="sys-intro">
+                <div className="sys-intro-card">
+                  <span className="sys-intro-eyebrow">About this world</span>
+                  <h3>Interface around the work.</h3>
+                  <p>I build the console before the incident. This world shows how I ship: L1 health at a glance, L2 the provider pool that keeps swaps quiet, L3 the single graph that proves every route, L4 the live room where every chart type is a real component.</p>
+                  <div className="sys-intro-meta"><span>React Flow</span><span>visx</span><span>bklit-ui</span><span>NumberFlow</span></div>
+                  <div className="sys-intro-actions"><a href="https://github.com/tuancookiez-hub" target="_blank" rel="noreferrer">View GitHub ↗</a><a href="#sys-contact">Get in touch →</a></div>
+                </div>
+                <div className="sys-intro-side">
+                  <div className="sys-kpi-grid">
+                    <KpiTile label="Availability" value={kpis.availability} decimals={3} suffix="%" delta={0.01} tone="#14b8a6" delay={0} />
+                    <KpiTile label="Latency p95" value={kpis.latencyP95} decimals={0} suffix=" ms" delta={-18} deltaUnit="ms" tone="#477da2" delay={0.08} />
+                    <KpiTile label="Error rate" value={kpis.errorRate} decimals={2} suffix="%" delta={-0.2} tone="#c98a12" delay={0.16} />
+                    <KpiTile label="Requests / sec" value={kpis.throughputRps} decimals={0} suffix="" delta={12.4} tone="#477da2" delay={0.24} />
+                  </div>
+                  <div className="sys-ov-mid">
+                    <Panel title="Traffic by hour" hint="requests · 24h">
+                      <BarChart data={barData} color="#477da2" height={150} />
+                    </Panel>
+                    <Panel title="Resource utilization" hint="current load">
+                      <div className="sys-ov-usage-col">
+                        {usage.map((u, i) => <UsageRow key={u.label} label={u.label} value={u.value} color={u.color} delay={i * 0.12} />)}
+                        <div className="sys-ov-donut-row">
+                          <Donut value={87} label="capacity" color="#14b8a6" size={120} thickness={10} />
+                          <div className="sys-ov-spark-cols">
+                            <div className="sys-ov-spark"><span>latency p95</span><Sparkline data={spark.latency} color="#14b8a6" /></div>
+                            <div className="sys-ov-spark"><span>throughput</span><Sparkline data={spark.throughput} color="#477da2" /></div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    </Panel>
                   </div>
-                </Panel>
-              </div>
-              <div className="sys-ov-bottom">
-                <Panel title="Service health" hint="real-time status">
-                  <div className="sys-status-list">
-                    {services.map((s, i) => <StatusRow key={s.name} name={s.name} status={s.status} detail={s.detail} delay={i * 0.08} />)}
+                  <div className="sys-ov-bottom">
+                    <Panel title="Service health" hint="real-time status">
+                      <div className="sys-status-list">
+                        {services.map((s, i) => <StatusRow key={s.name} name={s.name} status={s.status} detail={s.detail} delay={i * 0.08} />)}
+                      </div>
+                    </Panel>
                   </div>
-                </Panel>
+                </div>
               </div>
             </div>
 

@@ -919,9 +919,24 @@ text.ax-v {
 }
 .sys-ov-eyebrow { color: var(--sys-blue); font-size: 9px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
 .sys-ov-title { margin-top: 6px; color: var(--sys-ink); font: 700 clamp(30px, 4vw, 52px)/1 Georgia, serif; letter-spacing: -.03em; transition: color 800ms ease; }
-.sys-ov-uptime { text-align: right; }
+.sys-ov-lede { margin-top: 10px; max-width: 62ch; color: var(--sys-soft); font-size: 13px; line-height: 1.6; }
+.sys-ov-uptime { text-align: right; flex-shrink: 0; }
 .sys-ov-uptime-label { color: var(--sys-soft); font: 8px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 .sys-ov-uptime-num { margin-top: 2px; color: var(--sys-ink); font: 700 clamp(34px, 4.5vw, 58px)/1 Georgia, serif; letter-spacing: -.03em; transition: color 800ms ease; }
+
+.sys-intro { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; margin-bottom: 16px; }
+.sys-intro-card { padding: 18px; border: 1px solid rgba(16,36,58,.12); border-radius: 14px; background: rgba(255,255,255,.82); box-shadow: 0 12px 30px rgba(16,36,58,.08); display: flex; flex-direction: column; gap: 12px; }
+.sys-intro-eyebrow { color: var(--sys-blue); font: 800 8px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; }
+.sys-intro-card h3 { color: var(--sys-ink); font: 700 22px/1.05 Georgia, serif; letter-spacing: -.02em; }
+.sys-intro-card p { color: var(--sys-soft); font-size: 12px; line-height: 1.65; }
+.sys-intro-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.sys-intro-meta span { padding: 4px 8px; border-radius: 999px; background: rgba(16,36,58,.07); color: var(--sys-blue-deep); font: 700 8px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+.sys-intro-actions { display: flex; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+.sys-intro-actions a { padding: 9px 14px; border-radius: 999px; font: 800 9px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.sys-intro-actions a:first-child { color: white; background: var(--sys-blue-deep); }
+.sys-intro-actions a:last-child { color: var(--sys-blue-deep); border: 1px solid rgba(16,36,58,.18); background: transparent; }
+.sys-intro-side { display: grid; gap: 16px; min-width: 0; }
+@media (max-width: 920px) { .sys-intro { grid-template-columns: 1fr; } .sys-ov-head { flex-wrap: wrap; } }
 
 .sys-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 16px; }
 .sys-kpi {
