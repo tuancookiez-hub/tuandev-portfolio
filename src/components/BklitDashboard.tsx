@@ -277,9 +277,9 @@ const INCIDENTS = [
 
 function featureColor(f: ChoroplethFeature): string {
   const v = Number(f.properties?.value ?? 0);
-  if (!v) return "rgba(120,140,160,.18)";
+  if (!v) return "#e8edf1";
   const t = Math.min(1, v / 34000);
-  return `rgba(20,184,166,${(0.2 + t * 0.8).toFixed(2)})`;
+  return `rgba(20,184,166,${(0.26 + t * 0.74).toFixed(2)})`;
 }
 
 // ─── KPI tile ────────────────────────────────────────────────

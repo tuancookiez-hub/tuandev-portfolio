@@ -1044,6 +1044,12 @@ text.ax-v {
 .sys-l2-report { margin-top: 18px; }
 .sys-l2-report .sys-r-eyebrow { display: block; margin-bottom: 8px; }
 
+/* L4: keep bklit internals on light tokens inside the white cards */
+.sys-stage-reports .bklit-ui .bg-zinc-900 {
+  background-color: #f1f5f9;
+  border: 1px solid rgba(16,36,58,.08);
+}
+
 /* On touch, don't let chart internals capture the scroll gesture.
    The chart canvas is decorative — scroll should always win. Pinch/drag
    stays disabled on L3 via React Flow props; below hands it to the page. */
@@ -1090,19 +1096,28 @@ text.ax-v {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 .sys-dash-panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   margin-bottom: 12px;
   flex-shrink: 0;
+  min-width: 0;
 }
 .sys-dash-panel-title {
   color: #10243a;
   font: 800 9px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .sys-dash-panel-hint {
   color: #1d4a6b;
@@ -1110,11 +1125,25 @@ text.ax-v {
   letter-spacing: .06em;
   text-transform: uppercase;
   opacity: .9;
+  min-width: 0;
+  max-width: 52%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  flex-shrink: 0;
 }
 .sys-dash-panel-body {
   flex: 1;
   min-height: 0;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+.sys-dash-panel-body svg,
+.sys-dash-panel-body canvas {
+  max-width: 100%;
+  display: block;
 }
 .sys-dash-center {
   display: flex;
