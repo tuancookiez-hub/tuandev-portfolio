@@ -312,9 +312,9 @@ function Kpi({
   );
 }
 
-function Panel({ title, hint, live, children }: { title: string; hint?: string; live?: boolean; children: React.ReactNode }) {
+function Panel({ title, hint, live, span, h = 220, children }: { title: string; hint?: string; live?: boolean; span: number; h?: number; children: React.ReactNode }) {
   return (
-    <section className="sys-dash-panel">
+    <section className={`sys-dash-panel sys-span-${span}`}>
       <header className="sys-dash-panel-head">
         <span className="sys-dash-panel-title">
           {title}
@@ -322,7 +322,7 @@ function Panel({ title, hint, live, children }: { title: string; hint?: string; 
         </span>
         {hint && <span className="sys-dash-panel-hint">{hint}</span>}
       </header>
-      {children}
+      <div className="sys-dash-panel-body" style={{ height: h }}>{children}</div>
     </section>
   );
 }
@@ -374,8 +374,8 @@ export default function BklitDashboard() {
           format={{ maximumFractionDigits: 2 }} />
       </div>
 
-      {/* row 1 — time series */}
-      <Panel title="Active users" hint="7d">
+      {/* row A — two time series: wide + narrow */}
+      <Panel title="Active users" hint="7d" span={8} h={280}>
         <AreaChart data={usersTrend}>
           <Grid horizontal />
           <Area dataKey="value" curve={curveNatural} strokeWidth={2.5} fillOpacity={0.4} />
@@ -384,7 +384,7 @@ export default function BklitDashboard() {
         </AreaChart>
       </Panel>
 
-      <Panel title="API requests / min" hint="live" live>
+      <Panel title="API requests / min" hint="live" live span={4} h={280}>
         <LiveLineChart data={live.requests} value={live.requestValue} window={30}>
           <Grid horizontal />
           <LiveLine dataKey="value" curve={curveNatural} stroke="var(--chart-line-primary)" strokeWidth={2.5} />
@@ -394,7 +394,8 @@ export default function BklitDashboard() {
         </LiveLineChart>
       </Panel>
 
-      <Panel title="Latency · web" hint="p50 · p95">
+      {/* row B — three medium time series */}
+      <Panel title="Latency · web" hint="p50 · p95" span={4}>
         <LineChart data={webLatency}>
           <Grid horizontal />
           <Line dataKey="p50" curve={curveNatural} stroke="var(--chart-line-primary)" />
@@ -404,7 +405,7 @@ export default function BklitDashboard() {
         </LineChart>
       </Panel>
 
-      <Panel title="Revenue & run rate" hint="30d">
+      <Panel title="Revenue & run rate" hint="30d" span={4}>
         <ComposedChart data={revRun}>
           <Grid horizontal />
           <SeriesBar dataKey="revenue" fill="var(--chart-1)" />
@@ -415,7 +416,7 @@ export default function BklitDashboard() {
         </ComposedChart>
       </Panel>
 
-      <Panel title="Revenue volatility" hint="candlestick">
+      <Panel title="Revenue volatility" hint="candlestick" span={4}>
         <CandlestickChart data={ohlc}>
           <Grid horizontal vertical />
           <Candlestick />
@@ -425,7 +426,8 @@ export default function BklitDashboard() {
         </CandlestickChart>
       </Panel>
 
-      <Panel title="Recent activity" hint="live" live>
+      {/* row C — activity feed + horizontal bars */}
+      <Panel title="Recent activity" hint="live" live span={4} h={280}>
         <ul className="sys-live-feed">
           {live.activity.map((a, i) => (
             <li key={`${a}-${i}`}>
@@ -437,8 +439,7 @@ export default function BklitDashboard() {
         </ul>
       </Panel>
 
-      {/* row 2 — breakdowns */}
-      <Panel title="Top pages" hint="page views">
+      <Panel title="Top pages" hint="page views" span={8} h={280}>
         <BarChart data={topPages} xDataKey="name" orientation="horizontal" animationDuration={1100}>
           <Grid vertical />
           <Bar dataKey="value" fill="var(--chart-line-primary)" lineCap="round" />
@@ -447,19 +448,20 @@ export default function BklitDashboard() {
         </BarChart>
       </Panel>
 
-      <Panel title="Conversion funnel" hint="visitors → paid">
+      {/* row D — four compact widgets */}
+      <Panel title="Conversion funnel" hint="visitors → paid" span={3} h={240}>
         <FunnelChart data={funnelData} showValues showLabels />
       </Panel>
 
-      <Panel title="System health" hint="gauge">
+      <Panel title="System health" hint="gauge" span={3} h={240}>
         <div className="sys-dash-center">
           <Gauge value={92} centerValue={92} totalNotches={40} defaultLabel="Healthy" suffix="%" />
         </div>
       </Panel>
 
-      <Panel title="Channel mix" hint="ring">
+      <Panel title="Channel mix" hint="ring" span={3} h={240}>
         <div className="sys-dash-center">
-          <RingChart data={channelMix} size={240} strokeWidth={16}>
+          <RingChart data={channelMix} size={200} strokeWidth={16}>
             {channelMix.map((c, i) => (
               <Ring index={i} key={c.label} />
             ))}
@@ -468,9 +470,9 @@ export default function BklitDashboard() {
         </div>
       </Panel>
 
-      <Panel title="Traffic source" hint="pie">
+      <Panel title="Traffic source" hint="pie" span={3} h={240}>
         <div className="sys-dash-center">
-          <PieChart data={sourceShare} size={240}>
+          <PieChart data={sourceShare} size={200}>
             {sourceShare.map((s, i) => (
               <PieSlice index={i} key={s.label} />
             ))}
@@ -479,9 +481,10 @@ export default function BklitDashboard() {
         </div>
       </Panel>
 
-      <Panel title="Product quality" hint="radar">
+      {/* row E — three analyticals */}
+      <Panel title="Product quality" hint="radar" span={4} h={260}>
         <div className="sys-dash-center">
-          <RadarChart data={qualityData} metrics={qualityMetrics} size={280}>
+          <RadarChart data={qualityData} metrics={qualityMetrics} size={240}>
             <RadarGrid />
             <RadarAxis />
             <RadarLabels fontSize={10} offset={16} />
@@ -492,8 +495,7 @@ export default function BklitDashboard() {
         </div>
       </Panel>
 
-      {/* row 3 — deep dive */}
-      <Panel title="Service performance" hint="latency vs errors">
+      <Panel title="Service performance" hint="latency vs errors" span={4} h={260}>
         <ScatterChart data={serviceScatter}>
           <Grid horizontal />
           <Scatter dataKey="latency" />
@@ -503,7 +505,7 @@ export default function BklitDashboard() {
         </ScatterChart>
       </Panel>
 
-      <Panel title="User journey" hint="sankey">
+      <Panel title="User journey" hint="sankey" span={4} h={260}>
         <SankeyChart data={sankeyData} aspectRatio="2 / 1">
           <SankeyLink />
           <SankeyNode />
@@ -511,8 +513,9 @@ export default function BklitDashboard() {
         </SankeyChart>
       </Panel>
 
-      <Panel title="Users by country" hint="choropleth">
-        <ChoroplethChart data={fc} aspectRatio="2 / 1" zoomEnabled zoomMin={1} zoomMax={4}>
+      {/* row F — full-width geography */}
+      <Panel title="Users by country" hint="choropleth" span={12} h={430}>
+        <ChoroplethChart data={fc} aspectRatio="3 / 1" zoomEnabled zoomMin={1} zoomMax={4}>
           <ChoroplethFeatureComponent getFeatureColor={featureColor} stroke="rgba(10,10,15,.55)" strokeWidth={0.5} />
           <ChoroplethTooltip
             getFeatureName={(f) => String(f.properties?.name ?? "—")}
@@ -522,8 +525,8 @@ export default function BklitDashboard() {
         </ChoroplethChart>
       </Panel>
 
-      {/* incidents */}
-      <div className="sys-incidents">
+      {/* incidents + alerts */}
+      <div className="sys-incidents sys-span-8">
         <header className="sys-dash-panel-head">
           <span className="sys-dash-panel-title">Active incidents</span>
           <span className="sys-dash-panel-hint">{INCIDENTS.length} open</span>
@@ -539,7 +542,7 @@ export default function BklitDashboard() {
         </ul>
       </div>
 
-      <div className="sys-alerts">
+      <div className="sys-alerts sys-span-4">
         <header className="sys-dash-panel-head">
           <span className="sys-dash-panel-title">Alerts</span>
           <span className="sys-dash-panel-hint">12 total · last 24h</span>
