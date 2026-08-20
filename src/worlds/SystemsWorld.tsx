@@ -14,6 +14,7 @@ import AiClientConsole from "../components/AiClientConsole";
 import PdfViewer from "../components/PdfViewer";
 import RoutingTopology from "../components/RoutingTopology";
 import BklitDashboard from "../components/BklitDashboard";
+import GooeyNavButton from "../components/GooeyNavButton";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -126,9 +127,9 @@ export default function SystemsWorld({
         </defs>
       </svg>
       {!embed && (
-        <button type="button" className="world-return sys-return" onClick={() => (onClose ? onClose() : ctx.leave())}>
-          <i aria-hidden="true">←</i> Main menu
-        </button>
+        <div className="sys-gooey-slot" aria-label="Main menu">
+          <GooeyNavButton label="Main menu" onClick={() => (onClose ? onClose() : ctx.leave())} />
+        </div>
       )}
 
       <div className="sys-topbar" data-sync="utility">
