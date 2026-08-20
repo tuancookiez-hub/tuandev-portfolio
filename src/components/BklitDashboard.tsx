@@ -454,37 +454,32 @@ export default function BklitDashboard() {
       </Panel>
 
       <Panel title="System health" hint="gauge" span={3} h={240}>
-        <div className="sys-dash-center">
-          <Gauge value={92} centerValue={92} totalNotches={40} defaultLabel="Healthy" suffix="%" />
+        <div className="min-w-0 overflow-hidden">
+          <Gauge value={92} centerValue={92} minWidth={0} totalNotches={40} defaultLabel="Healthy" suffix="%" />
         </div>
       </Panel>
 
       <Panel title="Channel mix" hint="ring" span={3} h={240}>
-        <div className="sys-dash-center">
-          <RingChart data={channelMix} size={200} strokeWidth={16}>
+        <RingChart data={channelMix} size={180} strokeWidth={16}>
             {channelMix.map((c, i) => (
               <Ring index={i} key={c.label} />
             ))}
             <RingCenter defaultLabel="Channel mix" />
           </RingChart>
-        </div>
       </Panel>
 
       <Panel title="Traffic source" hint="pie" span={3} h={240}>
-        <div className="sys-dash-center">
-          <PieChart data={sourceShare} size={200}>
+        <PieChart data={sourceShare} size={180}>
             {sourceShare.map((s, i) => (
               <PieSlice index={i} key={s.label} />
             ))}
             <PieCenter defaultLabel="Sources" />
           </PieChart>
-        </div>
       </Panel>
 
       {/* row E — three analyticals */}
       <Panel title="Product quality" hint="radar" span={4} h={260}>
-        <div className="sys-dash-center">
-          <RadarChart data={qualityData} metrics={qualityMetrics} size={240}>
+        <RadarChart data={qualityData} metrics={qualityMetrics} size={220}>
             <RadarGrid />
             <RadarAxis />
             <RadarLabels fontSize={10} offset={16} />
@@ -492,7 +487,6 @@ export default function BklitDashboard() {
               <RadarArea key={row.label} index={i} color="var(--chart-line-primary)" />
             ))}
           </RadarChart>
-        </div>
       </Panel>
 
       <Panel title="Service performance" hint="latency vs errors" span={4} h={260}>

@@ -1001,7 +1001,10 @@ text.ax-v {
   align-items: center;
   justify-content: center;
   height: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
+.sys-dash-center svg { max-width: 100%; height: auto; display: block; }
 .sys-dash-heatmap {
   display: flex;
   flex-direction: column;
@@ -1009,11 +1012,20 @@ text.ax-v {
   width: 100%;
 }
 @media (max-width: 1080px) {
-  .sys-span-3, .sys-span-4, .sys-span-8, .sys-span-12 { grid-column: span 12; }
+  .sys-span-4 { grid-column: span 6; }
+  .sys-span-3 { grid-column: span 6; }
+  .sys-span-8 { grid-column: span 12; }
+  .sys-span-12 { grid-column: span 12; }
+  .sys-live-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sys-live-kpi { padding: 10px 12px; }
 }
-@media (max-width: 700px) {
+@media (max-width: 760px) {
+  .sys-live-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sys-dash { grid-template-columns: repeat(1, minmax(0, 1fr)); }
   .sys-span-3, .sys-span-4, .sys-span-8, .sys-span-12 { grid-column: span 1; }
+  .sys-dash-panel { padding: 12px; border-radius: 10px; }
+  .sys-dash-panel-body[style] { height: auto !important; min-height: 180px; }
+  .sys-incidents, .sys-alerts { grid-column: auto; }
 }
 
 /* L4 live KPI row */
@@ -1105,6 +1117,11 @@ text.ax-v {
 
 @media (max-width: 1080px) {
   .sys-live-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sys-live-kpi { padding: 10px 12px; }
+}
+@media (max-width: 760px) {
+  .sys-live-kpi-value { font-size: 18px; }
+  .sys-live-kpi-label { font-size: 7px; }
 }
 @media (max-width: 620px) {
   .sys-live-kpis { grid-template-columns: minmax(0, 1fr); }

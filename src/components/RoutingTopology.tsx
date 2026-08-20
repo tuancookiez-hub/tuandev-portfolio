@@ -116,8 +116,9 @@ export default function RoutingTopology() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           defaultEdgeOptions={{ type: "particle" }}
-          defaultViewport={{ x: 10, y: 90, zoom: 0.8 }}
-          minZoom={0.45}
+          fitView
+          fitViewOptions={{ padding: 0.18, minZoom: 0.42, maxZoom: 1.1 }}
+          minZoom={0.32}
           maxZoom={1.2}
           proOptions={{ hideAttribution: true }}
           nodesConnectable={false}
