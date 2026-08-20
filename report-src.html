@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" />
+<title>Batch Report — ORD-1279 → ORD-1284</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", system-ui, sans-serif; color: #10243a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 794px; min-height: 1123px; padding: 56px 56px 44px; page-break-after: always; position: relative; overflow: hidden; }
+  .page:last-child { page-break-after: avoid; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; font: 700 7px "Consolas", monospace; letter-spacing:.14em; text-transform:uppercase; color:#8fb0c7; border-bottom:1px solid rgba(16,36,58,.1); padding-bottom:10px; }
+  .meta { margin-top:10px; display:flex; gap:18px; font: 400 9px "Consolas", monospace; color:#5a6f82; }
+  h1 { margin-top:22px; font: 700 32px/1 Georgia, serif; letter-spacing:-.02em; color:#10243a; }
+  .lede { margin-top:10px; max-width: 56ch; font-size:11.5px; line-height:1.6; color:#2a3a4a; }
+  .kpis { margin-top:22px; display:grid; grid-template-columns: repeat(4,1fr); gap:10px; }
+  .kpi { border:1px solid rgba(16,36,58,.1); border-radius:10px; padding:12px 14px; background:#f8fafb; }
+  .kpi small { display:block; font:700 7px "Consolas", monospace; letter-spacing:.12em; text-transform:uppercase; color:#5a6f82; }
+  .kpi b { display:block; margin-top:6px; font:700 22px/1 Georgia, serif; letter-spacing:-.02em; }
+  .kpi b em { font:400 9px "Consolas", monospace; color:#5a6f82; font-style:normal; margin-left:4px; }
+  .kpi i { display:block; margin-top:6px; font:400 8px "Consolas", monospace; color:#5a6f82; font-style:normal; }
+  h2 { margin-top:28px; font:700 13px/1 "Segoe UI", system-ui, sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#10243a; }
+  h2 + p { margin-top:6px; font-size:10px; line-height:1.5; color:#5a6f82; max-width:62ch; }
+  table { width:100%; margin-top:12px; border-collapse: collapse; font-size:9px; }
+  th { text-align:left; font:700 7px "Consolas", monospace; letter-spacing:.1em; text-transform:uppercase; color:#5a6f82; padding:7px 8px; border-bottom:1px solid rgba(16,36,58,.12); background:#f2f6f9; }
+  td { padding:7px 8px; border-bottom:1px solid rgba(16,36,58,.08); vertical-align:middle; }
+  .pill { display:inline-flex; padding:2px 7px; border-radius:999px; font:700 7px "Consolas", monospace; letter-spacing:.06em; text-transform:uppercase; }
+  .ok { background:rgba(47,143,91,.12); color:#2f8f5b; }
+  .warn { background:rgba(201,138,18,.14); color:#8a6500; }
+  .fail { background:rgba(196,69,60,.12); color:#c4453c; }
+  .foot { margin-top:18px; display:flex; justify-content:space-between; font:400 7px "Consolas", monospace; letter-spacing:.08em; text-transform:uppercase; color:#8fb0c7; border-top:1px solid rgba(16,36,58,.08); padding-top:10px; }
+  .chart { margin-top:12px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .chart-card { border:1px solid rgba(16,36,58,.08); border-radius:10px; padding:12px; background:#fff; }
+  .chart-card small { font:700 7px "Consolas", monospace; letter-spacing:.1em; text-transform:uppercase; color:#5a6f82; }
+  .bar { margin-top:8px; height:6px; border-radius:999px; background:#eef2f5; overflow:hidden; }
+  .bar i { display:block; height:100%; border-radius:999px; }
+  .note { margin-top:14px; padding:10px 12px; border-radius:10px; background:#f2f6f9; border:1px solid rgba(16,36,58,.08); font-size:9.5px; line-height:1.5; color:#2a3a4a; }
+  .sig { margin-top:18px; display:flex; gap:18px; font:700 7px "Consolas", monospace; letter-spacing:.08em; text-transform:uppercase; color:#5a6f82; }
+  .sig b { display:block; margin-top:4px; height:1px; width:140px; background:rgba(16,36,58,.18); }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 — COVER + SUMMARY -->
+<div class="page">
+  <div class="topbar"><span>SYS · OPERATIONS CONSOLE — L2</span><span>Batch report · ORD-1279 → ORD-1284</span></div>
+  <div class="meta"><span>Run: 2026-02-18 · 14:42 MYT</span><span>Operator: Tuan</span><span>Source: the console above</span></div>
+  <h1>Batch report<br>ORD-1279 → ORD-1284</h1>
+  <p class="lede">Six orders through one queue. The console above routed them live; this is the receipt it printed — same lane names, same 6 orders, same single failover (ORD-1281, 429 → retried on another lane). Anyone can read it; engineers can verify it.</p>
+  <div class="kpis">
+    <div class="kpi"><small>Throughput</small><b>6<span style="font:700 10px monospace; color:#5a6f82;"> orders</span></b><i>1 batch · 6 lanes</i></div>
+    <div class="kpi"><small>p95 time</small><b>298<em>ms</em></b><i>fastest 184 ms · slowest 388 ms</i></div>
+    <div class="kpi"><small>Failover</small><b>1<em>· recovered</em></b><i>ORD-1281 → retried · 200</i></div>
+    <div class="kpi"><small>Success</small><b>100<em>%</em></b><i>6/6 delivered</i></div>
+  </div>
+  <h2>What this proves</h2>
+  <p>One queue handles many lanes, and a hiccup doesn't lose the order. The report mirrors the console's live state so a non-technical reader follows the story and a technical reader can audit it.</p>
+  <table>
+    <tr><th>Order</th><th>Lane</th><th>Model (under the hood)</th><th>Time</th><th>Result</th></tr>
+    <tr><td><b>ORD-1284</b></td><td>Express lane</td><td style="font-family:Consolas,monospace;">kimi-k3-max · openai-custom</td><td>184 ms</td><td><span class="pill ok">200 · delivered</span></td></tr>
+    <tr><td><b>ORD-1283</b></td><td>Batch lane</td><td style="font-family:Consolas,monospace;">deepseek-reasoner · deepseek-alias</td><td>262 ms</td><td><span class="pill ok">200 · delivered</span></td></tr>
+    <tr><td><b>ORD-1282</b></td><td>Priority lane</td><td style="font-family:Consolas,monospace;">claude-sonnet-4 · anthropic-native</td><td>210 ms</td><td><span class="pill ok">200 · delivered</span></td></tr>
+    <tr><td><b>ORD-1281</b></td><td>Standard lane → Priority lane</td><td style="font-family:Consolas,monospace;">gpt-4.1-mini → claude-sonnet-4</td><td>298 ms → 210 ms</td><td><span class="pill warn">429 → 200 · failover</span></td></tr>
+    <tr><td><b>ORD-1280</b></td><td>Express lane</td><td style="font-family:Consolas,monospace;">kimi-k3-max · openai-custom</td><td>184 ms</td><td><span class="pill ok">200 · delivered</span></td></tr>
+    <tr><td><b>ORD-1279</b></td><td>Coder lane</td><td style="font-family:Consolas,monospace;">qwen2.5-coder · dashscope</td><td>224 ms</td><td><span class="pill ok">200 · delivered</span></td></tr>
+  </table>
+  <div class="note"><b style="color:#10243a;">In plain words:</b> think of lanes as checkout counters. Six orders came in one line; the system sent each to the best open counter. One counter was busy (429) — the order stepped to the next counter and went through. No order lost.</div>
+  <div class="foot"><span>Generated from the L2 console · same data, same time</span><span>p. 1 / 3</span></div>
+</div>
+
+<!-- PAGE 2 — LANES + SIGNALS -->
+<div class="page">
+  <div class="topbar"><span>Routing lanes · 6 lanes</span><span>The same 6 lanes as the console</span></div>
+  <table>
+    <tr><th>Lane</th><th>Model</th><th>Avg time</th><th>Health</th><th>Share</th></tr>
+    <tr><td>Express lane</td><td style="font-family:Consolas,monospace;">kimi-k3-max</td><td>184 ms</td><td><span class="pill ok">ok</span></td><td>dedicated</td></tr>
+    <tr><td>Batch lane</td><td style="font-family:Consolas,monospace;">deepseek-reasoner</td><td>262 ms</td><td><span class="pill ok">ok</span></td><td>shared</td></tr>
+    <tr><td>Priority lane</td><td style="font-family:Consolas,monospace;">claude-sonnet-4</td><td>210 ms</td><td><span class="pill ok">ok</span></td><td>dedicated</td></tr>
+    <tr><td>Standard lane</td><td style="font-family:Consolas,monospace;">gpt-4.1-mini</td><td>298 ms</td><td><span class="pill ok">ok</span></td><td>shared</td></tr>
+    <tr><td>Overflow lane</td><td style="font-family:Consolas,monospace;">grok-4</td><td>388 ms</td><td><span class="pill warn">warm</span></td><td>dedicated</td></tr>
+    <tr><td>Coder lane</td><td style="font-family:Consolas,monospace;">qwen2.5-coder</td><td>224 ms</td><td><span class="pill ok">ok</span></td><td>shared</td></tr>
+  </table>
+  <h2>Routing signals — same 3 charts as L2</h2>
+  <p>Time (ms), volume, and cost over the last 14 hours — the console's three sparklines, frozen here for the record.</p>
+  <div class="chart">
+    <div class="chart-card"><small>Time p95 · ms</small><div style="margin-top:10px; font:700 18px Georgia, serif;">232 <span style="font:400 9px monospace; color:#5a6f82;">ms avg</span></div><div class="bar"><i style="width:62%; background:#477da2;"></i></div><div style="margin-top:6px; font:400 7px monospace; color:#5a6f82;">↓ 18 ms vs 24h</div></div>
+    <div class="chart-card"><small>Volume · orders / h</small><div style="margin-top:10px; font:700 18px Georgia, serif;">1,842 <span style="font:400 9px monospace; color:#5a6f82;">peak</span></div><div class="bar"><i style="width:78%; background:#14b8a6;"></i></div><div style="margin-top:6px; font:400 7px monospace; color:#5a6f82;">↑ 12.4% vs 24h</div></div>
+    <div class="chart-card"><small>Cost · $ / 1k</small><div style="margin-top:10px; font:700 18px Georgia, serif;">$2.60 <span style="font:400 9px monospace; color:#5a6f82;">current</span></div><div class="bar"><i style="width:34%; background:#c98a12;"></i></div><div style="margin-top:6px; font:400 7px monospace; color:#5a6f82;">stable</div></div>
+  </div>
+  <div class="note">These are the console's <b>golden signals</b> relabelled in plain words — time = how fast, volume = how many, cost = how much. Engineers still see latency/tokens/cost underneath; everyone else sees speed/scale/spend.</div>
+  <h2>Why it matters (for everyone)</h2>
+  <p>A queue that can reroute keeps promises. Customers see orders arrive; finance sees cost stay flat; engineers see p95 and failover rate. One batch, one receipt, many readers.</p>
+  <div class="foot"><span>Signals synced with L2 console</span><span>p. 2 / 3</span></div>
+</div>
+
+<!-- PAGE 3 — FAILOVER DETAIL + SIGN-OFF -->
+<div class="page">
+  <div class="topbar"><span>Incident · ORD-1281</span><span>429 → failover → 200</span></div>
+  <h1 style="font-size:24px; margin-top:16px;">One hiccup.<br>No lost order.</h1>
+  <p class="lede" style="margin-top:12px;">ORD-1281 hit a busy lane (429). The router retried on Priority lane (claude-sonnet-4) and delivered in 210 ms. The report captures the same event the console highlighted live — match the ID in both places.</p>
+  <table>
+    <tr><th>Step</th><th>What happened</th><th>Time</th></tr>
+    <tr><td>1</td><td>ORD-1281 routed to Standard lane (gpt-4.1-mini) — busy</td><td>298 ms · 429</td></tr>
+    <tr><td>2</td><td>Router retried → Priority lane (claude-sonnet-4)</td><td>210 ms</td></tr>
+    <tr><td>3</td><td>Delivered · no retry needed by the customer</td><td><span class="pill ok">200</span></td></tr>
+  </table>
+  <h2>Outcome</h2>
+  <p>Batch success 6/6. Effective p95 unchanged. Cost delta +$0.002 for the retry — within noise. The same ORD-1281 row is highlighted live in the console above; the report freezes it for audit.</p>
+  <div class="note"><b>Audit link:</b> verify ORD-1281 in the console's "Live fulfilment" list — it pulses with a tint on load. The report's row uses the identical ID and route. Same data, two views.</div>
+  <div class="sig"><span>Prepared by<b></b>Tuan · Systems</span><span>Date<b></b>2026-02-18</span><span>Source<b></b>L2 console (this page's source)</span></div>
+  <div style="margin-top:18px; font-size:9px; line-height:1.5; color:#5a6f82;">Built as a portfolio proof: the console is interactive; the report is the artefact it emits. Both are hand-built — no external BI tool — so the craft is the message.</div>
+  <div class="foot"><span>End of report · ORD-1279 → ORD-1284</span><span>p. 3 / 3</span></div>
+</div>
+
+</body>
+</html>

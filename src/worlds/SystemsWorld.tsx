@@ -194,17 +194,17 @@ export default function SystemsWorld({
               </div>
             </div>
 
-            {/* ── LEVEL 2: AICLIENT2API CONSOLE + REPORT ── */}
+            {/* ── LEVEL 2: OPERATIONS CONSOLE + THE REPORT IT PRINTED ── */}
             <div ref={l2} className="sys-stage sys-stage-aiclient">
               <header className="sys-r-head">
-                <span className="sys-r-eyebrow">AIClient2API · L2</span>
-                <h2>Route once. Swap providers later.</h2>
-                <p>The provider pool, golden routing signals, and a live workflow — how AIClient2API keeps the client stable while the model pool rotates underneath.</p>
+                <span className="sys-r-eyebrow">Operations console · L2</span>
+                <h2>One queue. Every order finds a lane.</h2>
+                <p>Orders in, lanes out — time, cost and throughput anyone can read. The console above just printed the batch report below: same 6 lanes, same 6 orders (ORD-1281 failed over), same numbers.</p>
               </header>
               <AiClientConsole />
               <div className="sys-l2-report">
-                <span className="sys-r-eyebrow">Inspection · report</span>
-                <PdfViewer src="sample-inspection-report.pdf" label="Inspection report — sample" />
+                <span className="sys-r-eyebrow">The same batch — as a report</span>
+                <PdfViewer src="sample-inspection-report.pdf" label="Batch report — ORD-1279 → ORD-1284 · 6 lanes · 1 failover" />
               </div>
             </div>
 

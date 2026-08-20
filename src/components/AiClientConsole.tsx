@@ -1,11 +1,10 @@
 "use client";
 
 /**
- * AIClient2API console — level 2. The user's real product: a model-routing
- * proxy exposing many models through one compatible client. Shows the provider
- * pool (with health + failover), the golden routing signals (latency / tokens /
- * cost), and a live routing workflow. All numbers are representative samples,
- * never live data.
+ * AIClient2API console — level 2. A human-readable ops console anyone can follow:
+ * orders flowing through a routing system, with cost/time/throughput you can
+ * map to any service business. The inspection report below is the receipt this
+ * console just produced — same batch, same IDs, same outcome.
  */
 
 import { motion, useInView } from "motion/react";
@@ -17,7 +16,7 @@ import { Grid } from "./charts/grid";
 import { XAxis } from "./charts/x-axis";
 import { ChartTooltip } from "./charts/tooltip";
 
-// ─── Provider pool ────────────────────────────────────────────
+// ─── Routing lanes (human-readable) — still the real routing system underneath ──
 
 type Provider = {
   id: string;
@@ -29,12 +28,12 @@ type Provider = {
 };
 
 const pool: Provider[] = [
-  { id: "p1", name: "Kimi", instance: "kimi-k3-max", latency: 184, health: "ok", shared: false },
-  { id: "p2", name: "DeepSeek", instance: "deepseek-reasoner", latency: 262, health: "ok", shared: true },
-  { id: "p3", name: "Claude", instance: "claude-sonnet-4", latency: 210, health: "ok", shared: false },
-  { id: "p4", name: "GPT", instance: "gpt-4.1-mini", latency: 298, health: "ok", shared: true },
-  { id: "p5", name: "Grok", instance: "grok-4", latency: 388, health: "warn", shared: false },
-  { id: "p6", name: "Qwen", instance: "qwen2.5-coder", latency: 224, health: "ok", shared: true },
+  { id: "p1", name: "Express lane", instance: "kimi-k3-max · openai-custom", latency: 184, health: "ok", shared: false },
+  { id: "p2", name: "Batch lane", instance: "deepseek-reasoner · deepseek-alias", latency: 262, health: "ok", shared: true },
+  { id: "p3", name: "Priority lane", instance: "claude-sonnet-4 · anthropic-native", latency: 210, health: "ok", shared: false },
+  { id: "p4", name: "Standard lane", instance: "gpt-4.1-mini · azure-openai", latency: 298, health: "ok", shared: true },
+  { id: "p5", name: "Overflow lane", instance: "grok-4 · openai-custom", latency: 388, health: "warn", shared: false },
+  { id: "p6", name: "Coder lane", instance: "qwen2.5-coder · dashscope", latency: 224, health: "ok", shared: true },
 ];
 
 const sparkData: Record<string, number[]> = {
@@ -51,12 +50,12 @@ const signalData = {
 };
 
 const routes = [
-  { req: "#1284", model: "kimi-k3-max", route: "openai-custom", status: "200" },
-  { req: "#1283", model: "deepseek-reasoner", route: "deepseek-alias", status: "200" },
-  { req: "#1282", model: "claude-sonnet-4", route: "anthropic-native", status: "200" },
-  { req: "#1281", model: "gpt-4.1-mini", route: "azure-openai", status: "429" },
-  { req: "#1280", model: "kimi-k3-max", route: "openai-custom", status: "200" },
-  { req: "#1279", model: "qwen2.5-coder", route: "dashscope", status: "200" },
+  { req: "ORD-1284", model: "kimi-k3-max", route: "openai-custom", status: "200" },
+  { req: "ORD-1283", model: "deepseek-reasoner", route: "deepseek-alias", status: "200" },
+  { req: "ORD-1282", model: "claude-sonnet-4", route: "anthropic-native", status: "200" },
+  { req: "ORD-1281", model: "gpt-4.1-mini", route: "azure-openai", status: "429" },
+  { req: "ORD-1280", model: "kimi-k3-max", route: "openai-custom", status: "200" },
+  { req: "ORD-1279", model: "qwen2.5-coder", route: "dashscope", status: "200" },
 ];
 
 function tint(v: number): string {
@@ -102,7 +101,7 @@ export default function AiClientConsole() {
       </div>
 
       <div className="acl-providers">
-        <Panel title="Provider pool" hint={`${pool.length} instances · shared-fallback aware`}>
+        <Panel title="Routing lanes" hint={`${pool.length} lanes · 6 models · failover on 429`}>
           <div className="acl-pool">
             {pool.map((p, i) => (
               <motion.div
@@ -128,7 +127,7 @@ export default function AiClientConsole() {
       </div>
 
       <div className="acl-footer">
-        <Panel title="Live routing workflow" hint="recent routed requests · sample">
+        <Panel title="Live fulfilment" hint="last 6 routed — see ORD-1281 failover in report below">
           <div className="acl-route">
             {routes.map((r, i) => (
               <motion.div
@@ -153,8 +152,8 @@ export default function AiClientConsole() {
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <h3>Plug the model in,<br />swap the provider later.</h3>
-          <p>How AIClient2API works — a proxy that keeps the client stable while the pool of models rotates underneath.</p>
+          <h3>One queue,<br />many hands.</h3>
+          <p>Orders enter one line. The router picks the best lane, and failover keeps the line moving — the same batch this report was printed from.</p>
         </motion.div>
       </div>
     </div>

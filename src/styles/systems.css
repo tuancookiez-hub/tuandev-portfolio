@@ -282,28 +282,29 @@
 .sys > .sys-return {
   top: 46px;
   left: 16px;
-  padding: 5px 9px;
-  color: rgba(16, 36, 58, .52);
-  border: 1px solid rgba(16, 36, 58, .1);
+  padding: 4px 8px;
+  color: rgba(16, 36, 58, .32);
+  border: 1px solid rgba(16, 36, 58, .06);
   border-radius: 999px;
-  background: rgba(255, 255, 255, .42);
-  backdrop-filter: blur(8px) saturate(1);
-  -webkit-backdrop-filter: blur(8px) saturate(1);
+  background: rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px) saturate(1);
+  -webkit-backdrop-filter: blur(10px) saturate(1);
   box-shadow: none;
-  font: 700 8px var(--font-mono);
-  letter-spacing: .12em;
+  font: 700 7px var(--font-mono);
+  letter-spacing: .13em;
   text-transform: uppercase;
-  opacity: .88;
+  opacity: .72;
 }
-.sys > .sys-return:hover { background: rgba(255,255,255,.72); color: rgba(16,36,58,.78); opacity: 1; border-color: rgba(16,36,58,.14); }
+.sys > .sys-return:hover { background: rgba(255,255,255,.32); color: rgba(16,36,58,.58); opacity: 1; border-color: rgba(16,36,58,.09); }
 @media (max-width: 620px) {
   .sys > .sys-return {
-    top: 36px; left: 12px; padding: 4px 8px; font-size: 7px;
-    background: rgba(255,255,255,.38); color: rgba(16,36,58,.46); border-color: rgba(16,36,58,.08);
+    top: 34px; left: 10px; padding: 3px 7px; font-size: 6.5px;
+    background: rgba(255,255,255,.16); color: rgba(16,36,58,.34); border-color: rgba(16,36,58,.06);
     box-shadow: none;
-    letter-spacing: .1em;
+    letter-spacing: .12em;
+    opacity: .7;
   }
-  .sys > .sys-return:hover { background: rgba(255,255,255,.62); color: rgba(16,36,58,.68); }
+  .sys > .sys-return:hover { background: rgba(255,255,255,.28); color: rgba(16,36,58,.52); }
 }
 
 .sys-utility {
