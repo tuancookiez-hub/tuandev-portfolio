@@ -1684,53 +1684,49 @@ text.ax-v {
 .sys-beams[data-active="true"] { opacity: 1; }
 .sys-beams-field {
   position: absolute;
-  inset: -12% 0 0 0;
+  inset: 0;
 }
 .sys-beam {
   position: absolute;
   top: 0;
-  height: 140%;
-  background: linear-gradient(180deg, transparent 0%, rgba(159, 208, 240, 0) 6%, rgba(159, 208, 240, .2) 22%, rgba(94, 234, 212, .6) 48%, rgba(255, 255, 255, .7) 66%, rgba(94, 234, 212, .3) 78%, transparent 94%);
   border-radius: 999px;
-  transform: rotate(var(--sys-beam-rot, 0deg));
-  transform-origin: top center;
-  filter: blur(0.5px);
+  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.05) 15%, rgba(255, 255, 255, 0.28) 45%, rgba(103, 232, 249, 0.75) 78%, rgba(165, 243, 252, 1) 100%);
+  filter: blur(0.4px);
   opacity: 0;
   will-change: transform, opacity;
   mix-blend-mode: screen;
+  box-shadow: 0 0 10px rgba(103, 232, 249, .35);
 }
-.sys-beam-core {
+.sys-burst {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(180deg, transparent, rgba(255,255,255,.7) 64%, rgba(94, 234, 212, .9) 86%);
-  opacity: .9;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
-.sys-beam-glow {
+.sys-burst-dot {
   position: absolute;
-  left: 50%;
-  bottom: 6%;
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
+  left: 0;
+  top: 0;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(94, 234, 212, .9) 0%, rgba(159, 208, 240, .45) 36%, transparent 72%);
-  opacity: 0;
-  transform: scale(.6);
-  transition: opacity .32s ease, transform .32s cubic-bezier(.22,1,.36,1);
+  background: radial-gradient(circle, rgba(165, 243, 252, 1) 0%, rgba(103, 232, 249, .8) 55%, transparent 100%);
+  box-shadow: 0 0 6px rgba(165, 243, 252, .9);
 }
-.sys-beam-glow.is-burst { opacity: 1; transform: scale(1.35); }
+.sys-burst-dot.is-white {
+  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, .75) 55%, transparent 100%);
+  box-shadow: 0 0 6px rgba(255, 255, 255, .9);
+}
 .sys-beams-collision {
   position: absolute;
-  left: 0; right: 0; bottom: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(159, 208, 240, .22), transparent);
-  box-shadow: 0 0 18px rgba(94, 234, 212, .18);
-  opacity: .7;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 8%, rgba(103, 232, 249, .28) 50%, transparent 92%);
+  box-shadow: 0 0 22px rgba(103, 232, 249, .22);
+  opacity: .55;
 }
 @media (max-width: 620px) {
-  .sys-beam { opacity: .85; }
-  .sys-beams-collision { bottom: 12%; }
+  .sys-beam { box-shadow: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .sys-beams { display: none; }

@@ -78,29 +78,30 @@ export default function SystemsWorld({
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const root = stageRef.current;
-    if (!root) return;
-    const map = new Map<Element, string>();
-    if (l1.current) map.set(l1.current, "overview");
-    if (l2.current) map.set(l2.current, "aiclient");
-    if (l3.current) map.set(l3.current, "flow");
-    if (l4.current) map.set(l4.current, "reports");
-    const io = new IntersectionObserver((entries) => {
-      const hit = entries
-        .filter((e) => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (hit) setStageName(map.get(hit.target) ?? "overview");
-    }, { root: null, threshold: [0.25, 0.45, 0.65], rootMargin: "-12% 0px -28% 0px" });
-    map.forEach((_, el) => io.observe(el));
-    const onScroll = () => {
+    const stages: [React.RefObject<HTMLDivElement | null>, string][] = [
+      [l1, "overview"],
+      [l2, "aiclient"],
+      [l3, "flow"],
+      [l4, "reports"],
+    ];
+    const compute = () => {
+      const anchor = window.innerHeight * 0.42;
+      let stage = "overview";
+      for (const [ref, name] of stages) {
+        const el = ref.current;
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= anchor) stage = name;
+      }
+      setStageName(stage);
       const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       setProgress(window.scrollY / max);
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    compute();
+    window.addEventListener("scroll", compute, { passive: true });
+    window.addEventListener("resize", compute);
     return () => {
-      io.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", compute);
+      window.removeEventListener("resize", compute);
     };
   }, []);
 

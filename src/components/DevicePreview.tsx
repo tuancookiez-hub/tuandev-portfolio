@@ -5,7 +5,27 @@ type Sync = {
   type: "portfolio-preview-scroll";
   section: string;
   progress: number;
+  stage?: string;
+  stageProgress?: number;
 };
+
+function activeStage(): { name: string; progress: number } | null {
+  const stages = [...document.querySelectorAll<HTMLElement>(".sys-stage")];
+  if (stages.length === 0) return null;
+  const anchor = window.innerHeight * 0.42;
+  let cur = stages[0];
+  if (!cur) return null;
+  for (const s of stages) {
+    if (s.getBoundingClientRect().top <= anchor) cur = s;
+  }
+  const cls = [...cur.classList].find((c) => c.startsWith("sys-stage-")) ?? "";
+  const name = cls.replace("sys-stage-", "");
+  if (!name) return null;
+  const box = cur.getBoundingClientRect();
+  const range = Math.max(1, box.height - window.innerHeight);
+  const progress = Math.min(1, Math.max(0, -box.top / range));
+  return { name, progress };
+}
 
 function current(): Omit<Sync, "type"> | null {
   const sections = [...document.querySelectorAll<HTMLElement>("[data-sync]")];
@@ -37,9 +57,24 @@ export function usePreviewReceiver(enabled: boolean) {
 
     const receive = (event: MessageEvent<Sync>) => {
       if (event.data?.type !== "portfolio-preview-scroll") return;
+
+      // Stage-aware sync (Systems world): land the phone at the same stage
+      // as the parent, positioned by how far INTO that stage the parent is.
+      // Stages differ wildly in height between desktop and mobile, so a
+      // whole-document proportional scroll can never line up.
+      if (event.data.stage) {
+        const el = document.querySelector<HTMLElement>(`.sys-stage-${CSS.escape(event.data.stage)}`);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          const range = Math.max(1, el.offsetHeight - window.innerHeight);
+          const target = top + (event.data.stageProgress ?? 0) * range;
+          window.scrollTo({ top: target, behavior: "auto" });
+          return;
+        }
+      }
+
       const section = document.querySelector<HTMLElement>(`[data-sync="${CSS.escape(event.data.section)}"]`);
       if (section === null) return;
-
       const journey = section.dataset.sync === "journey";
       const range = Math.max(1, section.offsetHeight - (journey ? window.innerHeight : 0));
       const target = section.offsetTop + (event.data.progress * range);
@@ -62,7 +97,8 @@ export default function DevicePreview({ world }: { world: "hospitality" | "syste
       tick.current = 0;
       const sync = current();
       if (sync === null) return;
-      frame.current?.contentWindow?.postMessage({ type: "portfolio-preview-scroll", ...sync } satisfies Sync, "*");
+      const stage = activeStage();
+      frame.current?.contentWindow?.postMessage({ type: "portfolio-preview-scroll", ...sync, stage: stage?.name, stageProgress: stage?.progress } satisfies Sync, "*");
     };
     const scroll = () => {
       if (tick.current !== 0) return;
