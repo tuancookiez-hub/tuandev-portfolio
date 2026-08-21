@@ -1745,17 +1745,10 @@ text.ax-v {
   .sys-beams { display: none; }
 }
 
-/* StPageFlip host — the library stretches to fill this box */
+/* StPageFlip host — react-pageflip stretches to fill this box */
 .sys-pdf-flip {
   width: 100%;
   max-width: 100%;
-}
-.sys-pdf-flip .stf__parent {
-  position: relative;
-  width: 100% !important;
-}
-.sys-pdf-flip .stf__parent > div {
-  width: 100% !important;
 }
 .sys-pdf-page {
   background: white;
