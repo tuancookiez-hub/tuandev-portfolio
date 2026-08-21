@@ -31,6 +31,14 @@ export default function PdfViewer({
   const [page, setPage] = useState(0);
   const [portrait, setPortrait] = useState(false);
   const [ready, setReady] = useState(false);
+  const [w, setW] = useState(430);
+
+  useEffect(() => {
+    const measure = () => setW(Math.min(560, Math.max(320, window.innerWidth - 64)));
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
 
   // Count pages on mount
   useEffect(() => {
@@ -61,13 +69,13 @@ export default function PdfViewer({
       if (pages.length === 0) return;
 
       const book = new PageFlip(el, {
-        width: 430,
-        height: 600,
+        width: w,
+        height: Math.round(w * 1.395),
         size: "stretch",
         minWidth: 260,
-        maxWidth: 540,
+        maxWidth: 600,
         minHeight: 380,
-        maxHeight: 720,
+        maxHeight: 840,
         drawShadow: true,
         flippingTime: reduced ? 300 : 950,
         usePortrait: true,
@@ -96,7 +104,7 @@ export default function PdfViewer({
       flipRef.current?.destroy();
       flipRef.current = null;
     };
-  }, [ready, numPages, src]);
+  }, [ready, numPages, src, w]);
 
   const turn = (delta: number) => {
     const book = flipRef.current;
@@ -135,10 +143,10 @@ export default function PdfViewer({
                 <Document file={src} loading={null} error={null}>
                   <Page
                     pageNumber={i + 1}
-                    scale={1}
+                    scale={1.25}
                     renderTextLayer
                     renderAnnotationLayer
-                    width={430}
+                    width={Math.round(w * 1.25)}
                   />
                 </Document>
               </div>
