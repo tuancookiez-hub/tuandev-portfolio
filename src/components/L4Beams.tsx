@@ -1,41 +1,69 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 /**
- * L4 Background Beams — scoped to the reports wall only.
- * Lightweight port of Aceternity's BackgroundBeamsWithCollision: vertical beams
- * that drift down and "collide" with a faint bottom edge, exploding into a
- * subtle pulse. Stays dark-theme, low opacity, and respects reduced-motion.
- * Only animates while L4 is in view (IntersectionObserver gate).
+ * L4 Background Beams — faithful port of Aceternity's
+ * BackgroundBeamsWithCollision. Beams fall from the top of the stage and,
+ * when their tip reaches the collision line, burst into scattered spark
+ * particles before restarting. Cyan/white palette, runs only while L4 is
+ * in view, respects reduced-motion.
  */
 
 type BeamOpts = {
-  initialX: number;
-  translateX: number;
-  initialY: number;
-  translateY: number;
+  x: number;
   duration: number;
+  repeatDelay: number;
   delay: number;
-  rotate: number;
+  height: number;
   width: number;
-  className?: string;
 };
 
-function Beam({ opts, active }: { opts: BeamOpts; active: boolean }) {
+const BEAMS: BeamOpts[] = [
+  { x: 2, duration: 7, repeatDelay: 3, delay: 2, height: 96, width: 2 },
+  { x: 46, duration: 3, repeatDelay: 3, delay: 4, height: 64, width: 2 },
+  { x: 9, duration: 7, repeatDelay: 7, delay: 0, height: 24, width: 1.5 },
+  { x: 32, duration: 5, repeatDelay: 14, delay: 4, height: 64, width: 2 },
+  { x: 62, duration: 11, repeatDelay: 2, delay: 0, height: 80, width: 2.5 },
+  { x: 78, duration: 4, repeatDelay: 2, delay: 0, height: 48, width: 1.5 },
+  { x: 92, duration: 6, repeatDelay: 4, delay: 2, height: 24, width: 2 },
+];
+
+type Burst = {
+  id: number;
+  x: number;
+  y: number;
+  spans: { x: number; y: number; size: number; white: boolean }[];
+};
+
+let burstId = 0;
+
+function makeBurst(x: number, y: number): Burst {
+  return {
+    id: ++burstId,
+    x,
+    y,
+    spans: Array.from({ length: 16 }, () => ({
+      x: Math.floor(Math.random() * 80 - 40),
+      y: Math.floor(Math.random() * -50 - 10),
+      size: 1.5 + Math.random() * 2,
+      white: Math.random() > 0.6,
+    })),
+  };
+}
+
+function Beam({ opts, active, collideY, containerW, onCollide }: { opts: BeamOpts; active: boolean; collideY: number; containerW: number; onCollide: (x: number, y: number) => void }) {
   const [key, setKey] = useState(0);
-  const [exploding, setExploding] = useState(false);
+  const [done, setDone] = useState(false);
+  const fall = collideY + opts.height * 0.4;
 
   useEffect(() => {
     if (!active) return;
-    const t = setTimeout(() => {
-      setExploding(true);
-      setTimeout(() => setExploding(false), 420);
-      setTimeout(() => setKey((k) => k + 1), 700);
-    }, (opts.duration - 0.35) * 1000 + opts.delay * 1000);
+    setDone(false);
+    const t = setTimeout(() => setKey((k) => k + 1), (opts.duration + opts.repeatDelay) * 1000 + opts.delay * 1000);
     return () => clearTimeout(t);
-  }, [key, active, opts.duration, opts.delay]);
+  }, [key, active, opts.duration, opts.repeatDelay, opts.delay]);
 
   if (!active) return null;
 
@@ -44,72 +72,92 @@ function Beam({ opts, active }: { opts: BeamOpts; active: boolean }) {
       key={key}
       className="sys-beam"
       style={{
-        left: opts.initialX,
+        left: `${opts.x}%`,
         width: opts.width,
-        ["--sys-beam-rot" as string]: `${opts.rotate}deg`,
-      } as React.CSSProperties}
-      initial={{ y: opts.initialY, x: 0, opacity: 0 }}
-      animate={{
-        y: opts.translateY,
-        x: opts.translateX,
-        opacity: [0, 0.8, 0.8, 0],
+        height: opts.height,
+        opacity: done ? 0 : undefined,
       }}
-      transition={{
-        duration: opts.duration,
-        delay: opts.delay,
-        ease: "linear",
-        repeat: Infinity,
-        repeatDelay: 0.6,
+      initial={{ y: -opts.height - 40 }}
+      animate={{ y: fall }}
+      transition={{ duration: opts.duration, delay: opts.delay, ease: "linear" }}
+      onAnimationComplete={() => {
+        if (!done) {
+          setDone(true);
+          onCollide((opts.x / 100) * containerW, fall + opts.height);
+        }
       }}
-      onAnimationComplete={() => {}}
-    >
-      <span className="sys-beam-core" />
-      <span className={`sys-beam-glow ${exploding ? "is-burst" : ""}`} aria-hidden="true" />
-    </motion.div>
+    />
   );
 }
 
-const BEAMS: BeamOpts[] = [
-  { initialX: 48, translateX: 10, initialY: -120, translateY: 780, duration: 7.2, delay: 0.1, rotate: 2, width: 3.5 },
-  { initialX: 180, translateX: -14, initialY: -160, translateY: 820, duration: 8.1, delay: 1.4, rotate: -1.5, width: 2.5 },
-  { initialX: 320, translateX: 8, initialY: -100, translateY: 860, duration: 6.8, delay: 0.6, rotate: 1, width: 3 },
-  { initialX: 520, translateX: -10, initialY: -140, translateY: 800, duration: 7.8, delay: 2.1, rotate: -2, width: 2.5 },
-  { initialX: 680, translateX: 12, initialY: -110, translateY: 840, duration: 6.5, delay: 0.9, rotate: 1.2, width: 3.5 },
-  { initialX: 840, translateX: -8, initialY: -170, translateY: 880, duration: 8.4, delay: 1.8, rotate: -1, width: 2.5 },
-  { initialX: 980, translateX: 6, initialY: -130, translateY: 820, duration: 7.0, delay: 0.3, rotate: 2.2, width: 3 },
-  { initialX: 1120, translateX: -12, initialY: -150, translateY: 860, duration: 7.6, delay: 2.6, rotate: -1.8, width: 2.5 },
-];
-
 export default function L4Beams({ containerRef }: { containerRef: React.RefObject<HTMLElement | null> }) {
   const [active, setActive] = useState(false);
-  const prefersReduced = useRef(false);
+  const [bursts, setBursts] = useState<Burst[]>([]);
+  const [collideY, setCollideY] = useState(620);
+  const [containerW, setContainerW] = useState(1200);
+  const reduced = useRef(false);
 
   useEffect(() => {
-    prefersReduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced.current) return;
+    reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced.current) return;
     const el = containerRef.current;
     if (!el) return;
+    const measure = () => {
+      setCollideY(Math.max(280, el.clientHeight - 70));
+      setContainerW(el.clientWidth);
+    };
+    measure();
     const io = new IntersectionObserver(
-      (entries) => {
-        const v = entries[0]?.isIntersecting ?? false;
-        setActive(v);
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+      (entries) => setActive(entries[0]?.isIntersecting ?? false),
+      { threshold: 0.08, rootMargin: "0px 0px -6% 0px" }
     );
     io.observe(el);
-    return () => io.disconnect();
+    window.addEventListener("resize", measure);
+    return () => {
+      io.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [containerRef]);
 
-  if (prefersReduced.current) return null;
+  useEffect(() => {
+    if (bursts.length === 0) return;
+    const t = setTimeout(() => setBursts((b) => b.slice(1)), 1100);
+    return () => clearTimeout(t);
+  }, [bursts]);
+
+  if (reduced.current) return null;
 
   return (
     <div className="sys-beams" aria-hidden="true" data-active={String(active)}>
       <div className="sys-beams-field">
         {BEAMS.map((b, i) => (
-          <Beam key={i} opts={b} active={active} />
+          <Beam
+            key={i}
+            opts={b}
+            active={active}
+            collideY={collideY}
+            containerW={containerW}
+            onCollide={(x, y) => setBursts((cur) => [...cur.slice(-3), makeBurst(x, y)])}
+          />
         ))}
       </div>
-      <div className="sys-beams-collision" />
+      <AnimatePresence>
+        {bursts.map((burst) => (
+          <div key={burst.id} className="sys-burst" style={{ left: burst.x, top: burst.y }}>
+            {burst.spans.map((s, i) => (
+              <motion.span
+                key={i}
+                className={`sys-burst-dot${s.white ? " is-white" : ""}`}
+                style={{ width: s.size, height: s.size }}
+                initial={{ x: 0, y: 0, opacity: 1 }}
+                animate={{ x: s.x, y: s.y, opacity: 0 }}
+                transition={{ duration: 0.85, ease: "easeOut" }}
+              />
+            ))}
+          </div>
+        ))}
+      </AnimatePresence>
+      <div className="sys-beams-collision" style={{ top: collideY + 46 }} />
     </div>
   );
 }
