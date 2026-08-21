@@ -75,9 +75,9 @@ export default function PdfViewer({
     const el = stageRef.current;
     if (!el) return;
     const measure = () => {
-      // Book gets the full stage width minus padding; height follows A4 ratio.
+      // Book fills the column minus card chrome; capped so A4 stays readable-tall.
       const avail = Math.floor(el.getBoundingClientRect().width);
-      setBookW(Math.max(360, Math.min(560, Math.min(avail, 560))));
+      setBookW(Math.max(300, Math.min(720, avail - 56)));
     };
     measure();
     const ro = new ResizeObserver(measure);
