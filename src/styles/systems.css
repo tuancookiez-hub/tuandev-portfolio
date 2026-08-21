@@ -1671,63 +1671,76 @@ text.ax-v {
 
 /* ── L4 Background Beams (Aceternity — exploding, scoped to reports) ── */
 .sys-stage-reports { position: relative; overflow: hidden; isolation: isolate; }
-.sys-stage-reports > * { position: relative; z-index: 1; }
+.sys-reports-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.sys-stage-reports > .sys-rep-head,
+.sys-stage-reports > .bklit-ui { position: relative; z-index: 1; }
 .sys-beams {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 0;
   pointer-events: none;
   overflow: hidden;
   opacity: 0;
   transition: opacity .6s ease;
 }
 .sys-beams[data-active="true"] { opacity: 1; }
-.sys-beams-field {
+.sys-beams-collision-line {
   position: absolute;
-  inset: 0;
-}
-.sys-beam {
-  position: absolute;
-  top: 0;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.05) 15%, rgba(255, 255, 255, 0.28) 45%, rgba(103, 232, 249, 0.75) 78%, rgba(165, 243, 252, 1) 100%);
-  filter: blur(0.4px);
-  opacity: 0;
-  will-change: transform, opacity;
-  mix-blend-mode: screen;
-  box-shadow: 0 0 10px rgba(103, 232, 249, .35);
-}
-.sys-burst {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-.sys-burst-dot {
-  position: absolute;
-  left: 0;
-  top: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(165, 243, 252, 1) 0%, rgba(103, 232, 249, .8) 55%, transparent 100%);
-  box-shadow: 0 0 6px rgba(165, 243, 252, .9);
-}
-.sys-burst-dot.is-white {
-  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, .75) 55%, transparent 100%);
-  box-shadow: 0 0 6px rgba(255, 255, 255, .9);
-}
-.sys-beams-collision {
-  position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent 8%, rgba(103, 232, 249, .28) 50%, transparent 92%);
-  box-shadow: 0 0 22px rgba(103, 232, 249, .22);
-  opacity: .55;
+  background: transparent;
+  pointer-events: none;
 }
-@media (max-width: 620px) {
-  .sys-beam { box-shadow: none; }
+.sys-beam {
+  position: absolute;
+  left: 0;
+  top: 24px;
+  width: 6px;
+  border-radius: 999px;
+  box-shadow: 0 0 14px rgba(168, 85, 247, .55), 0 0 30px rgba(99, 102, 241, .35);
+  background: linear-gradient(to top, rgba(99, 102, 241, .95) 0%, #c084fc 52%, #f0abfc 100%);
+  will-change: transform, opacity;
 }
+.sys-beam.h-6 { height: 24px; }
+.sys-beam.h-12 { height: 48px; }
+.sys-beam.h-14 { height: 56px; }
+.sys-beam.h-20 { height: 80px; }
+.sys-explosion {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px rgba(192, 132, 252, .9));
+}
+.sys-explosion-bar {
+  position: absolute;
+  left: -40px;
+  right: -40px;
+  top: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #6366f1, transparent);
+  filter: blur(1px);
+}
+.sys-explosion-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, #6366f1, #a855f7);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sys-beams { display: none; }
 }
