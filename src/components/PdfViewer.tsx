@@ -10,7 +10,7 @@
  * - Verified responsive: size="stretch" + min/max thresholds per README, not hardcoded 430px canvas.
  */
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -66,14 +66,33 @@ export default function PdfViewer({
     else flip.flipPrev("top");
   };
 
+  // Deterministic size — measure the actual stage box, don't let "stretch"
+  // collapse to minWidth/minHeight (that was the tiny-book bug).
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [bookW, setBookW] = useState(0);
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const measure = () => {
+      // Book gets the full stage width minus padding; height follows A4 ratio.
+      const avail = Math.floor(el.getBoundingClientRect().width);
+      setBookW(Math.max(360, Math.min(560, Math.min(avail, 560))));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // A4 portrait ratio: h = w × √2 ≈ 1.414
+  const PAGE_W = bookW || 520;
+  const PAGE_H = Math.round(PAGE_W * 1.414);
+
   const total = portrait ? numPages : Math.max(1, Math.ceil(numPages / 2));
   const current = portrait ? page + 1 : Math.min(total, Math.floor(page / 2) + 1);
   const atStart = page === 0;
   const atEnd = portrait ? page >= numPages - 1 : page >= numPages - 2;
-
-  // Page canvas width — matches HTMLFlipBook base width so pdf isn't blurred or tiny.
-  // With size="stretch" the book scales, but base width sets render sharpness.
-  const PAGE_W = 430;
 
   return (
     <div className="sys-pdf">
@@ -86,19 +105,19 @@ export default function PdfViewer({
         </div>
       </div>
 
-      <div className="sys-pdf-stage">
+      <div className="sys-pdf-stage" ref={stageRef}>
         <Document
           file={src}
           onLoadSuccess={onLoadSuccess}
           loading={<div className="sys-pdf-loading">Loading document…</div>}
           error={<div className="sys-pdf-error">Failed to load PDF.</div>}
         >
-          {numPages > 0 && (
+          {numPages > 0 && bookW > 0 && (
             <HTMLFlipBook
               ref={bookRef}
               width={PAGE_W}
-              height={608}
-              size="stretch"
+              height={PAGE_H}
+              size="fixed"
               minWidth={315}
               maxWidth={1000}
               minHeight={420}
@@ -110,7 +129,7 @@ export default function PdfViewer({
               flippingTime={1000}
               usePortrait
               startZIndex={0}
-              autoSize={false}
+              autoSize
               clickEventForward
               useMouseEvents
               swipeDistance={30}
