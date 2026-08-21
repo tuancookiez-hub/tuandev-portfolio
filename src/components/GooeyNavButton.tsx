@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from "motion/react";
 export default function GooeyNavButton({
   label = "Main menu",
   onClick,
-  collapsedWidth = 32,
-  expandedWidth = 138,
+  collapsedWidth = 44,
+  expandedWidth = 152,
   gooeyBlur = 5,
 }: {
   label?: string;
@@ -43,26 +43,19 @@ export default function GooeyNavButton({
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <svg aria-hidden="true" width={0} height={0} style={{ position: "absolute" }}>
-        <defs>
-          <filter id="sys-gooey" x="-35%" y="-35%" width="170%" height="170%" colorInterpolationFilters="sRGB">
-            <feGaussianBlur in="SourceGraphic" stdDeviation={gooeyBlur} result="blur" />
-            <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
-
       <motion.div
         className="sys-gooey-track"
         animate={{ width: open ? expandedWidth : collapsedWidth }}
-        transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.6 }}
-        style={{ filter: "url(#sys-gooey)" }}
+        transition={{ type: "spring", stiffness: 380, damping: 26, mass: 0.6 }}
       >
         <motion.button
           type="button"
-          className="sys-gooey-pill sys-liquid"
+          className="sys-gooey-pill"
           onClick={() => {
+            if (!open) {
+              setOpen(true);
+              return;
+            }
             if (onClick) onClick();
           }}
           onFocus={() => setOpen(true)}

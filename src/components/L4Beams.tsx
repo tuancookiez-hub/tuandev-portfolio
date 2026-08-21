@@ -52,7 +52,7 @@ function Beam({ opts, active }: { opts: BeamOpts; active: boolean }) {
       animate={{
         y: opts.translateY,
         x: opts.translateX,
-        opacity: [0, 0.14, 0.14, 0],
+        opacity: [0, 0.8, 0.8, 0],
       }}
       transition={{
         duration: opts.duration,
@@ -70,14 +70,14 @@ function Beam({ opts, active }: { opts: BeamOpts; active: boolean }) {
 }
 
 const BEAMS: BeamOpts[] = [
-  { initialX: 48, translateX: 10, initialY: -120, translateY: 780, duration: 7.2, delay: 0.1, rotate: 2, width: 2 },
-  { initialX: 180, translateX: -14, initialY: -160, translateY: 820, duration: 8.1, delay: 1.4, rotate: -1.5, width: 1.5 },
-  { initialX: 320, translateX: 8, initialY: -100, translateY: 860, duration: 6.8, delay: 0.6, rotate: 1, width: 1.75 },
-  { initialX: 520, translateX: -10, initialY: -140, translateY: 800, duration: 7.8, delay: 2.1, rotate: -2, width: 1.5 },
-  { initialX: 680, translateX: 12, initialY: -110, translateY: 840, duration: 6.5, delay: 0.9, rotate: 1.2, width: 2 },
-  { initialX: 840, translateX: -8, initialY: -170, translateY: 880, duration: 8.4, delay: 1.8, rotate: -1, width: 1.5 },
-  { initialX: 980, translateX: 6, initialY: -130, translateY: 820, duration: 7.0, delay: 0.3, rotate: 2.2, width: 1.75 },
-  { initialX: 1120, translateX: -12, initialY: -150, translateY: 860, duration: 7.6, delay: 2.6, rotate: -1.8, width: 1.5 },
+  { initialX: 48, translateX: 10, initialY: -120, translateY: 780, duration: 7.2, delay: 0.1, rotate: 2, width: 3.5 },
+  { initialX: 180, translateX: -14, initialY: -160, translateY: 820, duration: 8.1, delay: 1.4, rotate: -1.5, width: 2.5 },
+  { initialX: 320, translateX: 8, initialY: -100, translateY: 860, duration: 6.8, delay: 0.6, rotate: 1, width: 3 },
+  { initialX: 520, translateX: -10, initialY: -140, translateY: 800, duration: 7.8, delay: 2.1, rotate: -2, width: 2.5 },
+  { initialX: 680, translateX: 12, initialY: -110, translateY: 840, duration: 6.5, delay: 0.9, rotate: 1.2, width: 3.5 },
+  { initialX: 840, translateX: -8, initialY: -170, translateY: 880, duration: 8.4, delay: 1.8, rotate: -1, width: 2.5 },
+  { initialX: 980, translateX: 6, initialY: -130, translateY: 820, duration: 7.0, delay: 0.3, rotate: 2.2, width: 3 },
+  { initialX: 1120, translateX: -12, initialY: -150, translateY: 860, duration: 7.6, delay: 2.6, rotate: -1.8, width: 2.5 },
 ];
 
 export default function L4Beams({ containerRef }: { containerRef: React.RefObject<HTMLElement | null> }) {
