@@ -238,12 +238,14 @@ export default function SystemsWorld({
 
             {/* ── LEVEL 4: INSPECTION DATA (bklit dashboard) ── */}
             <div ref={l4} className="sys-stage sys-stage-reports">
-              <L4Beams containerRef={l4} />
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection data · L4</span>
                 <h2>Every signal, one glance.</h2>
                 <p>One page, live data — every chart type in the bklit engine, streamed like a real ops room.</p>
               </header>
+              <div className="sys-reports-bg" aria-hidden="true">
+                <L4Beams containerRef={l4} />
+              </div>
               <BklitDashboard />
             </div>
 
