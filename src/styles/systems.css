@@ -1652,15 +1652,13 @@ text.ax-v {
   position: absolute;
   top: 0;
   height: 140%;
-  background: linear-gradient(180deg, transparent 0%, rgba(94, 234, 212, 0) 6%, rgba(94, 234, 212, .55) 20%, rgba(159, 208, 240, .95) 42%, rgba(94, 234, 212, 1) 62%, rgba(255,255,255,.9) 74%, transparent 96%);
+  background: linear-gradient(180deg, transparent 0%, rgba(94, 234, 212, 0) 8%, rgba(159, 208, 240, 0) 18%, rgba(159, 208, 240, .14) 38%, rgba(94, 234, 212, .18) 58%, transparent 82%);
   border-radius: 999px;
   transform: rotate(var(--sys-beam-rot, 0deg));
   transform-origin: top center;
-  filter: blur(0.6px) brightness(1.35);
+  filter: blur(0.3px);
   opacity: 0;
   will-change: transform, opacity;
-  mix-blend-mode: screen;
-  box-shadow: 0 0 12px rgba(94,234,212,.55), 0 0 28px rgba(159,208,240,.35);
 }
 .sys-beam-core {
   position: absolute;
