@@ -97,10 +97,9 @@ function makeInitial(): LiveState {
       errorRate: 0.28,
       uptime: 99.92,
     },
-    requests: Array.from({ length: 40 }, (_, i) => {
-      const mins = (40 - i) * 30;
+    requests: Array.from({ length: 15 }, (_, i) => {
       return {
-        time: now - mins * 1000,
+        time: Math.floor(now / 1000) - (15 - i) * 2,
         value: Math.round(3200 + Math.sin(i / 5) * 1400 + (i % 7) * 180),
       };
     }),
@@ -125,7 +124,7 @@ function tick(s: LiveState): LiveState {
       errorRate: Math.max(0.2, Math.min(0.4, k.errorRate + (Math.random() - 0.5) * 0.03)),
       uptime: Math.max(99.85, Math.min(99.98, k.uptime + (Math.random() - 0.5) * 0.008)),
     },
-    requests: [...s.requests.slice(-59), { time: Date.now(), value: Math.round(Math.max(1600, s.requestValue + (Math.random() - 0.5) * 420)) }],
+    requests: [...s.requests.slice(-29), { time: Math.floor(Date.now() / 1000), value: Math.round(Math.max(1600, s.requestValue + (Math.random() - 0.5) * 420)) }],
     requestValue: Math.max(1600, s.requestValue + (Math.random() - 0.5) * 420),
     activity:
       Math.random() < 0.4
