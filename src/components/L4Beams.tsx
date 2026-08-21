@@ -52,7 +52,7 @@ function Beam({ opts, active }: { opts: BeamOpts; active: boolean }) {
       animate={{
         y: opts.translateY,
         x: opts.translateX,
-        opacity: [0, 0.85, 0.85, 0],
+        opacity: [0, 0.14, 0.14, 0],
       }}
       transition={{
         duration: opts.duration,
