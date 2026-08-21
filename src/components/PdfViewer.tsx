@@ -1,15 +1,18 @@
 "use client";
 
 /**
- * Built-in PDF viewer — a real flip-book using StPageFlip (page-flip).
- * Renders a real .pdf with realistic 3D page-turn, shadow, drag, and fold corners.
- * Uses pdfjs-dist to count pages first, then renders each as a <Page> inside
- * StPageFlip's HTML-based flip engine.
+ * Built-in PDF viewer — real flip-book per StPageFlip/react-pageflip docs.
+ * Reference: https://github.com/Nodlik/StPageFlip (page-flip) + https://nodlik.github.io/react-pageflip
+ * Pattern: HTMLFlipBook (react-pageflip) wrapping react-pdf <Page> blocks.
+ * - HTMLFlipBook handles all flip physics (width/height, size="stretch", drawShadow, flippingTime, usePortrait, etc.)
+ * - Single <Document> provides pdf context; pages are forwardRef divs with data-density for hard/soft cover feel.
+ * - No manual loadFromHTML / setTimeout guessing — the wrapper owns lifecycle.
+ * - Verified responsive: size="stretch" + min/max thresholds per README, not hardcoded 430px canvas.
  */
 
-import { useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { PageFlip } from "page-flip";
+import HTMLFlipBook from "react-pageflip";
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 
@@ -18,6 +21,20 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
+const FlipPage = React.forwardRef<HTMLDivElement, { pageNumber: number; width: number; hard?: boolean }>(
+  ({ pageNumber, width, hard }, ref) => (
+    <div ref={ref} className="sys-pdf-page" data-density={hard ? "hard" : "soft"}>
+      <Page
+        pageNumber={pageNumber}
+        width={width}
+        renderTextLayer
+        renderAnnotationLayer
+      />
+    </div>
+  ),
+);
+FlipPage.displayName = "FlipPage";
+
 export default function PdfViewer({
   src,
   label,
@@ -25,97 +42,28 @@ export default function PdfViewer({
   src: string;
   label: string;
 }) {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const flipRef = useRef<PageFlip | null>(null);
+  const bookRef = useRef<any>(null);
   const [numPages, setNumPages] = useState(0);
   const [page, setPage] = useState(0);
   const [portrait, setPortrait] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [w, setW] = useState(430);
 
-  useEffect(() => {
-    const measure = () => setW(Math.min(560, Math.max(320, window.innerWidth - 64)));
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+  const onLoadSuccess = useCallback(({ numPages: n }: { numPages: number }) => {
+    setNumPages(n);
   }, []);
 
-  // Count pages on mount
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const doc = await pdfjs.getDocument(src).promise;
-        if (!cancelled) {
-          setNumPages(doc.numPages);
-          setReady(true);
-        }
-      } catch (e) {
-        console.error("PDF load error", e);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [src]);
+  const onFlip = useCallback((e: any) => {
+    setPage(e.data as number);
+  }, []);
 
-  // Initialize StPageFlip after pages render
-  useEffect(() => {
-    if (!ready || numPages === 0 || !hostRef.current) return;
-
-    const el = hostRef.current;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const timer = setTimeout(() => {
-      const pages = el.querySelectorAll(".sys-pdf-page");
-      if (pages.length === 0) return;
-
-      const book = new PageFlip(el, {
-        width: w,
-        height: Math.round(w * 1.395),
-        size: "stretch",
-        minWidth: 260,
-        maxWidth: 600,
-        minHeight: 380,
-        maxHeight: 840,
-        drawShadow: true,
-        flippingTime: reduced ? 300 : 950,
-        usePortrait: true,
-        showCover: false,
-        autoSize: false,
-        maxShadowOpacity: 0.62,
-        mobileScrollSupport: true,
-        swipeDistance: 24,
-        clickEventForward: true,
-        useMouseEvents: true,
-        showPageCorners: true,
-      });
-
-      book.loadFromHTML(Array.from(pages) as HTMLElement[]);
-      book.on("flip", (event) => setPage(event.data as number));
-      book.on("init", (event) => {
-        const mode = (event.data as unknown as { mode?: string })?.mode;
-        setPortrait(mode === "portrait");
-      });
-      book.on("changeOrientation", (event) => setPortrait(event.data === "portrait"));
-      flipRef.current = book;
-    }, 200);
-
-    return () => {
-      clearTimeout(timer);
-      flipRef.current?.destroy();
-      flipRef.current = null;
-    };
-  }, [ready, numPages, src, w]);
+  const onChangeOrientation = useCallback((e: any) => {
+    setPortrait(e.data === "portrait");
+  }, []);
 
   const turn = (delta: number) => {
-    const book = flipRef.current;
-    if (!book) return;
-    if (delta > 0) {
-      if (page >= numPages - 1) return;
-      book.flipNext("top");
-    } else {
-      if (page <= 0) return;
-      book.flipPrev("top");
-    }
+    const flip = bookRef.current?.pageFlip?.();
+    if (!flip) return;
+    if (delta > 0) flip.flipNext("top");
+    else flip.flipPrev("top");
   };
 
   const total = portrait ? numPages : Math.max(1, Math.ceil(numPages / 2));
@@ -123,40 +71,72 @@ export default function PdfViewer({
   const atStart = page === 0;
   const atEnd = portrait ? page >= numPages - 1 : page >= numPages - 2;
 
+  // Page canvas width — matches HTMLFlipBook base width so pdf isn't blurred or tiny.
+  // With size="stretch" the book scales, but base width sets render sharpness.
+  const PAGE_W = 430;
+
   return (
     <div className="sys-pdf">
       <div className="sys-pdf-toolbar">
         <span className="sys-pdf-title">{label}</span>
         <div className="sys-pdf-controls">
-          <button type="button" onClick={() => turn(-1)} disabled={atStart || !ready} aria-label="Previous page">‹</button>
-          <span className="sys-pdf-count">{current} / {total || "…"}</span>
-          <button type="button" onClick={() => turn(1)} disabled={atEnd || !ready} aria-label="Next page">›</button>
+          <button type="button" onClick={() => turn(-1)} disabled={atStart || !numPages} aria-label="Previous page">‹</button>
+          <span className="sys-pdf-count">{numPages ? `${current} / ${total}` : "…"}</span>
+          <button type="button" onClick={() => turn(1)} disabled={atEnd || !numPages} aria-label="Next page">›</button>
         </div>
       </div>
 
       <div className="sys-pdf-stage">
-        {!ready && <div className="sys-pdf-loading">Loading document…</div>}
-        {ready && (
-          <div className="sys-pdf-flip" ref={hostRef}>
-            {Array.from({ length: numPages }, (_, i) => (
-              <div key={i} className="sys-pdf-page" data-density={i === 0 || i === numPages - 1 ? "hard" : "soft"}>
-                <Document file={src} loading={null} error={null}>
-                  <Page
-                    pageNumber={i + 1}
-                    scale={1.25}
-                    renderTextLayer
-                    renderAnnotationLayer
-                    width={Math.round(w * 1.25)}
-                  />
-                </Document>
-              </div>
-            ))}
-          </div>
-        )}
+        <Document
+          file={src}
+          onLoadSuccess={onLoadSuccess}
+          loading={<div className="sys-pdf-loading">Loading document…</div>}
+          error={<div className="sys-pdf-error">Failed to load PDF.</div>}
+        >
+          {numPages > 0 && (
+            <HTMLFlipBook
+              ref={bookRef}
+              width={PAGE_W}
+              height={608}
+              size="stretch"
+              minWidth={315}
+              maxWidth={1000}
+              minHeight={420}
+              maxHeight={1350}
+              maxShadowOpacity={0.5}
+              showCover={false}
+              mobileScrollSupport={true}
+              drawShadow
+              flippingTime={1000}
+              usePortrait
+              startZIndex={0}
+              autoSize={false}
+              clickEventForward
+              useMouseEvents
+              swipeDistance={30}
+              showPageCorners
+              disableFlipByClick={false}
+              startPage={0}
+              onFlip={onFlip}
+              onChangeOrientation={onChangeOrientation}
+              className="sys-pdf-flip"
+              style={{} as any}
+            >
+              {Array.from({ length: numPages }, (_, i) => (
+                <FlipPage
+                  key={i}
+                  pageNumber={i + 1}
+                  width={PAGE_W}
+                  hard={i === 0 || i === numPages - 1}
+                />
+              ))}
+            </HTMLFlipBook>
+          )}
+        </Document>
       </div>
 
       <div className="sys-pdf-foot">
-        <span>Flip-book viewer — StPageFlip</span>
+        <span>Flip-book viewer — StPageFlip · react-pageflip</span>
         <span>{label} · sample</span>
       </div>
     </div>
