@@ -1,10 +1,9 @@
 "use client";
 
 /**
- * L4 — live operations dashboard. A real-world BI surface (KPIs, traffic,
- * funnel, health, geography, service health, incidents) where every figure
- * is animated, and a mock-live ticker streams new data every couple seconds
- * so the page feels like it is running against a real system.
+ * L4 — live operations dashboard, 1:1 with the reference "Platform Operations"
+ * layout: 6-KPI strip → Map | Requests | Active users → Rev | Latency | Mix |
+ * Severity | Health → 6 analyticals → Incidents | Services | Activity+Alerts.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -29,9 +28,6 @@ import { LiveXAxis } from "./charts/live-x-axis";
 import { LiveYAxis } from "./charts/live-y-axis";
 import { CandlestickChart } from "./charts/candlestick-chart";
 import { Candlestick } from "./charts/candlestick";
-import { PieChart } from "./charts/pie-chart";
-import { PieSlice } from "./charts/pie-slice";
-import { PieCenter } from "./charts/pie-center";
 import { RingChart } from "./charts/ring-chart";
 import { Ring } from "./charts/ring";
 import { RingCenter } from "./charts/ring-center";
@@ -66,7 +62,6 @@ interface Kpis {
   revenue: number;
   users: number;
   sessions: number;
-  conversion: number;
   latency: number;
   errorRate: number;
   uptime: number;
@@ -97,8 +92,7 @@ function makeInitial(): LiveState {
     kpis: {
       revenue: 1_420_000,
       users: 42_890,
-      sessions: 128_990,
-      conversion: 3.62,
+      sessions: 128_980,
       latency: 342,
       errorRate: 0.28,
       uptime: 99.92,
@@ -127,7 +121,6 @@ function tick(s: LiveState): LiveState {
       revenue: k.revenue + (Math.random() - 0.48) * 9000,
       users: k.users + (Math.random() - 0.45) * 140,
       sessions: k.sessions + (Math.random() - 0.45) * 320,
-      conversion: Math.max(3.4, Math.min(3.85, k.conversion + (Math.random() - 0.5) * 0.05)),
       latency: Math.max(318, Math.min(372, k.latency + (Math.random() - 0.5) * 10)),
       errorRate: Math.max(0.2, Math.min(0.4, k.errorRate + (Math.random() - 0.5) * 0.03)),
       uptime: Math.max(99.85, Math.min(99.98, k.uptime + (Math.random() - 0.5) * 0.008)),
@@ -136,7 +129,7 @@ function tick(s: LiveState): LiveState {
     requestValue: Math.max(1600, s.requestValue + (Math.random() - 0.5) * 420),
     activity:
       Math.random() < 0.4
-        ? [ACTIVITY_POOL[Math.floor(Math.random() * ACTIVITY_POOL.length)], ...s.activity].slice(0, 6)
+        ? [ACTIVITY_POOL[Math.floor(Math.random() * ACTIVITY_POOL.length)], ...s.activity].slice(0, 5)
         : s.activity,
     started: s.started,
   };
@@ -151,7 +144,7 @@ function useLive(intervalMs = 2000) {
   return state;
 }
 
-// ─── static reference data (for non-streaming panels) ────────
+// ─── static reference data ───────────────────────────────────
 
 const usersTrend = [
   { date: new Date(2026, 5, 1), value: 37200 },
@@ -206,11 +199,11 @@ const channelMix = [
   { label: "Social", value: 7.5, maxValue: 100 },
 ];
 
-const sourceShare = [
-  { label: "Google", value: 46.3 },
-  { label: "Bing", value: 16.4 },
-  { label: "Direct", value: 15.2 },
-  { label: "Other", value: 22.1 },
+const severityData = [
+  { label: "Critical", value: 3, color: "#f87171" },
+  { label: "High", value: 8, color: "#fb923c" },
+  { label: "Medium", value: 14, color: "#fbbf24" },
+  { label: "Low", value: 21, color: "#38bdf8" },
 ];
 
 const qualityMetrics = [
@@ -270,9 +263,17 @@ const countries: Record<string, number> = {
 };
 
 const INCIDENTS = [
-  { sev: "High", title: "Elevated error rate in Checkout Service", status: "Investigating" },
-  { sev: "Medium", title: "Search latency above threshold", status: "Identified" },
-  { sev: "Low", title: "Increased 5xx from Payments API", status: "Monitoring" },
+  { sev: "Critical", title: "Checkout 5xx spike", service: "Checkout Service", status: "Investigating", owner: "SRE-1" },
+  { sev: "High", title: "Search latency above threshold", service: "Search API", status: "Identified", owner: "SRE-2" },
+  { sev: "Medium", title: "Payments API error rate up", service: "Payments", status: "Monitoring", owner: "SRE-3" },
+];
+
+const SERVICES = [
+  { name: "Search", sessions: "42.1k", error: "0.8%", p95: "212 ms", up: true },
+  { name: "Checkout", sessions: "31.8k", error: "2.4%", p95: "486 ms", up: false },
+  { name: "API Gateway", sessions: "28.4k", error: "0.4%", p95: "142 ms", up: true },
+  { name: "Auth", sessions: "19.2k", error: "0.1%", p95: "96 ms", up: true },
+  { name: "Payments", sessions: "12.7k", error: "1.6%", p95: "301 ms", up: false },
 ];
 
 function featureColor(f: ChoroplethFeature): string {
@@ -312,9 +313,9 @@ function Kpi({
   );
 }
 
-function Panel({ title, hint, live, span, h = 220, interactive = false, children }: { title: string; hint?: string; live?: boolean; span: number; h?: number; interactive?: boolean; children: React.ReactNode }) {
+function Panel({ title, hint, live, span, h = 160, children }: { title: string; hint?: string; live?: boolean; span: number; h?: number; children: React.ReactNode }) {
   return (
-    <section className={`sys-dash-panel sys-span-${span}`}>
+    <section className={`sys-dash-panel sys-span-${span}`} style={{ height: h + 44 }}>
       <header className="sys-dash-panel-head">
         <span className="sys-dash-panel-title">
           {title}
@@ -322,7 +323,7 @@ function Panel({ title, hint, live, span, h = 220, interactive = false, children
         </span>
         {hint && <span className="sys-dash-panel-hint">{hint}</span>}
       </header>
-      <div className={`sys-dash-panel-body${interactive ? " is-interactive" : ""}`} style={{ height: h }}>{children}</div>
+      <div className="sys-dash-panel-body" style={{ height: h }}>{children}</div>
     </section>
   );
 }
@@ -356,7 +357,7 @@ export default function BklitDashboard() {
 
   return (
     <div className="bklit-ui sys-dash">
-      {/* KPI row */}
+      {/* KPI strip — 6 */}
       <div className="sys-live-kpis">
         <Kpi label="Revenue" value={live.kpis.revenue} delta="12.5%" down
           format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }} />
@@ -364,9 +365,7 @@ export default function BklitDashboard() {
           format={{ maximumFractionDigits: 0 }} />
         <Kpi label="Sessions" value={live.kpis.sessions} delta="9.1%"
           format={{ maximumFractionDigits: 0 }} />
-        <Kpi label="Conversion" value={live.kpis.conversion} delta="10.4%" suffix="%"
-          format={{ maximumFractionDigits: 2 }} />
-        <Kpi label="p95 latency" value={live.kpis.latency} delta="18 ms" suffix="ms"
+        <Kpi label="p95 latency" value={live.kpis.latency} delta="18 ms" down suffix="ms"
           format={{ maximumFractionDigits: 0 }} />
         <Kpi label="Error rate" value={live.kpis.errorRate} delta="0.08 pp" suffix="%"
           format={{ maximumFractionDigits: 2 }} />
@@ -374,142 +373,9 @@ export default function BklitDashboard() {
           format={{ maximumFractionDigits: 2 }} />
       </div>
 
-      {/* row A — two time series: wide + narrow */}
-      <Panel title="Active users" hint="7d" span={8} h={200}>
-        <AreaChart data={usersTrend}>
-          <Grid horizontal />
-          <Area dataKey="value" curve={curveNatural} strokeWidth={2.5} fillOpacity={0.4} />
-          <XAxis numTicks={4} />
-          <ChartTooltip />
-        </AreaChart>
-      </Panel>
-
-      <Panel title="API requests / min" hint="live" live span={4} h={200}>
-        <LiveLineChart data={live.requests} value={live.requestValue} window={30}>
-          <Grid horizontal />
-          <LiveLine dataKey="value" curve={curveNatural} stroke="var(--chart-line-primary)" strokeWidth={2.5} />
-          <LiveXAxis />
-          <LiveYAxis />
-          <ChartTooltip />
-        </LiveLineChart>
-      </Panel>
-
-      {/* row B — three medium time series */}
-      <Panel title="Latency · web" hint="p50 · p95" span={4} h={180}>
-        <LineChart data={webLatency}>
-          <Grid horizontal />
-          <Line dataKey="p50" curve={curveNatural} stroke="var(--chart-line-primary)" />
-          <Line dataKey="p95" curve={curveNatural} stroke="var(--chart-line-secondary)" />
-          <XAxis numTicks={4} />
-          <ChartTooltip />
-        </LineChart>
-      </Panel>
-
-      <Panel title="Revenue & run rate" hint="30d" span={4} h={180}>
-        <ComposedChart data={revRun}>
-          <Grid horizontal />
-          <SeriesBar dataKey="revenue" fill="var(--chart-1)" />
-          <Area dataKey="runRate" curve={curveNatural} fill="var(--chart-4)" fillOpacity={0.35} />
-          <Line dataKey="runRate" curve={curveNatural} stroke="var(--chart-2)" />
-          <XAxis numTicks={4} />
-          <ChartTooltip />
-        </ComposedChart>
-      </Panel>
-
-      <Panel title="Revenue volatility" hint="candlestick" span={4} h={180}>
-        <CandlestickChart data={ohlc}>
-          <Grid horizontal vertical />
-          <Candlestick />
-          <XAxis numTicks={4} />
-          <YAxis />
-          <ChartTooltip />
-        </CandlestickChart>
-      </Panel>
-
-      {/* row C — activity feed + horizontal bars */}
-      <Panel title="Recent activity" hint="live" live span={4} h={200}>
-        <ul className="sys-live-feed">
-          {live.activity.map((a, i) => (
-            <li key={`${a}-${i}`}>
-              <span className="sys-live-feed-dot" />
-              <span className="sys-live-feed-text">{a}</span>
-              <span className="sys-live-feed-time">{i === 0 ? "just now" : `${rel(i * 43)} ago`}</span>
-            </li>
-          ))}
-        </ul>
-      </Panel>
-
-      <Panel title="Top pages" hint="page views" span={8} h={200}>
-        <BarChart data={topPages} xDataKey="name" orientation="horizontal" animationDuration={1100}>
-          <Grid vertical />
-          <Bar dataKey="value" fill="var(--chart-line-primary)" lineCap="round" />
-          <BarYAxis maxLabels={5} />
-          <ChartTooltip />
-        </BarChart>
-      </Panel>
-
-      {/* row D — four compact widgets */}
-      <Panel title="Conversion funnel" hint="visitors → paid" span={3} h={160}>
-        <FunnelChart data={funnelData} showValues showLabels />
-      </Panel>
-
-      <Panel title="System health" hint="gauge" span={3} h={160}>
-        <div className="min-w-0 overflow-hidden">
-          <Gauge value={92} centerValue={92} minWidth={0} totalNotches={40} defaultLabel="Healthy" suffix="%" />
-        </div>
-      </Panel>
-
-      <Panel title="Channel mix" hint="ring" span={3} h={160}>
-        <RingChart data={channelMix} size={160} strokeWidth={14}>
-            {channelMix.map((c, i) => (
-              <Ring index={i} key={c.label} />
-            ))}
-            <RingCenter defaultLabel="Channel mix" />
-          </RingChart>
-      </Panel>
-
-      <Panel title="Traffic source" hint="pie" span={3} h={160}>
-        <PieChart data={sourceShare} size={160}>
-            {sourceShare.map((s, i) => (
-              <PieSlice index={i} key={s.label} />
-            ))}
-            <PieCenter defaultLabel="Sources" />
-          </PieChart>
-      </Panel>
-
-      {/* row E — three analyticals */}
-      <Panel title="Product quality" hint="radar" span={4} h={180}>
-        <RadarChart data={qualityData} metrics={qualityMetrics} size={180}>
-            <RadarGrid />
-            <RadarAxis />
-            <RadarLabels fontSize={10} offset={16} />
-            {qualityData.map((row, i) => (
-              <RadarArea key={row.label} index={i} color="var(--chart-line-primary)" />
-            ))}
-          </RadarChart>
-      </Panel>
-
-      <Panel title="Service performance" hint="latency vs errors" span={4} h={180}>
-        <ScatterChart data={serviceScatter}>
-          <Grid horizontal />
-          <Scatter dataKey="latency" />
-          <Scatter dataKey="errors" />
-          <XAxis numTicks={4} />
-          <ChartTooltip />
-        </ScatterChart>
-      </Panel>
-
-      <Panel title="User journey" hint="sankey" span={4} h={180}>
-        <SankeyChart data={sankeyData} aspectRatio="2 / 1">
-          <SankeyLink />
-          <SankeyNode />
-          <SankeyTooltip />
-        </SankeyChart>
-      </Panel>
-
-      {/* row F — full-width geography */}
-      <Panel title="Users by country" hint="choropleth" span={12} h={320}>
-        <ChoroplethChart data={fc} aspectRatio="3 / 1" zoomEnabled zoomMin={1} zoomMax={4}>
+      {/* Row 2 — Map | Requests | Active users */}
+      <Panel title="Global user activity" hint="by country" span={4} h={170}>
+        <ChoroplethChart data={fc} aspectRatio="1.5 / 1" zoomEnabled zoomMin={1} zoomMax={3}>
           <ChoroplethFeatureComponent getFeatureColor={featureColor} stroke="rgba(10,10,15,.55)" strokeWidth={0.5} />
           <ChoroplethTooltip
             getFeatureName={(f) => String(f.properties?.name ?? "—")}
@@ -519,8 +385,129 @@ export default function BklitDashboard() {
         </ChoroplethChart>
       </Panel>
 
-      {/* incidents + alerts */}
-      <div className="sys-incidents sys-span-8">
+      <Panel title="Requests / min" hint="live" live span={4} h={170}>
+        <LiveLineChart data={live.requests} value={live.requestValue} window={30}>
+          <Grid horizontal />
+          <LiveLine dataKey="value" curve={curveNatural} stroke="var(--chart-line-primary)" strokeWidth={2} />
+          <LiveXAxis />
+          <LiveYAxis />
+          <ChartTooltip />
+        </LiveLineChart>
+      </Panel>
+
+      <Panel title="Active users" hint="7d" span={4} h={170}>
+        <AreaChart data={usersTrend}>
+          <Grid horizontal />
+          <Area dataKey="value" curve={curveNatural} strokeWidth={2} fillOpacity={0.4} />
+          <XAxis numTicks={4} />
+          <ChartTooltip />
+        </AreaChart>
+      </Panel>
+
+      {/* Row 3 — Rev | Latency | Mix | Severity | Health */}
+      <Panel title="Revenue & run rate" hint="30d" span={3} h={145}>
+        <ComposedChart data={revRun}>
+          <Grid horizontal />
+          <SeriesBar dataKey="revenue" fill="var(--chart-1)" />
+          <Area dataKey="runRate" curve={curveNatural} fill="var(--chart-4)" fillOpacity={0.3} />
+          <Line dataKey="runRate" curve={curveNatural} stroke="var(--chart-2)" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </ComposedChart>
+      </Panel>
+
+      <Panel title="Latency · web" hint="p50 · p95" span={3} h={145}>
+        <LineChart data={webLatency}>
+          <Grid horizontal />
+          <Line dataKey="p50" curve={curveNatural} stroke="var(--chart-line-primary)" />
+          <Line dataKey="p95" curve={curveNatural} stroke="var(--chart-line-secondary)" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </LineChart>
+      </Panel>
+
+      <Panel title="Channel mix" hint="sources" span={2} h={145}>
+        <RingChart data={channelMix} size={128} strokeWidth={12}>
+          {channelMix.map((c, i) => (
+            <Ring index={i} key={c.label} />
+          ))}
+          <RingCenter defaultLabel="Sources" />
+        </RingChart>
+      </Panel>
+
+      <Panel title="Alert severity" hint="24h" span={2} h={145}>
+        <div className="sys-severity">
+          {severityData.map((s) => (
+            <div className="sys-severity-row" key={s.label}>
+              <i style={{ background: s.color }} />
+              <span>{s.label}</span>
+              <b>{s.value}</b>
+            </div>
+          ))}
+        </div>
+      </Panel>
+
+      <Panel title="System health" hint="SLA" span={2} h={145}>
+        <div className="sys-dash-center">
+          <Gauge value={92} centerValue={92} minWidth={0} totalNotches={40} defaultLabel="Healthy" suffix="%" />
+        </div>
+      </Panel>
+
+      {/* Row 4 — six analyticals */}
+      <Panel title="Top pages" hint="views" span={2} h={130}>
+        <BarChart data={topPages} xDataKey="name" orientation="horizontal" animationDuration={1100}>
+          <Grid vertical />
+          <Bar dataKey="value" fill="var(--chart-line-primary)" lineCap="round" />
+          <BarYAxis maxLabels={5} />
+          <ChartTooltip />
+        </BarChart>
+      </Panel>
+
+      <Panel title="Conversion funnel" hint="→ paid" span={2} h={130}>
+        <FunnelChart data={funnelData} showValues showLabels />
+      </Panel>
+
+      <Panel title="Service quality" hint="dimensions" span={2} h={130}>
+        <RadarChart data={qualityData} metrics={qualityMetrics} size={128}>
+          <RadarGrid />
+          <RadarAxis />
+          <RadarLabels fontSize={8} offset={12} />
+          {qualityData.map((row, i) => (
+            <RadarArea key={row.label} index={i} color="var(--chart-line-primary)" />
+          ))}
+        </RadarChart>
+      </Panel>
+
+      <Panel title="Latency vs errors" hint="by service" span={2} h={130}>
+        <ScatterChart data={serviceScatter}>
+          <Grid horizontal />
+          <Scatter dataKey="latency" />
+          <Scatter dataKey="errors" />
+          <XAxis numTicks={3} />
+          <ChartTooltip />
+        </ScatterChart>
+      </Panel>
+
+      <Panel title="User journey" hint="flow" span={2} h={130}>
+        <SankeyChart data={sankeyData} aspectRatio="2 / 1">
+          <SankeyLink />
+          <SankeyNode />
+          <SankeyTooltip />
+        </SankeyChart>
+      </Panel>
+
+      <Panel title="MRR volatility" hint="USD" span={2} h={130}>
+        <CandlestickChart data={ohlc}>
+          <Grid horizontal vertical />
+          <Candlestick />
+          <XAxis numTicks={3} />
+          <YAxis />
+          <ChartTooltip />
+        </CandlestickChart>
+      </Panel>
+
+      {/* Row 5 — Incidents | Services | Activity + Alerts */}
+      <div className="sys-incidents sys-span-4">
         <header className="sys-dash-panel-head">
           <span className="sys-dash-panel-title">Active incidents</span>
           <span className="sys-dash-panel-hint">{INCIDENTS.length} open</span>
@@ -530,23 +517,57 @@ export default function BklitDashboard() {
             <li key={inc.title} className={`sys-incident sev-${inc.sev.toLowerCase()}`}>
               <span className="sys-incident-sev">{inc.sev}</span>
               <span className="sys-incident-title">{inc.title}</span>
-              <span className="sys-incident-meta">{inc.status} · started {rel(i * 120 + 2)}m ago</span>
+              <span className="sys-incident-meta">{inc.service} · {inc.status} · {inc.owner} · {rel(i * 120 + 2)}m ago</span>
             </li>
           ))}
         </ul>
       </div>
 
-      <div className="sys-alerts sys-span-4">
+      <div className="sys-services sys-span-4">
         <header className="sys-dash-panel-head">
+          <span className="sys-dash-panel-title">Top services by usage</span>
+          <span className="sys-dash-panel-hint">last 24h</span>
+        </header>
+        <table className="sys-services-table">
+          <thead>
+            <tr><th>Service</th><th>Sessions</th><th>Err</th><th>p95</th><th>Trend</th></tr>
+          </thead>
+          <tbody>
+            {SERVICES.map((s) => (
+              <tr key={s.name}>
+                <td>{s.name}</td>
+                <td>{s.sessions}</td>
+                <td className={s.error.startsWith("0") || s.error.startsWith("1") ? "ok" : "bad"}>{s.error}</td>
+                <td>{s.p95}</td>
+                <td className={s.up ? "up" : "down"}>{s.up ? "▲" : "▼"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="sys-activity-alerts sys-span-4">
+        <header className="sys-dash-panel-head">
+          <span className="sys-dash-panel-title">Recent activity</span>
+          <span className="sys-dash-panel-hint">live</span>
+        </header>
+        <ul className="sys-live-feed">
+          {live.activity.slice(0, 3).map((a, i) => (
+            <li key={`${a}-${i}`}>
+              <span className="sys-live-feed-dot" />
+              <span className="sys-live-feed-text">{a}</span>
+              <span className="sys-live-feed-time">{i === 0 ? "just now" : `${rel(i * 43)} ago`}</span>
+            </li>
+          ))}
+        </ul>
+        <header className="sys-dash-panel-head sys-sub-head">
           <span className="sys-dash-panel-title">Alerts</span>
-          <span className="sys-dash-panel-hint">12 total · last 24h</span>
+          <span className="sys-dash-panel-hint">last 24h</span>
         </header>
         <ul className="sys-alert-list">
           <li><b className="sys-alert-dot high" /> High error rate · Checkout Service</li>
           <li><b className="sys-alert-dot mid" /> CPU &gt; 85% · web-12</li>
           <li><b className="sys-alert-dot low" /> Disk 78% · db-replica-3</li>
-          <li><b className="sys-alert-dot mid" /> Memory spike · queue-worker</li>
-          <li><b className="sys-alert-dot low" /> Latency drift · search</li>
         </ul>
       </div>
     </div>
