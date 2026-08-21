@@ -375,7 +375,7 @@ export default function BklitDashboard() {
       </div>
 
       {/* row A — two time series: wide + narrow */}
-      <Panel title="Active users" hint="7d" span={8} h={280}>
+      <Panel title="Active users" hint="7d" span={8} h={200}>
         <AreaChart data={usersTrend}>
           <Grid horizontal />
           <Area dataKey="value" curve={curveNatural} strokeWidth={2.5} fillOpacity={0.4} />
@@ -384,7 +384,7 @@ export default function BklitDashboard() {
         </AreaChart>
       </Panel>
 
-      <Panel title="API requests / min" hint="live" live span={4} h={280}>
+      <Panel title="API requests / min" hint="live" live span={4} h={200}>
         <LiveLineChart data={live.requests} value={live.requestValue} window={30}>
           <Grid horizontal />
           <LiveLine dataKey="value" curve={curveNatural} stroke="var(--chart-line-primary)" strokeWidth={2.5} />
@@ -395,7 +395,7 @@ export default function BklitDashboard() {
       </Panel>
 
       {/* row B — three medium time series */}
-      <Panel title="Latency · web" hint="p50 · p95" span={4}>
+      <Panel title="Latency · web" hint="p50 · p95" span={4} h={180}>
         <LineChart data={webLatency}>
           <Grid horizontal />
           <Line dataKey="p50" curve={curveNatural} stroke="var(--chart-line-primary)" />
@@ -405,7 +405,7 @@ export default function BklitDashboard() {
         </LineChart>
       </Panel>
 
-      <Panel title="Revenue & run rate" hint="30d" span={4}>
+      <Panel title="Revenue & run rate" hint="30d" span={4} h={180}>
         <ComposedChart data={revRun}>
           <Grid horizontal />
           <SeriesBar dataKey="revenue" fill="var(--chart-1)" />
@@ -416,7 +416,7 @@ export default function BklitDashboard() {
         </ComposedChart>
       </Panel>
 
-      <Panel title="Revenue volatility" hint="candlestick" span={4}>
+      <Panel title="Revenue volatility" hint="candlestick" span={4} h={180}>
         <CandlestickChart data={ohlc}>
           <Grid horizontal vertical />
           <Candlestick />
@@ -427,7 +427,7 @@ export default function BklitDashboard() {
       </Panel>
 
       {/* row C — activity feed + horizontal bars */}
-      <Panel title="Recent activity" hint="live" live span={4} h={280}>
+      <Panel title="Recent activity" hint="live" live span={4} h={200}>
         <ul className="sys-live-feed">
           {live.activity.map((a, i) => (
             <li key={`${a}-${i}`}>
@@ -439,7 +439,7 @@ export default function BklitDashboard() {
         </ul>
       </Panel>
 
-      <Panel title="Top pages" hint="page views" span={8} h={280}>
+      <Panel title="Top pages" hint="page views" span={8} h={200}>
         <BarChart data={topPages} xDataKey="name" orientation="horizontal" animationDuration={1100}>
           <Grid vertical />
           <Bar dataKey="value" fill="var(--chart-line-primary)" lineCap="round" />
@@ -449,18 +449,18 @@ export default function BklitDashboard() {
       </Panel>
 
       {/* row D — four compact widgets */}
-      <Panel title="Conversion funnel" hint="visitors → paid" span={3} h={240}>
+      <Panel title="Conversion funnel" hint="visitors → paid" span={3} h={160}>
         <FunnelChart data={funnelData} showValues showLabels />
       </Panel>
 
-      <Panel title="System health" hint="gauge" span={3} h={240}>
+      <Panel title="System health" hint="gauge" span={3} h={160}>
         <div className="min-w-0 overflow-hidden">
           <Gauge value={92} centerValue={92} minWidth={0} totalNotches={40} defaultLabel="Healthy" suffix="%" />
         </div>
       </Panel>
 
-      <Panel title="Channel mix" hint="ring" span={3} h={240}>
-        <RingChart data={channelMix} size={180} strokeWidth={16}>
+      <Panel title="Channel mix" hint="ring" span={3} h={160}>
+        <RingChart data={channelMix} size={160} strokeWidth={14}>
             {channelMix.map((c, i) => (
               <Ring index={i} key={c.label} />
             ))}
@@ -468,8 +468,8 @@ export default function BklitDashboard() {
           </RingChart>
       </Panel>
 
-      <Panel title="Traffic source" hint="pie" span={3} h={240}>
-        <PieChart data={sourceShare} size={180}>
+      <Panel title="Traffic source" hint="pie" span={3} h={160}>
+        <PieChart data={sourceShare} size={160}>
             {sourceShare.map((s, i) => (
               <PieSlice index={i} key={s.label} />
             ))}
@@ -478,8 +478,8 @@ export default function BklitDashboard() {
       </Panel>
 
       {/* row E — three analyticals */}
-      <Panel title="Product quality" hint="radar" span={4} h={260}>
-        <RadarChart data={qualityData} metrics={qualityMetrics} size={220}>
+      <Panel title="Product quality" hint="radar" span={4} h={180}>
+        <RadarChart data={qualityData} metrics={qualityMetrics} size={180}>
             <RadarGrid />
             <RadarAxis />
             <RadarLabels fontSize={10} offset={16} />
@@ -489,7 +489,7 @@ export default function BklitDashboard() {
           </RadarChart>
       </Panel>
 
-      <Panel title="Service performance" hint="latency vs errors" span={4} h={260}>
+      <Panel title="Service performance" hint="latency vs errors" span={4} h={180}>
         <ScatterChart data={serviceScatter}>
           <Grid horizontal />
           <Scatter dataKey="latency" />
@@ -499,7 +499,7 @@ export default function BklitDashboard() {
         </ScatterChart>
       </Panel>
 
-      <Panel title="User journey" hint="sankey" span={4} h={260}>
+      <Panel title="User journey" hint="sankey" span={4} h={180}>
         <SankeyChart data={sankeyData} aspectRatio="2 / 1">
           <SankeyLink />
           <SankeyNode />
@@ -508,7 +508,7 @@ export default function BklitDashboard() {
       </Panel>
 
       {/* row F — full-width geography */}
-      <Panel title="Users by country" hint="choropleth" span={12} h={430}>
+      <Panel title="Users by country" hint="choropleth" span={12} h={320}>
         <ChoroplethChart data={fc} aspectRatio="3 / 1" zoomEnabled zoomMin={1} zoomMax={4}>
           <ChoroplethFeatureComponent getFeatureColor={featureColor} stroke="rgba(10,10,15,.55)" strokeWidth={0.5} />
           <ChoroplethTooltip
