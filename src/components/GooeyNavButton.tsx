@@ -6,8 +6,8 @@ import { motion, AnimatePresence } from "motion/react";
 export default function GooeyNavButton({
   label = "Main menu",
   onClick,
-  collapsedWidth = 112,
-  expandedWidth = 188,
+  collapsedWidth = 32,
+  expandedWidth = 138,
   gooeyBlur = 5,
 }: {
   label?: string;
@@ -63,9 +63,7 @@ export default function GooeyNavButton({
           type="button"
           className="sys-gooey-pill sys-liquid"
           onClick={() => {
-            if (open && onClick) onClick();
-            else if (!open) setOpen(true);
-            else if (onClick) onClick();
+            if (onClick) onClick();
           }}
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
@@ -73,32 +71,23 @@ export default function GooeyNavButton({
           aria-expanded={open}
           aria-label={label}
         >
-          <span className="sys-gooey-label">
-            <i aria-hidden="true">←</i> {label}
+          <span className="sys-gooey-arrow" aria-hidden="true">
+            ←
           </span>
           <AnimatePresence>
             {open && (
               <motion.span
-                className="sys-gooey-hint"
+                className="sys-gooey-text"
                 initial={{ opacity: 0, x: -8, filter: "blur(2px)" }}
                 animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, x: -8, filter: "blur(2px)" }}
                 transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                explore
+                {label}
               </motion.span>
             )}
           </AnimatePresence>
         </motion.button>
-
-        <motion.span
-          className="sys-gooey-bubble"
-          aria-hidden="true"
-          animate={{ x: open ? 10 : -10, scale: open ? 1 : 0.72, opacity: open ? 1 : 0 }}
-          transition={{ type: "spring", stiffness: 420, damping: 28, mass: 0.55 }}
-        >
-          <span className="sys-gooey-bubble-dot" />
-        </motion.span>
       </motion.div>
     </div>
   );

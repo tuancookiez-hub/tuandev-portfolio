@@ -15,6 +15,7 @@ import PdfViewer from "../components/PdfViewer";
 import RoutingTopology from "../components/RoutingTopology";
 import BklitDashboard from "../components/BklitDashboard";
 import GooeyNavButton from "../components/GooeyNavButton";
+import L4Beams from "../components/L4Beams";
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -236,6 +237,7 @@ export default function SystemsWorld({
 
             {/* ── LEVEL 4: INSPECTION DATA (bklit dashboard) ── */}
             <div ref={l4} className="sys-stage sys-stage-reports">
+              <L4Beams containerRef={l4} />
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection data · L4</span>
                 <h2>Every signal, one glance.</h2>
