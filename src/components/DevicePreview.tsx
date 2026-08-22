@@ -90,15 +90,45 @@ export function usePreviewReceiver(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
+    // Smooth glide toward each sync target instead of a hard snap.
+    // Exponential ease (lerp) in rAF — messages update `target` continuously,
+    // the loop eases toward it and settles. Direct jump only on big jumps
+    // (>1200px, e.g. anchor/hash navigation); reduced-motion snaps too.
+    let target = window.scrollY;
+    let gliding = false;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const step = () => {
+      const y = window.scrollY;
+      const delta = target - y;
+      if (Math.abs(delta) < 1.5) {
+        gliding = false;
+        return;
+      }
+      window.scrollTo(0, y + delta * 0.22);
+      requestAnimationFrame(step);
+    };
+
+    const seek = (y: number) => {
+      target = Math.max(0, y);
+      if (reduced || Math.abs(target - window.scrollY) > 1200) {
+        window.scrollTo({ top: target, behavior: "auto" });
+        gliding = false;
+        return;
+      }
+      if (!gliding) {
+        gliding = true;
+        requestAnimationFrame(step);
+      }
+    };
+
     const receive = (event: MessageEvent<Sync>) => {
       if (event.data?.type !== "portfolio-preview-scroll") return;
 
       // Landmark sync (Systems): put the same content block under the anchor.
       if (typeof event.data.lm === "number" && typeof event.data.lf === "number") {
         const y = landmarkY(event.data.lm, event.data.lf);
-        if (y !== null && Math.abs(y - window.scrollY) > 2) {
-          window.scrollTo({ top: y, behavior: "auto" });
-        }
+        if (y !== null && Math.abs(y - window.scrollY) > 2) seek(y);
         return;
       }
 
@@ -107,10 +137,8 @@ export function usePreviewReceiver(enabled: boolean) {
       if (section === null) return;
       const journey = section.dataset.sync === "journey";
       const range = Math.max(1, section.offsetHeight - (journey ? window.innerHeight : 0));
-      const target = section.offsetTop + (event.data.progress * range);
-      if (Math.abs(target - window.scrollY) > 2) {
-        window.scrollTo({ top: target, behavior: "auto" });
-      }
+      const t = section.offsetTop + (event.data.progress * range);
+      if (Math.abs(t - window.scrollY) > 2) seek(t);
     };
 
     window.addEventListener("message", receive);
