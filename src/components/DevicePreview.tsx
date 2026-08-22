@@ -5,33 +5,68 @@ type Sync = {
   type: "portfolio-preview-scroll";
   section: string;
   progress: number;
-  stage?: string;
-  stageProgress?: number;
+  /** Landmark sync (Systems): index into shared LANDMARKS list + fraction
+   *  between landmark[idx] and landmark[idx+1] under the viewport anchor. */
+  lm?: number;
+  lf?: number;
 };
 
-function activeStage(): { name: string; progress: number } | null {
-  const stages = [...document.querySelectorAll<HTMLElement>(".sys-stage")];
-  if (stages.length === 0) return null;
-  const anchor = window.innerHeight * 0.42;
-  let cur = stages[0];
-  if (!cur) return null;
-  for (const s of stages) {
-    if (s.getBoundingClientRect().top <= anchor) cur = s;
+/** Semantic blocks that exist in BOTH desktop and mobile layouts, in document order.
+ *  Sync interpolates between these, so alignment follows content, not raw pixels —
+ *  stage heights differ ~2x between layouts (L4: 2105px desktop vs 4441px mobile),
+ *  which made proportional stage mapping show mismatched content.
+ *  NOTE: the L2 PDF viewer also renders a `.bklit-ui` element — use
+ *  `.sys-dash` (the L4 dashboard root) instead of bare `.bklit-ui`. */
+const LANDMARKS = [
+  ".sys-stage-overview",
+  ".sys-intro-card",
+  ".sys-ov-bottom",
+  ".sys-stage-aiclient",
+  ".sys-l2-report",
+  ".sys-pdf",
+  ".sys-stage-flow",
+  ".kv-shell",
+  ".sys-stage-reports",
+  ".bklit-ui.sys-dash",
+];
+
+const ANCHOR = () => window.innerHeight * 0.42;
+
+/** Where does the anchor line sit relative to this document's landmarks? */
+function landmarkPos(): { i: number; f: number } | null {
+  const tops = LANDMARKS.map((s) => {
+    const el = document.querySelector<HTMLElement>(s);
+    return el ? el.getBoundingClientRect().top + window.scrollY : null;
+  });
+  const pts = tops.filter((t): t is number => t !== null);
+  if (pts.length < 2) return null;
+  const a = window.scrollY + ANCHOR();
+  if (a <= pts[0]) return { i: 0, f: 0 };
+  for (let k = 0; k < pts.length - 1; k++) {
+    if (a < pts[k + 1]) {
+      return { i: k, f: (a - pts[k]) / Math.max(1, pts[k + 1] - pts[k]) };
+    }
   }
-  const cls = [...cur.classList].find((c) => c.startsWith("sys-stage-")) ?? "";
-  const name = cls.replace("sys-stage-", "");
-  if (!name) return null;
-  const box = cur.getBoundingClientRect();
-  const range = Math.max(1, box.height - window.innerHeight);
-  const progress = Math.min(1, Math.max(0, -box.top / range));
-  return { name, progress };
+  return { i: pts.length - 2, f: 1 };
+}
+
+/** Document Y that puts landmark position (i, f) under the anchor line. */
+function landmarkY(i: number, f: number): number | null {
+  const pts = LANDMARKS.map((s) => {
+    const el = document.querySelector<HTMLElement>(s);
+    return el ? el.getBoundingClientRect().top + window.scrollY : null;
+  }).filter((t): t is number => t !== null);
+  if (pts.length < 2) return null;
+  const k = Math.min(i, pts.length - 2);
+  const y = pts[k] + Math.min(1, Math.max(0, f)) * (pts[k + 1] - pts[k]);
+  return y - ANCHOR();
 }
 
 function current(): Omit<Sync, "type"> | null {
   const sections = [...document.querySelectorAll<HTMLElement>("[data-sync]")];
   if (sections.length === 0) return null;
 
-  const line = window.innerHeight * 0.42;
+  const line = ANCHOR();
   const section = sections.find((item) => {
     const box = item.getBoundingClientRect();
     return box.top <= line && box.bottom > line;
@@ -58,27 +93,24 @@ export function usePreviewReceiver(enabled: boolean) {
     const receive = (event: MessageEvent<Sync>) => {
       if (event.data?.type !== "portfolio-preview-scroll") return;
 
-      // Stage-aware sync (Systems world): land the phone at the same stage
-      // as the parent, positioned by how far INTO that stage the parent is.
-      // Stages differ wildly in height between desktop and mobile, so a
-      // whole-document proportional scroll can never line up.
-      if (event.data.stage) {
-        const el = document.querySelector<HTMLElement>(`.sys-stage-${CSS.escape(event.data.stage)}`);
-        if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY;
-          const range = Math.max(1, el.offsetHeight - window.innerHeight);
-          const target = top + (event.data.stageProgress ?? 0) * range;
-          window.scrollTo({ top: target, behavior: "auto" });
-          return;
+      // Landmark sync (Systems): put the same content block under the anchor.
+      if (typeof event.data.lm === "number" && typeof event.data.lf === "number") {
+        const y = landmarkY(event.data.lm, event.data.lf);
+        if (y !== null && Math.abs(y - window.scrollY) > 2) {
+          window.scrollTo({ top: y, behavior: "auto" });
         }
+        return;
       }
 
+      // Legacy section-proportional fallback (other worlds).
       const section = document.querySelector<HTMLElement>(`[data-sync="${CSS.escape(event.data.section)}"]`);
       if (section === null) return;
       const journey = section.dataset.sync === "journey";
       const range = Math.max(1, section.offsetHeight - (journey ? window.innerHeight : 0));
       const target = section.offsetTop + (event.data.progress * range);
-      window.scrollTo({ top: target, behavior: "auto" });
+      if (Math.abs(target - window.scrollY) > 2) {
+        window.scrollTo({ top: target, behavior: "auto" });
+      }
     };
 
     window.addEventListener("message", receive);
@@ -88,32 +120,29 @@ export function usePreviewReceiver(enabled: boolean) {
 
 export default function DevicePreview({ world }: { world: "hospitality" | "systems" }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const tick = useRef(0);
   const [open, setOpen] = useState(true);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Continuous rAF sync — Lenis smooth-scroll keeps animating the parent
+    // AFTER scroll events stop, so event-driven posting freezes the iframe
+    // at a stale offset (mid-stage drift). A rAF loop converges to the final
+    // resting position; posting only on change > 1px keeps it cheap.
+    let last = -1;
+    let raf = 0;
     const send = () => {
-      tick.current = 0;
+      raf = requestAnimationFrame(send);
+      const y = window.scrollY;
+      if (Math.abs(y - last) < 1) return;
+      last = y;
       const sync = current();
       if (sync === null) return;
-      const stage = activeStage();
-      frame.current?.contentWindow?.postMessage({ type: "portfolio-preview-scroll", ...sync, stage: stage?.name, stageProgress: stage?.progress } satisfies Sync, "*");
+      const lp = world === "systems" ? landmarkPos() : null;
+      frame.current?.contentWindow?.postMessage({ type: "portfolio-preview-scroll", ...sync, lm: lp?.i, lf: lp?.f } satisfies Sync, "*");
     };
-    const scroll = () => {
-      if (tick.current !== 0) return;
-      tick.current = requestAnimationFrame(send);
-    };
-
-    window.addEventListener("scroll", scroll, { passive: true });
-    window.addEventListener("resize", scroll);
-    send();
-    return () => {
-      window.removeEventListener("scroll", scroll);
-      window.removeEventListener("resize", scroll);
-      if (tick.current !== 0) cancelAnimationFrame(tick.current);
-    };
-  }, [ready]);
+    raf = requestAnimationFrame(send);
+    return () => cancelAnimationFrame(raf);
+  }, [ready, world]);
 
   const src = `${window.location.pathname}?world=${world}&embed=1`;
 
