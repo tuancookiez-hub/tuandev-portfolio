@@ -25,5 +25,28 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      /* Deploy self-heal: if the served index.html references a newer bundle
+         than the one this page loaded with, hard-reload once (per session). */
+      (function () {
+        var here = location.pathname.replace(/[^/]*$/, "");
+        fetch(location.pathname, { cache: "no-store" })
+          .then(function (r) { return r.text(); })
+          .then(function (html) {
+            var m = html.match(/index-([A-Za-z0-9_-]+)\.js/);
+            if (!m) return;
+            var live = m[1], mine = null;
+            document.querySelectorAll('script[src]').forEach(function (s) {
+              var mm = s.src.match(/index-([A-Za-z0-9_-]+)\.js/);
+              if (mm) mine = mm[1];
+            });
+            if (live && mine && live !== mine && !sessionStorage.getItem("deploy-bumped")) {
+              sessionStorage.setItem("deploy-bumped", "1");
+              location.replace(location.href);
+            }
+          })
+          .catch(function () {});
+      })();
+    </script>
   </body>
 </html>
