@@ -21,9 +21,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-const FlipPage = React.forwardRef<HTMLDivElement, { pageNumber: number; width: number; hard?: boolean }>(
-  ({ pageNumber, width, hard }, ref) => (
-    <div ref={ref} className="sys-pdf-page" data-density={hard ? "hard" : "soft"}>
+const FlipPage = React.forwardRef<HTMLDivElement, { pageNumber: number; width: number }>(
+  ({ pageNumber, width }, ref) => (
+    <div ref={ref} className="sys-pdf-page" data-density="soft">
       <Page
         pageNumber={pageNumber}
         width={width}
@@ -142,12 +142,7 @@ export default function PdfViewer({
               style={{} as any}
             >
               {Array.from({ length: numPages }, (_, i) => (
-                <FlipPage
-                  key={i}
-                  pageNumber={i + 1}
-                  width={PAGE_W}
-                  hard={i === 0 || i === numPages - 1}
-                />
+                <FlipPage key={i} pageNumber={i + 1} width={PAGE_W} />
               ))}
             </HTMLFlipBook>
           )}

@@ -179,7 +179,7 @@ export default function CreativeWorld({ ready = true }: { ready?: boolean }) {
       <div className="creative-grade" aria-hidden="true" />
 
       <button type="button" className="world-return creative-return" onClick={() => ctx.leave()}>
-        <i aria-hidden="true">↑</i> Surface
+        <i aria-hidden="true">↑</i> Main menu
       </button>
 
       <div className="bh-caption" data-show={step === 0}>
@@ -212,11 +212,12 @@ export default function CreativeWorld({ ready = true }: { ready?: boolean }) {
       )}
 
       <div className="bh-shot" data-show={step >= 2 && step <= 6}>
-        <small>{String(Math.max(1, step - 1)).padStart(2, "0")} / 05</small>
-        <span>Continue downward ↓</span>
+        <small>{String(Math.min(5, Math.max(1, step - 1))).padStart(2, "0")} / 05</small>
+        {step <= 6 && <span>Continue downward ↓</span>}
       </div>
 
       <div className="bh-finale" data-show={done}>
+        <span className="bh-finale-kicker">Finale</span>
         <p>I built the whole site myself. This page is the part that asks: can a website do this with no assets?</p>
         <h2>
           <span className="creative-mask"><span className="creative-mask-line" data-show={done}>I wanted you</span></span>

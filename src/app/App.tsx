@@ -1,17 +1,23 @@
+import { useEffect } from "react";
 import { ActiveWorldProvider } from "../context/ActiveWorldProvider";
 import Header from "../components/Header";
+import LandingIntro from "../components/LandingIntro";
+import LandingContact from "../components/LandingContact";
 import WorldSelector from "../components/WorldSelector";
 import WeatherPortal from "../components/WeatherPortal";
 import HospitalityWorld from "../worlds/HospitalityWorld";
 import CreativeWorld from "../worlds/CreativeWorld";
 import SystemsWorld from "../worlds/SystemsWorld";
 import { useActiveWorld } from "../context/ActiveWorldContext";
+import { applyMeta } from "../utils/meta";
 
 function Shell() {
   const state = useActiveWorld();
   const query = new URLSearchParams(window.location.search);
   const direct = query.get("world");
   const embed = query.get("embed") === "1";
+  const worldParam = direct === "hospitality" || direct === "systems" || direct === "creative" ? direct : null;
+  useEffect(() => applyMeta(worldParam), [worldParam]);
 
   if (direct === "hospitality" && embed) return <HospitalityWorld embed shared />;
   if (direct === "hospitality") {
@@ -43,8 +49,10 @@ function Shell() {
         style={cover ? { pointerEvents: "none" } : undefined}
       >
         <Header />
-        <main className="landing-main" aria-label="Select a world">
+        <main className="landing-main">
+          <LandingIntro />
           <WorldSelector />
+          <LandingContact />
         </main>
       </div>
 

@@ -384,7 +384,7 @@ export default function BklitDashboard() {
         </ChoroplethChart>
       </Panel>
 
-      <Panel title="Requests / min" hint="live" live span={4} h={170}>
+      <Panel title="Requests / min" hint="representative sample · updates live" live span={4} h={170}>
         <LiveLineChart data={live.requests} value={live.requestValue} window={30}>
           <Grid horizontal />
           <LiveLine dataKey="value" curve={curveNatural} stroke="var(--chart-line-primary)" strokeWidth={2} />
@@ -548,7 +548,7 @@ export default function BklitDashboard() {
       <div className="sys-activity-alerts sys-span-4">
         <header className="sys-dash-panel-head">
           <span className="sys-dash-panel-title">Recent activity</span>
-          <span className="sys-dash-panel-hint">live</span>
+          <span className="sys-dash-panel-hint">representative sample · updates live</span>
         </header>
         <ul className="sys-live-feed">
           {live.activity.slice(0, 3).map((a, i) => (

@@ -12,28 +12,27 @@ export const WORLDS: readonly World[] = [
     id: "hospitality",
     number: "01",
     label: "Hospitality",
-    line: "Café sites. Menu, hours, a reason to come in.",
+    line: "Websites for caf\u00e9s and neighbourhood places: menu, hours, directions, and a reason to visit.",
   },
   {
     id: "systems",
     number: "02",
     label: "Systems",
-    line: "Inspection dashboards for plants, equipment, cable runs.",
+    line: "AI gateways, observability, routing, and interfaces that stay readable under load.",
   },
   {
     id: "creative",
     number: "03",
     label: "Creative / Interactive",
-    line: "I wrote a black hole. No assets. Just code.",
+    line: "A procedural black hole and scroll-driven experiments built in code.",
   },
   {
     id: "robotics",
     number: "04",
-    label: "Robotics / 3D",
-    line: "Physical work. Not ready to show yet.",
+    label: "Robotics / 3D Lab",
+    line: "Physical computing and 3D studies in progress.",
   },
 ] as const;
-
 export function getWorld(id: WorldId): World {
   const world = WORLDS.find((item) => item.id === id);
   if (world === undefined) throw new Error(`Unknown world: ${id}`);

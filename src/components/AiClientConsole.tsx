@@ -127,7 +127,7 @@ export default function AiClientConsole() {
       </div>
 
       <div className="acl-footer">
-        <Panel title="Live fulfilment" hint="last 6 routed — see ORD-1281 failover in report below">
+        <Panel title="Live fulfilment" hint="representative sample — last 6 routed (updates live)">
           <div className="acl-route">
             {routes.map((r, i) => (
               <motion.div

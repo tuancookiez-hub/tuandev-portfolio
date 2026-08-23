@@ -43,15 +43,27 @@ export default function WorldSelector() {
     Object.entries(variables(palette)).forEach(([key, value]) => landing.style.setProperty(key, String(value)));
   }, [palette]);
 
+  const statusLine = (() => {
+    if (state.active === null) return "I'm Tuan. These are the things I make.";
+    const w = WORLDS.find((world) => world.id === state.active);
+    return w?.line ?? "";
+  })();
+  const statusCta = (() => {
+    if (state.active === null) return "Hover a world";
+    if (state.active === "robotics") return "Lab — in progress";
+    return "Open this one ↗";
+  })();
+
   return (
     <section className="gateway" id="work" data-theme={theme} style={variables(palette)} aria-label="Portfolio worlds">
       <div className="gateway-atmosphere" aria-hidden="true"><i /><i /><i /></div>
       <div className="selector">
         {WORLDS.map((world, index) => <WorldPanel key={world.id} world={world} index={index} />)}
       </div>
+      <p className="gateway-mobile-lab" role="note" aria-label="Robotics lab note">Robotics / 3D Lab — physical computing and 3D studies in progress.</p>
       <div className="gateway-status" aria-hidden="true">
-        <span>{state.active === null ? "I'm Tuan. These are the things I make." : WORLDS.find((world) => world.id === state.active)?.line}</span>
-        <b>{state.active === null ? "Hover a world" : state.active === "hospitality" || state.active === "creative" || state.active === "systems" ? "Open this one ↗" : "Still building this"}</b>
+        <span>{statusLine}</span>
+        <b>{statusCta}</b>
       </div>
     </section>
   );

@@ -122,6 +122,13 @@
   transition: opacity .8s ease;
 }
 .bh-finale[data-show="true"] { opacity: 1; }
+.bh-finale-kicker {
+  display: block;
+  color: #ffd184;
+  font: 12px Georgia, serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
 .bh-finale::before {
   content: "";
   position: absolute;

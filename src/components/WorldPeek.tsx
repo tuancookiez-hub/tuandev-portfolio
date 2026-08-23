@@ -34,7 +34,7 @@ function RoboticsPreview() {
   return (
     <span className="peek peek-robotics">
       {[0, 1, 2, 3, 4].map((part) => <i key={part} style={{ ["--part" as string]: part }} />)}
-      <span><small>ASSEMBLY / 04</small><b>Not open yet</b><em>Still building this</em></span>
+      <span><small>LAB / 04</small><b>Physical studies</b></span>
     </span>
   );
 }

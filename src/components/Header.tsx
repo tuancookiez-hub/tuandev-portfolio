@@ -7,7 +7,7 @@ const LINKS = [
 export default function Header() {
   return (
     <header className="header">
-      <a className="header-wordmark" href="#top">
+      <a id="top" className="header-wordmark" href="#top">
         TUAN DEV PORTFOLIO
       </a>
       <nav className="header-nav" aria-label="Portfolio">

@@ -135,9 +135,9 @@ export default function SystemsWorld({
       )}
 
       <div className="sys-topbar" data-sync="utility">
-        <span className="sys-topbar-left">SYS · LIVE OPERATIONS CONSOLE</span>
+        <span className="sys-topbar-left">SYS · OPERATIONS CONSOLE</span>
         <span className="sys-topbar-right">
-          <i className="sys-live-dot" /> LIVE · Kuala Lumpur · MYT
+          Representative data · Kuala Lumpur · MYT
         </span>
       </div>
 
@@ -161,8 +161,8 @@ export default function SystemsWorld({
               <header className="sys-ov-head">
                 <div>
                   <span className="sys-ov-eyebrow">TUAN — SYSTEMS · KUALA LUMPUR</span>
-                  <h1 className="sys-ov-title">I run this in production.</h1>
-                  <p className="sys-ov-lede">I design and operate AI systems that stay readable under load. L1→L4 is my production loop — gateway + routing, provider observability, live topology, and a streamed bklit ops dashboard.</p>
+                  <h1 className="sys-ov-title">I build production-minded systems.</h1>
+                  <p className="sys-ov-lede">I design and operate AI systems that stay readable under load. L1→L4 is my production loop — gateway + routing, provider observability, live topology, and a streamed bklit ops dashboard. Metrics below are representative sample data · 24h window.</p>
                 </div>
                 <div className="sys-ov-uptime">
                   <span className="sys-ov-uptime-label">uptime · 30d</span>
@@ -241,7 +241,7 @@ export default function SystemsWorld({
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection data · L4</span>
                 <h2>Every signal, one glance.</h2>
-                <p>One page, live data — every chart type in the bklit engine, streamed like a real ops room.</p>
+                <p>One page, representative sample — every chart type in the bklit engine, streamed like a real ops room. Data updates live in the demo.</p>
               </header>
               <div className="sys-reports-bg" aria-hidden="true">
                 <L4Beams containerRef={l4} />

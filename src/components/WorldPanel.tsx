@@ -11,16 +11,17 @@ type Props = { world: World; index: number };
 export default function WorldPanel({ world, index }: Props) {
   const state = useActiveWorld();
   const ref = useRef<HTMLButtonElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const intent = useRef<ReturnType<typeof setTimeout> | null>(null);
   const active = state.active === world.id;
   const muted = state.active !== null && !active;
   const available = world.id === "hospitality" || world.id === "creative" || world.id === "systems";
-  const disabled = !available;
   const entered = state.entered !== null;
   const face = available;
+  const isLab = world.id === "robotics";
 
   useEffect(() => {
-    const node = ref.current;
+    const node = (ref.current ?? divRef.current) as HTMLElement | null;
     if (!node || !face) return;
     const pin = () => {
       const box = node.getBoundingClientRect();
@@ -39,6 +40,54 @@ export default function WorldPanel({ world, index }: Props) {
     };
   }, [face, active, muted]);
 
+  if (isLab) {
+    return (
+      <div
+        ref={divRef}
+        className="world world-lab"
+        style={{ "--index": index } as CSSProperties}
+        data-world={world.id}
+        data-active={active}
+        data-muted={muted}
+        data-entered={entered}
+        data-face={false}
+        data-available={false}
+        data-wip={true}
+        aria-disabled="true"
+        role="note"
+        aria-label={`${world.label} — ${world.line}`}
+        tabIndex={0}
+        onFocus={() => state.hover(world.id)}
+        onMouseEnter={() => {
+          if (intent.current !== null) clearTimeout(intent.current);
+          if (state.active !== null) { state.hover(world.id); return; }
+          intent.current = setTimeout(() => state.hover(world.id), 110);
+        }}
+        onMouseLeave={(event) => {
+          if (intent.current !== null) clearTimeout(intent.current);
+          (event.currentTarget as HTMLElement).style.removeProperty("--mx");
+          (event.currentTarget as HTMLElement).style.removeProperty("--my");
+        }}
+        onPointerMove={(event) => {
+          const box = divRef.current?.getBoundingClientRect();
+          if (box === undefined) return;
+          (event.currentTarget as HTMLElement).style.setProperty("--mx", `${(event.clientX - box.left) / box.width - .5}`);
+          (event.currentTarget as HTMLElement).style.setProperty("--my", `${(event.clientY - box.top) / box.height - .5}`);
+        }}
+      >
+        <span className="world-art" aria-hidden="true"><WorldArt id={world.id} /></span>
+        <span className="world-shade" aria-hidden="true" />
+        <span className="world-topline" aria-hidden="true"><i /> {world.number}</span>
+        <span className="world-copy">
+          <strong className="world-label">{world.label}</strong>
+          <span className="world-line">{world.line}</span>
+        </span>
+        <WorldPeek id={world.id} />
+        <span className="world-wip"><i aria-hidden="true" /> Lab — in progress</span>
+      </div>
+    );
+  }
+
   return (
     <motion.button
       ref={ref}
@@ -54,15 +103,13 @@ export default function WorldPanel({ world, index }: Props) {
       aria-pressed={active}
       aria-label={`Explore ${world.label}`}
       onClick={() => {
-        if (!available) return;
         const box = ref.current?.getBoundingClientRect();
         state.enter(world.id, box
           ? { x: box.left, y: box.top, w: box.width, h: box.height }
           : undefined);
       }}
-      aria-disabled={disabled}
       data-available={available}
-      data-wip={disabled}
+      data-wip={false}
       onFocus={() => state.hover(world.id)}
       onBlur={(event) => {
         const next = event.relatedTarget;
@@ -100,14 +147,7 @@ export default function WorldPanel({ world, index }: Props) {
         <strong className="world-label">{world.label}</strong>
         <span className="world-line">{world.line}</span>
       </span>
-      {available ? (
-        <span className="world-enter" aria-hidden="true"><i /> Come in <b>↗</b></span>
-      ) : (
-        <>
-          <WorldPeek id={world.id} />
-          <span className="world-wip" aria-hidden="true"><i /> Under construction</span>
-        </>
-      )}
+      <span className="world-enter" aria-hidden="true"><i /> Come in <b>↗</b></span>
     </motion.button>
   );
 }
