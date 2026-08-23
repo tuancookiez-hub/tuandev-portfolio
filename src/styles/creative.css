@@ -275,7 +275,7 @@
   border: 1px solid rgba(178, 192, 252, .22);
   border-radius: 12px;
   background: #070a14;
-  box-shadow: 0 30px 100px rgba(0, 0, 0, .62);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .55);
 }
 .creative-player-close {
   position: absolute;

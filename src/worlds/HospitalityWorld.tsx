@@ -82,9 +82,9 @@ export default function HospitalityWorld({
 
         <section className="cafe-fast-strip" data-sync="quick">
           <span>START HERE</span>
-          <a href="#cafe-services"><b>Menu</b><small>Readable on a phone</small><i>↗</i></a>
-          <a href="#cafe-process"><b>Hours</b><small>Whether you are open</small><i>↗</i></a>
-          <a href="#cafe-contact"><b>Contact</b><small>Map and WhatsApp</small><i>↗</i></a>
+          <a href="#cafe-services"><b>Menu</b><small>Readable on a phone</small><i>→</i></a>
+          <a href="#cafe-process"><b>Hours</b><small>Whether you are open</small><i>→</i></a>
+          <a href="#cafe-contact"><b>Contact</b><small>Map and WhatsApp</small><i>→</i></a>
         </section>
 
         <section className="cafe-intro" data-sync="approach">
@@ -104,7 +104,7 @@ export default function HospitalityWorld({
           <div className="cafe-services-title">
             <p>03 · What I build</p>
             <h2>Useful first.<br />Then it should look<br /><em>like your place.</em></h2>
-            <a href="#cafe-contact">Tell me about the café ↗</a>
+            <a href="#cafe-contact">Tell me about the café →</a>
           </div>
           <div className="cafe-feature-list">
             {features.map((feature) => (
@@ -158,8 +158,8 @@ export default function HospitalityWorld({
             <p>Hours, walking notes, phone, WhatsApp. Especially on a phone, in the rain, while deciding whether to come over.</p>
             <div className="cafe-location-demo">
               <div><span>Open today</span><b>8:00 AM — 7:00 PM</b></div>
-              <a href="#cafe-contact">Get directions ↗</a>
-              <a href="#cafe-contact">WhatsApp ↗</a>
+              <a href="#cafe-contact">Get directions →</a>
+              <a href="#cafe-contact">WhatsApp →</a>
             </div>
           </div>
         </section>

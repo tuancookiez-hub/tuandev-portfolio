@@ -129,7 +129,7 @@ export default function CafePortfolioBook() {
                 <div key={number}>
                   <span>{number}</span>
                   <div><small>{title}</small><h3>{text}</h3></div>
-                  <b>↗</b>
+                  <b>→</b>
                 </div>
               ))}
             </div>
@@ -159,7 +159,7 @@ export default function CafePortfolioBook() {
                 <div key={number}>
                   <span>{number}</span>
                   <div><small>{title}</small><p>{text}</p></div>
-                  <b>↗</b>
+                  <b>→</b>
                 </div>
               ))}
             </div>

@@ -252,7 +252,7 @@
   min-height: 0;
   overflow: hidden;
   border-radius: 3px;
-  box-shadow: 0 30px 70px color-mix(in srgb, var(--ink) 18%, transparent);
+  box-shadow: 0 16px 44px color-mix(in srgb, var(--ink) 15%, transparent);
 }
 .world {
   --mx: 0;
