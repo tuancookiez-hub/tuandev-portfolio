@@ -5,11 +5,14 @@ import LandingIntro from "../components/LandingIntro";
 import LandingContact from "../components/LandingContact";
 import WorldSelector from "../components/WorldSelector";
 import WeatherPortal from "../components/WeatherPortal";
-import HospitalityWorld from "../worlds/HospitalityWorld";
-import CreativeWorld from "../worlds/CreativeWorld";
-import SystemsWorld from "../worlds/SystemsWorld";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import { applyMeta } from "../utils/meta";
+import { lazy, Suspense } from "react";
+import WorldLoader from "../components/WorldLoader";
+
+const HospitalityWorld = lazy(() => import("../worlds/HospitalityWorld"));
+const SystemsWorld = lazy(() => import("../worlds/SystemsWorld"));
+const CreativeWorld = lazy(() => import("../worlds/CreativeWorld"));
 
 function Shell() {
   const state = useActiveWorld();
@@ -19,23 +22,25 @@ function Shell() {
   const worldParam = direct === "hospitality" || direct === "systems" || direct === "creative" ? direct : null;
   useEffect(() => applyMeta(worldParam), [worldParam]);
 
-  if (direct === "hospitality" && embed) return <HospitalityWorld embed shared />;
+  if (direct === "hospitality" && embed) return <Suspense fallback={<WorldLoader label="Hospitality" />}><HospitalityWorld embed shared /></Suspense>;
   if (direct === "hospitality") {
     return (
-      <HospitalityWorld
-        embed={false}
-        shared={false}
-        showReturn
-        onClose={() => window.location.assign(window.location.pathname)}
-      />
+      <Suspense fallback={<WorldLoader label="Hospitality" />}>
+        <HospitalityWorld
+          embed={false}
+          shared={false}
+          showReturn
+          onClose={() => window.location.assign(window.location.pathname)}
+        />
+      </Suspense>
     );
   }
-  if (direct === "systems" && embed) return <SystemsWorld embed />;
+  if (direct === "systems" && embed) return <Suspense fallback={<WorldLoader label="Systems" />}><SystemsWorld embed /></Suspense>;
   if (direct === "systems") {
-    return <SystemsWorld onClose={() => window.location.assign(window.location.pathname)} />;
+    return <Suspense fallback={<WorldLoader label="Systems" />}><SystemsWorld onClose={() => window.location.assign(window.location.pathname)} /></Suspense>;
   }
-  if (direct === "creative" && embed) return <CreativeWorld />;
-  if (direct === "creative") return <CreativeWorld />;
+  if (direct === "creative" && embed) return <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld /></Suspense>;
+  if (direct === "creative") return <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld /></Suspense>;
 
   const cover = state.entered !== null;
 
@@ -58,21 +63,23 @@ function Shell() {
 
       <WeatherPortal world="hospitality">
         {(ready) => (
-          <HospitalityWorld
-            embed={false}
-            shared={false}
-            showReturn={ready}
-            onClose={() => state.leave()}
-          />
+          <Suspense fallback={<WorldLoader label="Hospitality" />}>
+            <HospitalityWorld
+              embed={false}
+              shared={false}
+              showReturn={ready}
+              onClose={() => state.leave()}
+            />
+          </Suspense>
         )}
       </WeatherPortal>
 
       <WeatherPortal world="systems">
-        {(ready) => <SystemsWorld ready={ready} />}
+        {(ready) => <Suspense fallback={<WorldLoader label="Systems" />}><SystemsWorld ready={ready} /></Suspense>}
       </WeatherPortal>
 
       <WeatherPortal world="creative">
-        {(ready) => <CreativeWorld ready={ready} />}
+        {(ready) => <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld ready={ready} /></Suspense>}
       </WeatherPortal>
     </div>
   );

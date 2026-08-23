@@ -2,12 +2,6 @@ import { createRoot } from "react-dom/client";
 import App from "./app/App";
 import "./styles/global.css";
 import "./styles/landing.css";
-import "./styles/restaurant.css";
-import "./styles/cafe-book.css";
-import "./styles/device-preview.css";
-import "./styles/creative.css";
-import "./styles/systems.css";
-import "./styles/bklit-charts.css";
 import "./styles/weather.css";
 
 const root = document.getElementById("root");

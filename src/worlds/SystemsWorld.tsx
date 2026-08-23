@@ -10,12 +10,18 @@ import { useEffect, useRef, useState } from "react";
 import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import { BarChart, CountUp, Donut, KpiTile, Panel, Sparkline, StatusRow, UsageRow } from "../components/SystemsWidgets";
-import AiClientConsole from "../components/AiClientConsole";
-import PdfViewer from "../components/PdfViewer";
-import RoutingTopology from "../components/RoutingTopology";
-import BklitDashboard from "../components/BklitDashboard";
+import { lazy, Suspense } from "react";
+import useNearViewport from "../hooks/useNearViewport";
 import GooeyNavButton from "../components/GooeyNavButton";
 import L4Beams from "../components/L4Beams";
+import "../styles/systems.css";
+import "../styles/bklit-charts.css";
+import "../styles/device-preview.css";
+
+const AiClientConsole = lazy(() => import("../components/AiClientConsole"));
+const PdfViewer = lazy(() => import("../components/PdfViewer"));
+const RoutingTopology = lazy(() => import("../components/RoutingTopology"));
+const BklitDashboard = lazy(() => import("../components/BklitDashboard"));
 
 // ─── L1 OVERVIEW DATA ────────────────────────────────────────
 
@@ -54,6 +60,10 @@ const spark = {
   latency: [180, 190, 175, 205, 195, 220, 210, 232, 215, 208, 226, 232],
   throughput: [120, 240, 380, 520, 690, 860, 1020, 1180, 1360, 1540, 1710, 1842],
 };
+function GateLoader({ label }: { label: string }) {
+  return <div className="sys-gate-loader" role="status" aria-live="polite"><span>{label}</span></div>;
+}
+
 
 // ─── TIER NARRATIVE ─────────────────────────────────────────
 
@@ -76,6 +86,9 @@ export default function SystemsWorld({
 
   const [stageName, setStageName] = useState("overview");
   const [progress, setProgress] = useState(0);
+  const [l2NearRef, l2Near] = useNearViewport<HTMLDivElement>({ bufferPx: 800 });
+  const [flowNearRef, flowNear] = useNearViewport<HTMLDivElement>({ bufferPx: 800 });
+  const [reportsNearRef, reportsNear] = useNearViewport<HTMLDivElement>({ bufferPx: 1000 });
 
   useEffect(() => {
     const stages: [React.RefObject<HTMLDivElement | null>, string][] = [
@@ -213,40 +226,52 @@ export default function SystemsWorld({
             </div>
 
             {/* ── LEVEL 2: OPERATIONS CONSOLE + THE REPORT IT PRINTED ── */}
-            <div ref={l2} className="sys-stage sys-stage-aiclient">
+            <div ref={(node) => { (l2 as any).current = node; (l2NearRef as any).current = node; }} className="sys-stage sys-stage-aiclient">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">Operations console · L2</span>
                 <h2>One queue. Every order finds a lane.</h2>
                 <p>Orders in, lanes out — time, cost and throughput anyone can read. The console above just printed the batch report below: same 6 lanes, same 6 orders (ORD-1281 failed over), same numbers.</p>
               </header>
-              <AiClientConsole />
+              <Suspense fallback={<GateLoader label="Loading console" />}>
+                {l2Near && <AiClientConsole />}
+              </Suspense>
               <div className="sys-l2-report">
                 <span className="sys-r-eyebrow">The same batch — as a report</span>
-                <PdfViewer src="sample-inspection-report.pdf" label="Batch report — ORD-1279 → ORD-1284 · 6 lanes · 1 failover" />
+                <Suspense fallback={<GateLoader label="Loading report" />}>
+                  {l2Near && <PdfViewer src="sample-inspection-report.pdf" label="Batch report — ORD-1279 → ORD-1284 · 6 lanes · 1 failover" />}
+                </Suspense>
               </div>
             </div>
 
             {/* ── LEVEL 3: ROUTING TOPOLOGY (one graph) ── */}
-            <div ref={l3} className="sys-stage sys-stage-flow">
+            <div ref={(node) => { (l3 as any).current = node; (flowNearRef as any).current = node; }} className="sys-stage sys-stage-flow">
               <header className="sys-r-head">
                 <span className="sys-r-eyebrow">routing topology · L3</span>
                 <h2>One graph. Every route.</h2>
                 <p>Client traffic enters the gateway, the router picks a provider, and failover keeps the request moving. Live particles trace each path.</p>
               </header>
-              <RoutingTopology />
+              <Suspense fallback={<GateLoader label="Loading topology" />}>
+                {flowNear && <RoutingTopology />}
+              </Suspense>
             </div>
 
             {/* ── LEVEL 4: INSPECTION DATA (bklit dashboard) ── */}
-            <div ref={l4} className="sys-stage sys-stage-reports">
+            <div ref={(node) => { (l4 as any).current = node; (reportsNearRef as any).current = node; }} className="sys-stage sys-stage-reports">
               <header className="sys-rep-head">
                 <span className="sys-rep-eyebrow">Inspection data · L4</span>
                 <h2>Every signal, one glance.</h2>
                 <p>One page, representative sample — every chart type in the bklit engine, streamed like a real ops room. Data updates live in the demo.</p>
               </header>
-              <div className="sys-reports-bg" aria-hidden="true">
-                <L4Beams containerRef={l4} />
-              </div>
-              <BklitDashboard />
+              {reportsNear && (
+                <>
+                  <div className="sys-reports-bg" aria-hidden="true">
+                    <L4Beams containerRef={l4} />
+                  </div>
+                  <Suspense fallback={<GateLoader label="Loading dashboard" />}>
+                    <BklitDashboard />
+                  </Suspense>
+                </>
+              )}
             </div>
 
               

@@ -149,9 +149,12 @@ export function usePreviewReceiver(enabled: boolean) {
 export default function DevicePreview({ world }: { world: "hospitality" | "systems" }) {
   const frame = useRef<HTMLIFrameElement>(null);
   const [open, setOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (!mounted) return;
+    if (!open || !ready || document.hidden) return;
     // Continuous rAF sync — Lenis smooth-scroll keeps animating the parent
     // AFTER scroll events stop, so event-driven posting freezes the iframe
     // at a stale offset (mid-stage drift). A rAF loop converges to the final
@@ -169,10 +172,47 @@ export default function DevicePreview({ world }: { world: "hospitality" | "syste
       frame.current?.contentWindow?.postMessage({ type: "portfolio-preview-scroll", ...sync, lm: lp?.i, lf: lp?.f } satisfies Sync, "*");
     };
     raf = requestAnimationFrame(send);
-    return () => cancelAnimationFrame(raf);
-  }, [ready, world]);
+    const onVis = () => {
+      last = -1;
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { cancelAnimationFrame(raf); document.removeEventListener("visibilitychange", onVis); }
+  }, [mounted, open, ready, world]);
 
   const src = `${window.location.pathname}?world=${world}&embed=1`;
+  const hostRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const node = hostRef.current;
+    if (node === null) return;
+    const idle = (cb: () => void) => (typeof (window as unknown as { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void }).requestIdleCallback === "function")
+      ? (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(cb, { timeout: 2200 })
+      : window.setTimeout(cb, 700);
+    const cancel = (id: number) => (typeof (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback === "function")
+      ? (window as unknown as { cancelIdleCallback: (id: number) => void }).cancelIdleCallback(id)
+      : window.clearTimeout(id);
+    let id: number | null = null;
+    let io: IntersectionObserver | null = null;
+    const mount = () => {
+      if (id !== null) cancel(id);
+      if (mounted) return;
+      setMounted(true);
+    };
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          mount();
+          io?.disconnect();
+        }
+      }, { rootMargin: "320px" });
+      io.observe(node);
+    }
+    id = idle(mount);
+    return () => {
+      if (id !== null) cancel(id);
+      io?.disconnect();
+    };
+  }, [mounted]);
 
   if (!open) {
     return <motion.button className="device-preview-restore" data-world={world} type="button" onClick={() => setOpen(true)} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>Mobile view ▣</motion.button>;
@@ -180,9 +220,11 @@ export default function DevicePreview({ world }: { world: "hospitality" | "syste
 
   return (
     <motion.aside
+      ref={hostRef as unknown as React.RefObject<HTMLElement>}
       className="device-preview"
       data-world={world}
       aria-label="Synchronized mobile website preview"
+      data-iframe-mounted={String(mounted && open)}
       initial={{ opacity: 0, x: 28, y: "calc(-50% + 18px)" }}
       animate={{ opacity: 1, x: 0, y: "-50%" }}
       transition={{ duration: 0.7, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
@@ -194,12 +236,16 @@ export default function DevicePreview({ world }: { world: "hospitality" | "syste
       <div className="device-shell">
         <div className="device-speaker" aria-hidden="true" />
         <div className="device-screen">
-          <iframe
-            ref={frame}
-            title={`Mobile version of this ${world} portfolio page`}
-            src={src}
-            onLoad={() => setReady(true)}
-          />
+          {mounted && open ? (
+            <iframe
+              ref={frame}
+              title={`Mobile version of this ${world} portfolio page`}
+              src={src}
+              onLoad={() => setReady(true)}
+            />
+          ) : (
+            <div className="device-screen-fallback" aria-hidden="true" />
+          )}
         </div>
         <div className="device-home" aria-hidden="true" />
       </div>

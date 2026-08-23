@@ -3,6 +3,8 @@ import Lenis from "lenis";
 import { bh, stops } from "../components/creative-black-hole";
 import RaymarchedBlackHole from "../components/RaymarchedBlackHole";
 import { useActiveWorld } from "../context/ActiveWorldContext";
+import "../styles/creative.css";
+import "../styles/device-preview.css";
 
 /* Creative world — one continuous long-form document scroll.
    Each section gives the raymarched phenomenon room to arrive and breathe.

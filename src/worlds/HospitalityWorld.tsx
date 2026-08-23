@@ -1,6 +1,9 @@
 import { motion } from "motion/react";
 import DevicePreview, { usePreviewReceiver } from "../components/DevicePreview";
 import CafePortfolioBook from "../components/CafePortfolioBook";
+import "../styles/restaurant.css";
+import "../styles/cafe-book.css";
+import "../styles/device-preview.css";
 
 const features = [
   { number: "01", title: "A menu people can read on a phone", text: "HTML, prices, dietary notes. If the specials change, the page changes. No PDF." },
