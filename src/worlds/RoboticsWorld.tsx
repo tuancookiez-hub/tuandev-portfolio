@@ -12,7 +12,12 @@ import "../styles/robotics.css";
  * The scrub never autoplays; on error the scene falls back to a static CSS stage.
  */
 
-const VIDEO_SRC =
+// Scrub-optimized local encode (keyframe every 2 frames, 1280px, 2.3MB).
+// The original CDN clip had ONE keyframe for the whole 4s — every seek
+// decoded from frame 0, which read as teleporting/laggy. Remote kept as
+// fallback; swap REMOTE_FALLBACK to VIDEO_SRC to revert to CDN hosting.
+const VIDEO_SRC = "./assets/gateway/robotics-scrub.mp4";
+const REMOTE_FALLBACK =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4";
 
 const STUDIES = [
@@ -131,6 +136,7 @@ export default function RoboticsWorld({
 }) {
   const ctx = useActiveWorld();
   const video = useRef<HTMLVideoElement | null>(null);
+  const [source, setSource] = useState(VIDEO_SRC);
   const [failed, setFailed] = useState(false);
   const [pillsIn, setPillsIn] = useState(false);
   useScrub(video, failed);
@@ -148,11 +154,15 @@ export default function RoboticsWorld({
         <video
           ref={video}
           className="bot-scrub"
-          src={VIDEO_SRC}
+          src={source}
           muted
           playsInline
           preload="auto"
-          onError={() => setFailed(true)}
+          onError={() => {
+            // local encode missing -> try the CDN clip -> static CSS stage
+            if (source !== REMOTE_FALLBACK) setSource(REMOTE_FALLBACK);
+            else setFailed(true);
+          }}
           aria-hidden="true"
         />
       ) : (
