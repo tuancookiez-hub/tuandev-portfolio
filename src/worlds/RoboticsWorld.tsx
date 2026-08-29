@@ -14,7 +14,6 @@ import "../styles/robotics.css";
 
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4";
-const SCRUB_SENSITIVITY = 0.8;
 
 const STUDIES = [
   { id: "chassis", label: "Chassis", note: "Frames, mounts, and the parts that hold everything else" },
@@ -69,9 +68,10 @@ function useScrub(video: React.RefObject<HTMLVideoElement | null>, failed: boole
       void el.play().catch(() => undefined);
       return;
     }
-    // Scrub: horizontal mouse movement maps to timeline position. Seeks are
-    // queued through onseeked so a fast mouse never floods the decoder.
-    let prevX: number | null = null;
+    // Absolute scrub: the playhead tracks the cursor's horizontal position
+    // (left edge = first frame, right edge = last), so the subject visibly
+    // follows the mouse. Seeks queue through onseeked so a fast pointer
+    // never floods the decoder. pointermove covers touch-drag too.
     let want = -1;
     let seeking = false;
     const drain = () => {
@@ -85,17 +85,11 @@ function useScrub(video: React.RefObject<HTMLVideoElement | null>, failed: boole
       }
     };
     el.addEventListener("seeked", drain);
-    const onMove = (event: MouseEvent) => {
-      if (prevX === null) {
-        prevX = event.clientX;
-        return;
-      }
-      const delta = event.clientX - prevX;
-      prevX = event.clientX;
+    const onMove = (event: PointerEvent) => {
       const span = el.duration;
       if (!Number.isFinite(span) || span <= 0) return;
-      const shifted = el.currentTime + (delta / window.innerWidth) * SCRUB_SENSITIVITY * span;
-      const target = Math.min(span - 0.05, Math.max(0, shifted));
+      const frac = Math.min(1, Math.max(0, event.clientX / window.innerWidth));
+      const target = frac * Math.max(0, span - 0.05);
       if (seeking) {
         want = target;
         return;
@@ -103,10 +97,10 @@ function useScrub(video: React.RefObject<HTMLVideoElement | null>, failed: boole
       seeking = true;
       el.currentTime = target;
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("pointermove", onMove);
     return () => {
       el.removeEventListener("seeked", drain);
-      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("pointermove", onMove);
     };
   }, [video, failed]);
 }
