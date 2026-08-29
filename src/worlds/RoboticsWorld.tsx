@@ -68,38 +68,51 @@ function useScrub(video: React.RefObject<HTMLVideoElement | null>, failed: boole
       void el.play().catch(() => undefined);
       return;
     }
-    // Absolute scrub: the playhead tracks the cursor's horizontal position
-    // (left edge = first frame, right edge = last), so the subject visibly
-    // follows the mouse. Seeks queue through onseeked so a fast pointer
-    // never floods the decoder. pointermove covers touch-drag too.
-    let want = -1;
-    let seeking = false;
-    const drain = () => {
-      seeking = false;
-      if (want < 0) return;
-      const next = want;
-      want = -1;
-      if (Math.abs(el.currentTime - next) > 0.01) {
-        seeking = true;
-        el.currentTime = next;
-      }
+    // Absolute scrub with an eased render loop: pointer events only set the
+    // target; one rAF glides the playhead toward it, at most one seek per
+    // frame and none while the decoder is busy (el.seeking). The loop stops
+    // entirely once converged, so an idle pointer costs nothing. Event-per-
+    // -seek on a long-GOP remote clip is what makes naive scrubbing laggy.
+    let target = 0;
+    let frac = 0;
+    let raf = 0;
+    let running = false;
+    const span = () => {
+      const d = el.duration;
+      return Number.isFinite(d) && d > 0 ? d - 0.05 : 0;
     };
-    el.addEventListener("seeked", drain);
-    const onMove = (event: PointerEvent) => {
-      const span = el.duration;
-      if (!Number.isFinite(span) || span <= 0) return;
-      const frac = Math.min(1, Math.max(0, event.clientX / window.innerWidth));
-      const target = frac * Math.max(0, span - 0.05);
-      if (seeking) {
-        want = target;
+    const frame = () => {
+      const d = span();
+      if (d <= 0) {
+        running = false;
         return;
       }
-      seeking = true;
-      el.currentTime = target;
+      const diff = target - frac;
+      if (Math.abs(diff) < 0.0008 && !el.seeking) {
+        running = false;
+        return;
+      }
+      frac += diff * 0.16;
+      if (!el.seeking && Math.abs(el.currentTime - frac * d) > 0.033) {
+        el.currentTime = Math.min(d, Math.max(0, frac * d));
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    const wake = () => {
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(frame);
+      }
+    };
+    const onMove = (event: PointerEvent) => {
+      const d = span();
+      if (d <= 0) return;
+      target = Math.min(1, Math.max(0, event.clientX / window.innerWidth));
+      wake();
     };
     window.addEventListener("pointermove", onMove);
     return () => {
-      el.removeEventListener("seeked", drain);
+      cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
     };
   }, [video, failed]);

@@ -194,9 +194,7 @@
   z-index: 2;
   padding: clamp(48px, 7.5vh, 92px) clamp(16px, 3vw, 48px);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(9, 12, 14, 0.72);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
+  background: rgba(9, 12, 14, 0.88);
 }
 
 .bot-eyebrow {
@@ -268,9 +266,7 @@
   z-index: 2;
   padding: clamp(44px, 7vh, 84px) clamp(16px, 3vw, 48px) clamp(56px, 9vh, 100px);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(7, 9, 11, 0.82);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
+  background: rgba(7, 9, 11, 0.92);
 }
 
 .bot-foot-mail {
