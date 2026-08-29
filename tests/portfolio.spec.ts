@@ -12,17 +12,12 @@ test.describe("Release A — portfolio", () => {
     await expect(page.locator("#about")).toBeVisible();
     await expect(page.locator("#work")).toBeVisible();
     await expect(page.locator("#contact")).toBeVisible();
-    // three live worlds reachable via keyboard/button
-    for (const label of ["Hospitality", "Systems", "Creative"]) {
+    // robotics is now the fourth live world
+    for (const label of ["Hospitality", "Systems", "Creative", "Robotics"]) {
       const btn = page.getByRole("button", { name: new RegExp(label, "i") });
       await expect(btn).toBeVisible();
       await expect(btn).toBeEnabled();
     }
-    // robotics is lab note, not a button that says Come in
-    const roboticsLab = page.locator("[data-world='robotics']");
-    await expect(roboticsLab).toBeVisible();
-    await expect(roboticsLab).toContainText(/Lab/i);
-    await expect(page.getByText("Lab — in progress").first()).toBeVisible();
     // contact links keyboard reachable
     await expect(page.getByRole("link", { name: /tuancookiez@gmail.com/i })).toBeVisible();
     await expect(page.locator("#contact a[href*='github']")).toBeVisible();
@@ -56,6 +51,9 @@ test.describe("Release A — portfolio", () => {
 
     await page.goto("/?world=creative", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle(/Creative/);
+
+    await page.goto("/?world=robotics", { waitUntil: "domcontentloaded" });
+    await expect(page).toHaveTitle(/Robotics/);
   });
 
   test("all worlds render and main-menu exists", async ({ page }) => {
@@ -81,6 +79,16 @@ test.describe("Release A — portfolio", () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, "overflow creative").toBeLessThanOrEqual(1);
     expect(errors, errors.join("\n")).toEqual([]);
+
+    // robotics — scrub hero (video errors fall back, so page must still render)
+    await page.goto("/?world=robotics", { waitUntil: "domcontentloaded" });
+    await page.waitForTimeout(1800);
+    const botText = (await page.textContent("body")) || "";
+    expect(botText.length).toBeGreaterThan(200);
+    await expect(page.getByRole("button", { name: /Main menu/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator(".bot-tiles .bot-tile")).toHaveCount(5);
+    const botOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(botOverflow, "overflow robotics").toBeLessThanOrEqual(1);
   });
 
   test("creative counter never 06/05, finale appears", async ({ page }) => {

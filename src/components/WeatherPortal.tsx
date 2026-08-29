@@ -15,10 +15,11 @@ import type { Origin } from "../context/ActiveWorld.types";
 type Phase = "hidden" | "entering" | "open" | "closing";
 const EASE = [0.22, 1, 0.32, 1] as const;
 
-const HOLD: Record<Exclude<WorldId, "robotics">, string> = {
+const HOLD: Record<WorldId, string> = {
   hospitality: "#fff9ec",
   systems: "#eef0f2",
   creative: "#07060a",
+  robotics: "#0a0d10",
 };
 
 function box(origin: Origin | null) {
@@ -32,7 +33,7 @@ export default function WeatherPortal({
   world,
   children,
 }: {
-  world: Exclude<WorldId, "robotics">;
+  world: WorldId;
   children: (ready: boolean) => ReactNode;
 }) {
   const ctx = useActiveWorld();

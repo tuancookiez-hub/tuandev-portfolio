@@ -50,7 +50,6 @@ export default function WorldSelector() {
   })();
   const statusCta = (() => {
     if (state.active === null) return "Hover a world";
-    if (state.active === "robotics") return "Lab — in progress";
     return "Open this one ↗";
   })();
 
@@ -60,7 +59,6 @@ export default function WorldSelector() {
       <div className="selector">
         {WORLDS.map((world, index) => <WorldPanel key={world.id} world={world} index={index} />)}
       </div>
-      <p className="gateway-mobile-lab" role="note" aria-label="Robotics lab note">Robotics / 3D Lab — physical computing and 3D studies in progress.</p>
       <div className="gateway-status" aria-hidden="true">
         <span>{statusLine}</span>
         <b>{statusCta}</b>

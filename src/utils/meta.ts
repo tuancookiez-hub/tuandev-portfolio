@@ -27,6 +27,11 @@ const MAP: Record<string, Meta> = {
     description: "A procedural black hole and scroll-driven experiments built in code.",
     url: `${BASE}?world=creative`,
   },
+  robotics: {
+    title: "Tuan \u2014 Robotics & 3D Lab",
+    description: "Physical computing and 3D studies: motion, sensors, and machines that answer back.",
+    url: `${BASE}?world=robotics`,
+  },
 };
 
 function setMeta(name: string, content: string, attr: "name" | "property" = "name") {

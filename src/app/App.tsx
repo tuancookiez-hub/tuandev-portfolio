@@ -13,13 +13,14 @@ import WorldLoader from "../components/WorldLoader";
 const HospitalityWorld = lazy(() => import("../worlds/HospitalityWorld"));
 const SystemsWorld = lazy(() => import("../worlds/SystemsWorld"));
 const CreativeWorld = lazy(() => import("../worlds/CreativeWorld"));
+const RoboticsWorld = lazy(() => import("../worlds/RoboticsWorld"));
 
 function Shell() {
   const state = useActiveWorld();
   const query = new URLSearchParams(window.location.search);
   const direct = query.get("world");
   const embed = query.get("embed") === "1";
-  const worldParam = direct === "hospitality" || direct === "systems" || direct === "creative" ? direct : null;
+  const worldParam = direct === "hospitality" || direct === "systems" || direct === "creative" || direct === "robotics" ? direct : null;
   useEffect(() => applyMeta(worldParam), [worldParam]);
 
   if (direct === "hospitality" && embed) return <Suspense fallback={<WorldLoader label="Hospitality" />}><HospitalityWorld embed shared /></Suspense>;
@@ -41,6 +42,11 @@ function Shell() {
   }
   if (direct === "creative" && embed) return <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld /></Suspense>;
   if (direct === "creative") return <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld /></Suspense>;
+
+  if (direct === "robotics" && embed) return <Suspense fallback={<WorldLoader label="Robotics" />}><RoboticsWorld embed /></Suspense>;
+  if (direct === "robotics") {
+    return <Suspense fallback={<WorldLoader label="Robotics" />}><RoboticsWorld onClose={() => window.location.assign(window.location.pathname)} /></Suspense>;
+  }
 
   const cover = state.entered !== null;
 
@@ -80,6 +86,10 @@ function Shell() {
 
       <WeatherPortal world="creative">
         {(ready) => <Suspense fallback={<WorldLoader label="Creative" />}><CreativeWorld ready={ready} /></Suspense>}
+      </WeatherPortal>
+
+      <WeatherPortal world="robotics">
+        {(ready) => <Suspense fallback={<WorldLoader label="Robotics" />}><RoboticsWorld ready={ready} /></Suspense>}
       </WeatherPortal>
     </div>
   );

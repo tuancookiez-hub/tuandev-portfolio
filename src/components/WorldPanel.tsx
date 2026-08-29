@@ -15,10 +15,10 @@ export default function WorldPanel({ world, index }: Props) {
   const intent = useRef<ReturnType<typeof setTimeout> | null>(null);
   const active = state.active === world.id;
   const muted = state.active !== null && !active;
-  const available = world.id === "hospitality" || world.id === "creative" || world.id === "systems";
+  const available = true; // robotics live as of retro-futurist lab world
   const entered = state.entered !== null;
   const face = available;
-  const isLab = world.id === "robotics";
+  const isLab = false; // lab retired: robotics is the fourth live world
 
   useEffect(() => {
     const node = (ref.current ?? divRef.current) as HTMLElement | null;
