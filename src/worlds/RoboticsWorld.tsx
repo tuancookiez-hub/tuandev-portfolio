@@ -1,8 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import type { CSSProperties } from "react";
 import GooeyNavButton from "../components/GooeyNavButton";
 import { useActiveWorld } from "../context/ActiveWorldContext";
 import "../styles/robotics.css";
+
+const AriadViewer = lazy(() => import("../worlds/AriadViewer").then((m) => ({ default: m.AriadViewer })));
 
 /**
  * Robotics world — retro-futurist hero.
@@ -32,7 +34,7 @@ const JOURNEY = [
 ] as const;
 
 const MACHINE = [
-  { k: "Body shell", v: "112 × 58 × 92 mm, kernel-valid single solid" },
+  { k: "Body shell", v: "120 × 92 × 58 mm, kernel-valid single solid" },
   { k: "Limbs", v: "Two 105 mm flat-print parts on a two-servo drive" },
   { k: "Brain", v: "Pi Zero 2 W carrier on the official 58 × 23 mm pattern" },
   { k: "Eyes", v: "Camera board locating bezel + service panel" },
@@ -265,6 +267,9 @@ export default function RoboticsWorld({
           and nothing ships until it passes on the exact machine, material, and process. Digital evidence only
           until then, and the package says so literally.
         </p>
+        <Suspense fallback={<div className="bot-view"><span className="bot-view-note">loading viewer…</span></div>}>
+          <AriadViewer />
+        </Suspense>
       </section>
 
       <section className="bot-sec" id="bot-boundaries">

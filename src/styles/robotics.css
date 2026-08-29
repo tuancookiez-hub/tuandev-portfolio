@@ -330,6 +330,113 @@
   font-weight: 700;
 }
 
+/* Ariad 3D exhibit */
+
+.bot-view-wrap {
+  margin-top: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(10, 13, 16, 0.55);
+  overflow: hidden;
+}
+
+.bot-view-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 16px 4px;
+}
+
+.bot-chip {
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: rgba(242, 242, 238, 0.7);
+  cursor: pointer;
+}
+
+.bot-chip.on {
+  border-color: rgba(240, 148, 32, 0.7);
+  color: rgba(255, 196, 120, 0.95);
+  background: rgba(240, 148, 32, 0.12);
+}
+
+.bot-view {
+  position: relative;
+  height: clamp(320px, 48vh, 520px);
+  touch-action: pan-y;
+}
+
+.bot-view canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+}
+
+.bot-view canvas:active { cursor: grabbing; }
+
+.bot-view-note {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  color: rgba(240, 148, 32, 0.9);
+}
+
+.bot-view-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bot-view-meta strong { font-size: 15px; }
+
+.bot-view-meta span {
+  font-family: system-ui, sans-serif;
+  font-size: 12.5px;
+  color: rgba(242, 242, 238, 0.72);
+}
+
+.bot-turn {
+  margin-left: auto;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 148, 32, 0.6);
+  background: transparent;
+  color: rgba(255, 196, 120, 0.95);
+  cursor: pointer;
+}
+
+.bot-view-asm {
+  margin: 0;
+  padding: 0 16px 10px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(242, 242, 238, 0.78);
+}
+
+.bot-view-hint {
+  margin: 0;
+  padding: 0 16px 14px;
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(242, 242, 238, 0.5);
+}
+
 .bot-copy {
   margin: 0;
   max-width: 640px;
@@ -376,6 +483,7 @@
   .bot-pill { white-space: normal; }
   .bot-stage { min-height: 110px; }
   .bot-spec { grid-template-columns: 84px 1fr; }
+  .bot-view { height: 320px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
