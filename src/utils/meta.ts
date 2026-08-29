@@ -28,8 +28,8 @@ const MAP: Record<string, Meta> = {
     url: `${BASE}?world=creative`,
   },
   robotics: {
-    title: "Tuan \u2014 Robotics & 3D Lab",
-    description: "Physical computing and 3D studies: motion, sensors, and machines that answer back.",
+    title: "Tuan — Robotics: Ariad, idea-to-fabrication",
+    description: "A local fabrication pipeline: plain-language idea to verified, checksum-bound print bundle.",
     url: `${BASE}?world=robotics`,
   },
 };

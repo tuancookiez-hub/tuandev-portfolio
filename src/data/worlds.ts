@@ -30,7 +30,7 @@ export const WORLDS: readonly World[] = [
     id: "robotics",
     number: "04",
     label: "Robotics / 3D Lab",
-    line: "Mouse-scrub lab bench: motion, sensors, machines that answer back.",
+    line: "Ariad: one sentence in, a checked fabrication bundle out.",
   },
 ] as const;
 export function getWorld(id: WorldId): World {

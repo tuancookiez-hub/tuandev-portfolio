@@ -86,7 +86,7 @@ test.describe("Release A — portfolio", () => {
     const botText = (await page.textContent("body")) || "";
     expect(botText.length).toBeGreaterThan(200);
     await expect(page.getByRole("button", { name: /Main menu/i })).toBeVisible({ timeout: 10000 });
-    await expect(page.locator(".bot-tiles .bot-tile")).toHaveCount(5);
+    await expect(page.locator(".bot-flow .bot-stage")).toHaveCount(8);
     const botOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(botOverflow, "overflow robotics").toBeLessThanOrEqual(1);
   });
