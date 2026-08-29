@@ -291,7 +291,7 @@
 
 @media (max-width: 620px) {
   .bot-hero { padding-bottom: 36px; }
-  .bot-blur { margin-bottom: 14px; }
+  .bot-blur { margin-bottom: 14px; max-width: 70%; }
   .bot-pill { white-space: normal; }
 }
 

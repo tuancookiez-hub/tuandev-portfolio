@@ -427,18 +427,6 @@
   border-color: rgba(255,255,255,.22);
   background: rgba(11,20,32,.92);
 }
-.gateway-mobile-lab {
-  display: none;
-  margin-top: 10px;
-  padding: 10px 14px;
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--page) 92%, white);
-  color: var(--ink-soft);
-  font: 10px var(--font-mono);
-  letter-spacing: .06em;
-  line-height: 1.6;
-}
 
 .peek {
   position: absolute;
@@ -511,7 +499,6 @@
   .world:not(:first-child):not(:last-child),
   .world:last-child { min-height: 42vw; margin: 0; clip-path: none; border-radius: 4px; }
   .world-lab { display: none !important; }
-  .gateway-mobile-lab { display: block; }
   .world::after { display: none; }
   .peek { top: 14%; height: 48%; }
   .gateway-status { display: none; }
@@ -529,6 +516,6 @@
   .world:not(:first-child):not(:last-child),
   .world:last-child { min-height: 46vw; }
   .world-label { font-size: 22px; }
-  .world-line { font-size: 10px; }
+  .world-line { font-size: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .peek { left: 12px; right: 12px; }
 }
