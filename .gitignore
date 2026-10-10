@@ -5,3 +5,5 @@ playwright-report/
 *.local
 .vercel
 *.log
+dist-ssr/
+.delegate/

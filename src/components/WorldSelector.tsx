@@ -25,13 +25,22 @@ export default function WorldSelector() {
 
   useEffect(() => {
     let live = true;
-    Promise.all(WORLDS.map(async (world) => [world.id, await imagePalette(world.id)] as const))
-      .then((entries) => {
-        if (!live) return;
-        setPalettes((current) => ({ ...current, ...Object.fromEntries(entries) }));
-      })
-      .catch(() => undefined);
-    return () => { live = false; };
+    // Sample colours after first paint so decoding never competes with it.
+    const run = () => {
+      Promise.all(WORLDS.map(async (world) => [world.id, await imagePalette(world.id)] as const))
+        .then((entries) => {
+          if (!live) return;
+          setPalettes((current) => ({ ...current, ...Object.fromEntries(entries) }));
+        })
+        .catch(() => undefined);
+    };
+    const idle = typeof window.requestIdleCallback === "function";
+    const handle = idle ? window.requestIdleCallback(run, { timeout: 1500 }) : window.setTimeout(run, 200);
+    return () => {
+      live = false;
+      if (idle) window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+    };
   }, []);
 
   const theme = state.active ?? "neutral";
@@ -56,7 +65,7 @@ export default function WorldSelector() {
   return (
     <section className="gateway" id="work" data-theme={theme} style={variables(palette)} aria-label="Portfolio worlds">
       <div className="gateway-atmosphere" aria-hidden="true"><i /><i /><i /></div>
-      <div className="selector">
+      <div className="selector" onMouseLeave={() => { if (state.entered === null) state.unhover(); }}>
         {WORLDS.map((world, index) => <WorldPanel key={world.id} world={world} index={index} />)}
       </div>
       <div className="gateway-status" aria-hidden="true">

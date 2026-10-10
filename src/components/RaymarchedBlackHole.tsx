@@ -133,6 +133,21 @@ export default function RaymarchedBlackHole() {
     const narrow = window.matchMedia("(max-width: 700px)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    let fitted = { width: 0, height: 0 };
+    const fit = () => {
+      const width = root.clientWidth;
+      const height = root.clientHeight;
+      if (renderer === null || width === 0 || height === 0) return false;
+      if (width !== fitted.width || height !== fitted.height) {
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        u.resolution.value.set(width, height);
+        fitted = { width, height };
+      }
+      return true;
+    };
+
     const move = (event: PointerEvent) => {
       pointer.set(event.clientX / window.innerWidth * 2 - 1, event.clientY / window.innerHeight * 2 - 1);
     };
@@ -142,7 +157,7 @@ export default function RaymarchedBlackHole() {
       try {
         renderer = new THREE.WebGPURenderer({ antialias: !narrow, alpha: false });
         renderer.setPixelRatio(narrow ? Math.min(devicePixelRatio, 0.8) : Math.min(devicePixelRatio, 1.35));
-        renderer.setSize(root.clientWidth, root.clientHeight);
+        fit();
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.domElement.className = "bh-ray-canvas";
         root.appendChild(renderer.domElement);
@@ -165,21 +180,16 @@ export default function RaymarchedBlackHole() {
         glow.radius.value = 0.2;
         post.outputNode = color.add(glow);
 
-        observer = new ResizeObserver(() => {
-          if (renderer === null) return;
-          const width = root.clientWidth;
-          const height = root.clientHeight;
-          renderer.setSize(width, height);
-          camera.aspect = width / Math.max(1, height);
-          camera.updateProjectionMatrix();
-          u.resolution.value.set(width, height);
-        });
+        observer = new ResizeObserver(() => void fit());
         observer.observe(root);
         setReady(true);
 
         const loop = () => {
           if (!live || renderer === null || post === null) return;
           frame = requestAnimationFrame(loop);
+          // WebGPU rejects zero-size render targets, so never render until the
+          // canvas matches a laid-out container (the observer can lag a frame).
+          if (!fit()) return;
           const tick = Math.min(clock.getDelta(), 0.033);
           const raw = Math.min(1, Math.max(0, bh.raw));
           const k = narrow ? 0.48 : 1;

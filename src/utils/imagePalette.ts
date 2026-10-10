@@ -14,6 +14,7 @@ export type Palette = {
 
 export const fallback: Record<WorldId | "neutral", Palette> = {
   neutral: { bg: "#eef0ed", ink: "#152019", soft: "#677269", accent: "#809088", deep: "#25332b", wash: "#536259", rgb: "128 144 136" },
+  hyatlas: { bg: "#0b0b10", ink: "#eef0f6", soft: "#9aa0b4", accent: "#3ddc97", deep: "#05050a", wash: "#16161f", rgb: "61 220 151" },
   hospitality: { bg: "#e8e6d7", ink: "#1d291f", soft: "#667060", accent: "#a89060", deep: "#303018", wash: "#687351", rgb: "168 144 96" },
   systems: { bg: "#e8f0f4", ink: "#10243a", soft: "#637a8e", accent: "#477da2", deep: "#001830", wash: "#375d75", rgb: "71 125 162" },
   creative: { bg: "#000c22", ink: "#edf8ff", soft: "#90b9d6", accent: "#127bc0", deep: "#000018", wash: "#063967", rgb: "18 123 192" },
@@ -73,9 +74,14 @@ function extract(image: HTMLImageElement): Palette {
   };
 }
 
+/** Card cover URL, shared by the <img> and the palette sampler so the browser cache serves both. */
+export const cardSrc = (id: WorldId) => `/assets/gateway/${id}-card.webp`;
+
 export async function imagePalette(id: WorldId): Promise<Palette> {
+  if (id === "hyatlas") return fallback.hyatlas; // CSS-only card art, no image to sample
   const image = new Image();
-  image.src = `./assets/gateway/${id}.webp`;
+  image.decoding = "async";
+  image.src = cardSrc(id);
   await image.decode();
   return extract(image);
 }

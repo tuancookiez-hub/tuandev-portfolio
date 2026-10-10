@@ -238,7 +238,7 @@ export default function SystemsWorld({
               <div className="sys-l2-report">
                 <span className="sys-r-eyebrow">The same batch — as a report</span>
                 <Suspense fallback={<GateLoader label="Loading report" />}>
-                  {l2Near && <PdfViewer src="sample-inspection-report.pdf" label="Batch report — ORD-1279 → ORD-1284 · 6 lanes · 1 failover" />}
+                  {l2Near && <PdfViewer src="/sample-inspection-report.pdf" label="Batch report — ORD-1279 → ORD-1284 · 6 lanes · 1 failover" />}
                 </Suspense>
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function SystemsWorld({
         <section className="sys-contact" id="sys-contact" data-sync="contact">
           <span>I build the interface around the work.</span>
           <h2>Show me the system.<br />I'll make it readable.</h2>
-          <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
+          <a href="mailto:tabdullahrashid@tuandev.app">Write to Tuan ↗</a>
         </section>
       </motion.main>
 

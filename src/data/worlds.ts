@@ -1,4 +1,4 @@
-export type WorldId = "hospitality" | "systems" | "creative" | "robotics";
+export type WorldId = "hyatlas" | "hospitality" | "systems" | "creative" | "robotics";
 
 export interface World {
   id: WorldId;
@@ -9,10 +9,16 @@ export interface World {
 
 export const WORLDS: readonly World[] = [
   {
+    id: "hyatlas",
+    number: "00",
+    label: "HyAtlas",
+    line: "Long-term memory for AI agents. My flagship product.",
+  },
+  {
     id: "hospitality",
     number: "01",
     label: "Hospitality",
-    line: "Websites for caf\u00e9s and neighbourhood places: menu, hours, directions, and a reason to visit.",
+    line: "Websites for cafés and neighbourhood places: menu, hours, directions, and a reason to visit.",
   },
   {
     id: "systems",

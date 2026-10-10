@@ -40,6 +40,7 @@ function RoboticsPreview() {
 }
 
 export default function WorldPeek({ id }: { id: WorldId }) {
+  if (id === "hyatlas") return null;
   if (id === "hospitality") return <HospitalityPreview />;
   if (id === "systems") return <SystemsPreview />;
   if (id === "creative") return <CreativePreview />;

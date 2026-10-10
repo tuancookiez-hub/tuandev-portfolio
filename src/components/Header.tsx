@@ -1,4 +1,5 @@
 const LINKS = [
+  { label: "HyAtlas", href: "/" },
   { label: "About", href: "#about" },
   { label: "All Work", href: "#work" },
   { label: "Contact", href: "#contact" },
@@ -8,7 +9,7 @@ export default function Header() {
   return (
     <header className="header">
       <a id="top" className="header-wordmark" href="#top">
-        TUAN DEV PORTFOLIO
+        TUAN · SELECTED WORK
       </a>
       <nav className="header-nav" aria-label="Portfolio">
         <ul>

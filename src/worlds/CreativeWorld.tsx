@@ -25,16 +25,16 @@ const videos = [
     title: "Seedance / Proxifai",
     note: "My Seedance submission for the Proxifai hackathon.",
     duration: "0:47",
-    src: "./assets/creative/adventure.mp4",
-    poster: "./assets/creative/adventure-poster.webp",
+    src: "/assets/creative/adventure.mp4",
+    poster: "/assets/creative/adventure-poster.webp",
     format: "vertical",
   },
   {
     title: "Pain / FLUX 3",
     note: "My medieval submission for the Nous FLUX 3 hackathon.",
     duration: "1:54",
-    src: "./assets/creative/pain.mp4",
-    poster: "./assets/creative/pain-poster.webp",
+    src: "/assets/creative/pain.mp4",
+    poster: "/assets/creative/pain-poster.webp",
     format: "wide",
   },
 ] as const;
@@ -237,7 +237,7 @@ export default function CreativeWorld({ ready = true }: { ready?: boolean }) {
             ))}
           </div>
         </div>
-        <a href="mailto:tuancookiez@gmail.com">
+        <a href="mailto:tabdullahrashid@tuandev.app">
           <span className="cta-full">Write to Tuan ↗</span>
           <span className="cta-short">Say hello ↗</span>
         </a>

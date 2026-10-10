@@ -8,39 +8,52 @@
 .landing[data-entered="true"] {
   pointer-events: none;
 }
-.world[data-entered="true"][data-active="true"] {
-  visibility: hidden;
-}
-
-.world[data-face="true"] .world-art,
-.world[data-face="true"][data-active="true"] .world-art,
-.world[data-world="systems"][data-face="true"][data-active="true"] .world-art {
-  transform: none !important;
-  filter: none !important;
-}
-.world[data-face="true"] .world-shade {
+.world[data-world] .world-shade {
   opacity: 1;
-  background: linear-gradient(0deg, rgba(3,8,12,.72), transparent 46%);
+  background: linear-gradient(0deg, rgba(3,8,12,.78), transparent 52%);
 }
-.world[data-face="true"] .world-copy,
-.world[data-face="true"] .world-topline,
-.world[data-face="true"] .world-enter {
+.world .world-copy,
+.world .world-topline,
+.world .world-enter {
   text-shadow: 0 1px 10px rgba(0,0,0,.55);
 }
-.world[data-face="true"] .gateway-image {
+
+/* Document-flow worlds: while a world is open the gateway is out of the layout
+   so the real window scrolls the world (see WeatherPortal). */
+html[data-wx-open] .landing { display: none; }
+
+/* Quiet, centred loader inside the expanding window. */
+.world-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.world-loader-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #7d8590;
+}
+.world-loader-text {
   position: absolute;
-  left: var(--vx, 0px);
-  top: var(--vy, 0px);
-  width: 100vw;
-  height: auto;
-  max-width: none;
-  aspect-ratio: 1440 / 900;
-  object-fit: unset;
-  object-position: top left;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.wx-portal[data-phase="entering"] .world-return,
+/* Fixed controls would float over the gateway while the window shrinks. */
 .wx-portal[data-phase="closing"] .world-return,
+.wx-portal[data-phase="closing"] .sys-gooey-slot,
+.wx-portal[data-phase="closing"] .sys-topbar,
+.wx-portal[data-phase="closing"] .bot-menu,
+.wx-portal[data-phase="closing"] .creative-return,
+.wx-portal[data-phase="closing"] .hya-return,
+.wx-portal[data-phase="entering"] .world-return,
 .wx-portal[data-phase="entering"] .device-preview,
 .wx-portal[data-phase="closing"] .device-preview,
 .wx-portal[data-phase="entering"] .device-preview-restore,
@@ -95,12 +108,12 @@
 }
 
 @media (max-width: 720px) {
-  .world[data-face="true"] .world-shade {
-    background: linear-gradient(180deg, rgba(8,12,16,.28) 0%, rgba(8,12,16,.62) 100%);
+  .world[data-world] .world-shade {
+    background: linear-gradient(0deg, rgba(8,12,16,.86) 0%, rgba(8,12,16,.3) 58%, rgba(8,12,16,.08) 100%);
   }
-  .world[data-face="true"] .world-copy,
-  .world[data-face="true"] .world-topline,
-  .world[data-face="true"] .world-enter {
+  .world .world-copy,
+  .world .world-topline,
+  .world .world-enter {
     text-shadow: 0 1px 12px rgba(0,0,0,.75);
     color: #fff;
   }

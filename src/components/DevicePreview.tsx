@@ -148,7 +148,8 @@ export function usePreviewReceiver(enabled: boolean) {
 
 export default function DevicePreview({ world }: { world: "hospitality" | "systems" }) {
   const frame = useRef<HTMLIFrameElement>(null);
-  const [open, setOpen] = useState(true);
+  // Below ~1500px the floating phone would sit on top of page content, so start minimised.
+  const [open, setOpen] = useState(() => window.innerWidth >= 1500);
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
 

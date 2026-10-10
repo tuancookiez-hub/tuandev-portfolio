@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-const DIR = "./assets/ariad/";
+const DIR = "/assets/ariad/";
 
 const PARTS = [
   { id: "layout", label: "Layout", glb: "component_layout.glb", dims: "components in position", vol: 0, tri: 48, asm: "Manufacturer envelopes plus a supplier-dependent camera reservation." },

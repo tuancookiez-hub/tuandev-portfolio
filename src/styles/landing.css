@@ -87,28 +87,19 @@
   min-height: 76px;
   padding: 0 clamp(20px, 3.5vw, 54px);
   color: var(--ink);
-  mix-blend-mode: normal;
-  pointer-events: none;
-  transition: color 450ms ease;
+  background: color-mix(in srgb, var(--page) 92%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  transition: color 450ms ease, background-color 450ms ease, border-color 450ms ease;
 }
-.header::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--page) 84%, transparent), transparent);
-  opacity: .88;
-  transition: background 450ms ease;
-}
-.header-wordmark,
-.header-nav { pointer-events: auto; }
 .header-wordmark {
-  max-width: 112px;
   color: inherit;
   font-size: 10px;
   font-weight: 800;
   line-height: 1.35;
   letter-spacing: .2em;
+  white-space: nowrap;
 }
 .header-nav ul { display: flex; gap: clamp(17px, 2.6vw, 36px); }
 .header-nav a {
@@ -291,9 +282,36 @@
   transform: scale(1.045) translate(calc(var(--mx) * -8px), calc(var(--my) * -6px));
   transition: transform 900ms cubic-bezier(.22,1,.36,1), filter 650ms ease;
 }
-.gateway-image { width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.world[data-world="hospitality"] .gateway-image { object-position: 54% center; }
-.world[data-world="systems"] .gateway-image { object-position: 48% center; }
+.gateway-image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center; }
+.world[data-world="hospitality"] .gateway-image { object-position: 50% 62%; }
+.world[data-world="systems"] .gateway-image { object-position: 52% 40%; }
+
+/* HyAtlas cover: seven memory layers as thin stacked bars. CSS only. */
+.hyatlas-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: clamp(7px, 1.1vw, 12px);
+  padding: clamp(56px, 12%, 96px) clamp(22px, 8%, 56px) 0 0;
+  background:
+    radial-gradient(120% 70% at 85% 12%, rgba(61,220,151,.14), transparent 60%),
+    radial-gradient(90% 60% at 20% 100%, rgba(185,140,255,.12), transparent 62%),
+    #0b0b10;
+}
+.hyatlas-art i {
+  display: block;
+  width: calc(var(--w) * .78);
+  height: clamp(4px, .5vw, 6px);
+  border-radius: 99px;
+  background: var(--bar);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--bar) 45%, transparent);
+  opacity: .88;
+  transition: width 700ms cubic-bezier(.22,1,.36,1), opacity 400ms ease;
+}
+.world[data-active="true"] .hyatlas-art i { width: var(--w); opacity: 1; }
 .world[data-world="creative"] .gateway-image { object-position: center; }
 .world[data-world="robotics"] .gateway-image { object-position: 48% center; }
 .world-shade {
@@ -303,19 +321,9 @@
     linear-gradient(0deg, rgba(3,8,12,.91), rgba(3,8,12,.07) 61%);
   transition: background 650ms ease;
 }
-.world[data-muted="true"] { filter: saturate(.3) brightness(.5) contrast(1.06); }
-.gateway:not([data-theme="neutral"]) .world[data-muted="true"] {
-  filter: grayscale(.62) saturate(.5) brightness(.5) contrast(1.04);
-}
-.gateway:not([data-theme="neutral"]) .world[data-muted="true"] .world-shade {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--wash) 66%, transparent), color-mix(in srgb, var(--deep) 94%, transparent));
-}
+.world[data-muted="true"] { filter: saturate(.62) brightness(.76); }
 .world[data-active="true"] .world-art {
   transform: scale(1.105) translate(calc(var(--mx) * -13px), calc(var(--my) * -10px));
-}
-.world[data-world="systems"][data-active="true"] .world-art {
-  filter: brightness(.42) saturate(.48) blur(2px);
-  transform: scale(1.14) translate(calc(var(--mx) * -9px), calc(var(--my) * -7px));
 }
 .world[data-active="true"] .world-shade {
   background: linear-gradient(180deg, rgba(4,10,14,.05), transparent 38%), linear-gradient(0deg, rgba(3,8,12,.88) 8%, rgba(3,8,12,.55) 42%, transparent 78%);
@@ -329,7 +337,7 @@
   position: absolute;
   z-index: 5;
   top: 27px;
-  left: clamp(27px, 3vw, 48px);
+  left: clamp(22px, 2.6vw, 46px);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -341,8 +349,8 @@
 .world-copy {
   position: absolute;
   z-index: 5;
-  left: clamp(27px, 3vw, 48px);
-  right: clamp(27px, 3vw, 48px);
+  left: clamp(22px, 2.6vw, 46px);
+  right: clamp(22px, 2.6vw, 46px);
   bottom: clamp(32px, 5.2vh, 60px);
   display: grid;
   gap: 12px;
@@ -351,7 +359,7 @@
 }
 .world-label {
   max-width: 11ch;
-  font: clamp(25px, 2.8vw, 45px)/.96 Georgia,serif;
+  font: clamp(22px, 2.15vw, 40px)/.98 Georgia,serif;
   font-weight: 400;
   letter-spacing: -.045em;
 }
@@ -370,10 +378,8 @@
 .gateway[data-theme="robotics"] .world[data-muted="true"] .world-line { color: rgba(222,240,247,.72); }
 .world[data-active="true"] .world-copy { transform: translateY(-3px); }
 .world-enter {
-  position: absolute;
-  z-index: 8;
-  top: 27px;
-  right: clamp(24px,3vw,44px);
+  justify-self: start;
+  margin-top: 2px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -383,7 +389,7 @@
   letter-spacing: .14em;
   text-transform: uppercase;
   opacity: 0;
-  transform: translateY(-7px);
+  transform: translateY(6px);
   transition: opacity 280ms ease, transform 350ms ease;
 }
 .world-enter i { width: 20px; height: 1px; background: currentColor; transform: scaleX(.2); transform-origin: left; transition: transform 350ms ease; }
@@ -497,9 +503,12 @@
   .world,
   .world:first-child,
   .world:not(:first-child):not(:last-child),
-  .world:last-child { min-height: 42vw; margin: 0; clip-path: none; border-radius: 4px; }
-  .world-lab { display: none !important; }
+  .world:last-child { min-height: clamp(230px, 44vw, 340px); margin: 0; clip-path: none; border-radius: 4px; }
+  .world:first-child { grid-column: 1 / -1; min-height: clamp(190px, 30vw, 260px); }
   .world::after { display: none; }
+  .world-enter { display: none; }
+  .world-topline { top: 16px; left: 16px; }
+  .world-copy { left: 16px; right: 16px; bottom: 16px; gap: 8px; }
   .peek { top: 14%; height: 48%; }
   .gateway-status { display: none; }
 }
@@ -512,10 +521,41 @@
   .gateway { padding: 66px 10px 12px; }
   .selector { grid-template-columns: 1fr 1fr; gap: 8px; }
   .world,
-  .world:first-child,
   .world:not(:first-child):not(:last-child),
-  .world:last-child { min-height: 46vw; }
-  .world-label { font-size: 22px; }
+  .world:last-child { min-height: 232px; }
+  .world:first-child { min-height: 196px; }
+  .world-topline { top: 14px; left: 14px; }
+  .world-copy { left: 14px; right: 14px; bottom: 14px; }
+  .world-label { font-size: 21px; }
   .world-line { font-size: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .peek { left: 12px; right: 12px; }
 }
+
+/* Desktop diagonal row: keep each card's number inside its visible (non-clipped) corner. */
+@media (min-width: 901px) {
+  .world:not(:first-child) .world-topline { left: calc(var(--seam) + clamp(14px, 1.4vw, 24px)); }
+}
+
+/* Keep copy clear of the next card's diagonal edge, which overlaps the right side of each non-last card. */
+@media (min-width: 901px) {
+  .world:not(:last-child) .world-copy { right: calc(var(--seam) + clamp(8px, 1vw, 18px)); }
+  .world:not(:last-child) .world-line { max-width: 100%; }
+}
+/* On narrow desktops a muted card is too slim for its description; the label stays. */
+@media (min-width: 901px) and (max-width: 1199px) {
+  .world[data-muted="true"] .world-line { display: none; }
+}
+
+/* Keyboard focus: the card's clip-path would cut a normal outline, so draw top/bottom bars inside it. */
+.world:focus-visible { outline: none; }
+.world:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  border-top: 4px solid #fff;
+  border-bottom: 4px solid #fff;
+  box-shadow: inset 0 3px 0 rgba(0,0,0,.45), inset 0 -3px 0 rgba(0,0,0,.45);
+}
+.world:focus-visible .world-label { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }

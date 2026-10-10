@@ -18,7 +18,7 @@ test.describe("Release C — performance and lazy gates", () => {
       if (/visx.*heatmap|@visx\/heatmap/i.test(url)) forbidden.push(url);
     });
 
-    const response = await page.goto("/");
+    const response = await page.goto("/work/");
     expect(response?.status()).toBe(200);
     await page.waitForLoadState("networkidle");
     // Landing should not have downloaded heavy world resources.
@@ -40,7 +40,9 @@ test.describe("Release C — performance and lazy gates", () => {
   });
 
   test("device preview does not mount before visibility gate", async ({ page }) => {
-    await page.goto("/?world=systems", { waitUntil: "domcontentloaded" });
+    // The phone preview starts open only at >=1500px (it would cover content below that).
+    await page.setViewportSize({ width: 1600, height: 900 });
+    await page.goto("/work/?world=systems", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(900);
     // The preview chrome exists, but the iframe should be deferred until idle/intersection.
     const preview = page.locator(".device-preview");

@@ -18,7 +18,7 @@ const AriadViewer = lazy(() => import("../worlds/AriadViewer").then((m) => ({ de
 // The original CDN clip had ONE keyframe for the whole 4s — every seek
 // decoded from frame 0, which read as teleporting/laggy. Remote kept as
 // fallback; swap REMOTE_FALLBACK to VIDEO_SRC to revert to CDN hosting.
-const VIDEO_SRC = "./assets/gateway/robotics-scrub.mp4";
+const VIDEO_SRC = "/assets/gateway/robotics-scrub.mp4";
 const REMOTE_FALLBACK =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260530_042513_df96a13b-6155-4f6e-8b93-c9dee66fba08.mp4";
 
@@ -219,9 +219,9 @@ export default function RoboticsWorld({
             <button
               type="button"
               className="bot-pill bot-pill-ghost"
-              onClick={() => void navigator.clipboard?.writeText("tuancookiez@gmail.com").catch(() => undefined)}
+              onClick={() => void navigator.clipboard?.writeText("tabdullahrashid@tuandev.app").catch(() => undefined)}
             >
-              Reach us: <span className="bot-mail">tuancookiez@gmail.com</span>
+              Reach us: <span className="bot-mail">tabdullahrashid@tuandev.app</span>
               <svg className="bot-copy" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
                 <rect x="1" y="1" width="7" height="7" fill="none" stroke="currentColor" strokeWidth="1.2" />
                 <rect x="4" y="4" width="7" height="7" fill="none" stroke="currentColor" strokeWidth="1.2" />
@@ -284,7 +284,7 @@ export default function RoboticsWorld({
 
       <footer className="bot-foot" id="lab-contact">
         <p className="bot-eyebrow">04 · Contact</p>
-        <a className="bot-foot-mail" href="mailto:tuancookiez@gmail.com">tuancookiez@gmail.com</a>
+        <a className="bot-foot-mail" href="mailto:tabdullahrashid@tuandev.app">tabdullahrashid@tuandev.app</a>
         <a className="bot-foot-gh" href="https://github.com/tuancookiez-hub" target="_blank" rel="noreferrer">GitHub ↗</a>
       </footer>
     </div>

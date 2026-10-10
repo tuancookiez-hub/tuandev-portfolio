@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 test.describe("Release A — portfolio", () => {
   test.describe.configure({ mode: "serial" });
   test("landing: single h1, about/work/contact, worlds, robotics lab", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/work/");
     await page.waitForLoadState("networkidle");
     const h1s = page.locator("h1");
     await expect(h1s).toHaveCount(1);
@@ -13,13 +13,13 @@ test.describe("Release A — portfolio", () => {
     await expect(page.locator("#work")).toBeVisible();
     await expect(page.locator("#contact")).toBeVisible();
     // robotics is now the fourth live world
-    for (const label of ["Hospitality", "Systems", "Creative", "Robotics"]) {
-      const btn = page.getByRole("button", { name: new RegExp(label, "i") });
+    for (const label of ["HyAtlas", "Hospitality", "Systems", "Creative", "Robotics"]) {
+      const btn = page.locator(".world").filter({ hasText: new RegExp(label, "i") });
       await expect(btn).toBeVisible();
       await expect(btn).toBeEnabled();
     }
     // contact links keyboard reachable
-    await expect(page.getByRole("link", { name: /tuancookiez@gmail.com/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /tabdullahrashid@tuandev.app/i })).toBeVisible();
     await expect(page.locator("#contact a[href*='github']")).toBeVisible();
     // no duplicate under-construction duplication on landing
     const body = await page.textContent("body");
@@ -30,7 +30,7 @@ test.describe("Release A — portfolio", () => {
   test("landing no horizontal overflow desktop + mobile", async ({ page }) => {
     for (const size of [{ w: 1440, h: 900 }, { w: 390, h: 844 }]) {
       await page.setViewportSize({ width: size.w, height: size.h });
-      await page.goto("/");
+      await page.goto("/work/");
       await page.waitForLoadState("networkidle");
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `overflow at ${size.w}x${size.h}`).toBeLessThanOrEqual(1);
@@ -38,21 +38,24 @@ test.describe("Release A — portfolio", () => {
   });
 
   test("route metadata changes", async ({ page }) => {
-    await page.goto("/");
-    await expect(page).toHaveTitle(/Product Engineer/);
+    await page.goto("/work/");
+    await expect(page).toHaveTitle(/Selected work/);
     const landingDesc = await page.getAttribute('meta[name="description"]', "content");
-    expect(landingDesc).toMatch(/product engineer|Kuala Lumpur/i);
+    expect(landingDesc).toMatch(/founder of TuanDev|HyAtlas/i);
 
-    await page.goto("/?world=hospitality", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=hyatlas", { waitUntil: "domcontentloaded" });
+    await expect(page).toHaveTitle(/HyAtlas, long-term memory/);
+
+    await page.goto("/work/?world=hospitality", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle(/Hospitality/);
 
-    await page.goto("/?world=systems", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=systems", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle(/AI Systems/);
 
-    await page.goto("/?world=creative", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=creative", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle(/Creative/);
 
-    await page.goto("/?world=robotics", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=robotics", { waitUntil: "domcontentloaded" });
     await expect(page).toHaveTitle(/Robotics/);
   });
 
@@ -61,17 +64,17 @@ test.describe("Release A — portfolio", () => {
     page.on("pageerror", (e) => errors.push(String(e)));
     page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
 
-    for (const w of ["hospitality", "systems"]) {
-      await page.goto(`/?world=${w}`, { waitUntil: "domcontentloaded" });
+    for (const w of ["hyatlas", "hospitality", "systems"]) {
+      await page.goto(`/work/?world=${w}`, { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(1500);
       const bodyText = (await page.textContent("body")) || "";
       expect(bodyText.length).toBeGreaterThan(200);
-      if (w === "systems") await expect(page.getByRole("button", { name: /Main menu/i })).toBeVisible({ timeout: 10000 });
+      if (w === "systems" || w === "hyatlas") await expect(page.getByRole("button", { name: /Main menu/i })).toBeVisible({ timeout: 10000 });
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `overflow ${w}`).toBeLessThanOrEqual(1);
     }
     // creative separately - heavy world, avoid session crash by not checking console errors strictly
-    await page.goto("/?world=creative", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=creative", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(1500);
     const bodyText = (await page.textContent("body")) || "";
     expect(bodyText.length).toBeGreaterThan(200);
@@ -81,7 +84,7 @@ test.describe("Release A — portfolio", () => {
     expect(errors, errors.join("\n")).toEqual([]);
 
     // robotics — scrub hero (video errors fall back, so page must still render)
-    await page.goto("/?world=robotics", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=robotics", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(1800);
     const botText = (await page.textContent("body")) || "";
     expect(botText.length).toBeGreaterThan(200);
@@ -92,7 +95,7 @@ test.describe("Release A — portfolio", () => {
   });
 
   test("creative counter never 06/05, finale appears", async ({ page }) => {
-    await page.goto("/?world=creative", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=creative", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(1500);
     const body = await page.textContent("body") || "";
     expect(body).not.toContain("06 / 05");
@@ -109,7 +112,7 @@ test.describe("Release A — portfolio", () => {
   });
 
   test("systems representative label exists", async ({ page }) => {
-    await page.goto("/?world=systems", { waitUntil: "domcontentloaded" });
+    await page.goto("/work/?world=systems", { waitUntil: "domcontentloaded" });
     await expect(page.locator(".sys-ov-title")).toBeVisible();
     const body = await page.textContent("body") || "";
     expect(body).toMatch(/Representative data|representative sample data|Sanitized sample data/i);
@@ -123,7 +126,7 @@ test.describe("Release A — portfolio", () => {
     const buf = await res.body();
     expect(buf.length).toBeGreaterThan(1000);
     // check dimensions via image element
-    await page.goto("/");
+    await page.goto("/work/");
     const dims = await page.evaluate(() => new Promise<{w:number,h:number}>((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
@@ -142,6 +145,7 @@ test.describe("Release A — portfolio", () => {
       expect(txt.length).toBeGreaterThan(10);
     }
     const sitemap = await (await page.request.get("/sitemap.xml")).text();
+    expect(sitemap).toContain("?world=hyatlas");
     expect(sitemap).toContain("?world=hospitality");
     expect(sitemap).toContain("?world=systems");
     expect(sitemap).toContain("?world=creative");

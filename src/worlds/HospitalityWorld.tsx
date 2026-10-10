@@ -49,7 +49,7 @@ export default function HospitalityWorld({
       <div className="cafe-utility" data-sync="utility">
         <span><i /> Open for selected projects</span>
         <span>Kuala Lumpur · Remote</span>
-        <a href="mailto:tuancookiez@gmail.com">Say hello ↗</a>
+        <a href="mailto:tabdullahrashid@tuandev.app">Say hello ↗</a>
       </div>
 
       <header className="cafe-nav" data-sync="nav">
@@ -66,7 +66,7 @@ export default function HospitalityWorld({
 
       <main id="cafe-top">
         <section className="cafe-hero" data-sync="hero">
-          <img src="./assets/cafe/hero.webp" alt="Bright independent neighbourhood café demonstrating Tuan's café website direction" />
+          <img src="/assets/cafe/hero.webp" alt="Bright independent neighbourhood café demonstrating Tuan's café website direction" />
           <div className="cafe-hero-tint" />
           <motion.div className="cafe-hero-copy">
             <p>Café websites from Kuala Lumpur</p>
@@ -118,7 +118,7 @@ export default function HospitalityWorld({
         </section>
 
         <section className="cafe-showcase" data-sync="showcase">
-          <div className="cafe-showcase-image"><img src="./assets/cafe/menu.webp" alt="Bright café menu photography with drinks and pastries" /></div>
+          <div className="cafe-showcase-image"><img src="/assets/cafe/menu.webp" alt="Bright café menu photography with drinks and pastries" /></div>
           <div className="cafe-showcase-copy">
             <p>Menu experience</p>
             <h2>Show the food they came for.</h2>
@@ -151,7 +151,7 @@ export default function HospitalityWorld({
         </section>
 
         <section className="cafe-local" data-sync="local">
-          <div className="cafe-local-photo"><img src="./assets/cafe/exterior.webp" alt="Friendly small neighbourhood café exterior in Kuala Lumpur" /></div>
+          <div className="cafe-local-photo"><img src="/assets/cafe/exterior.webp" alt="Friendly small neighbourhood café exterior in Kuala Lumpur" /></div>
           <div className="cafe-local-copy">
             <p>Local-business UX</p>
             <h2>If they have to hunt for the map, they leave.</h2>
@@ -177,7 +177,7 @@ export default function HospitalityWorld({
         <section className="cafe-contact" id="cafe-contact" data-sync="contact">
           <span>Got a small place people already like?</span>
           <h2>I can give it a website<br />that does not get in the way.</h2>
-          <a href="mailto:tuancookiez@gmail.com">Write to Tuan ↗</a>
+          <a href="mailto:tabdullahrashid@tuandev.app">Write to Tuan ↗</a>
         </section>
       </main>
 

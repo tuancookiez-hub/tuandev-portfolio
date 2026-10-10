@@ -1,4 +1,4 @@
-const BASE = "https://tuancookiez-hub.github.io/tuandev-portfolio/";
+const BASE = "https://tuandev.app/work/";
 
 type Meta = {
   title: string;
@@ -8,9 +8,14 @@ type Meta = {
 
 const MAP: Record<string, Meta> = {
   landing: {
-    title: "Tuan \u2014 Product Engineer & Creative Technologist",
-    description: "Tuan \u2014 product engineer and creative technologist building AI systems, data-heavy interfaces, and interactive web experiences from Kuala Lumpur.",
+    title: "Tuan \u2014 Selected work \u00b7 TuanDev",
+    description: "Earlier work by Tuan, founder of TuanDev (HyAtlas): AI systems, data-heavy interfaces, creative coding and robotics.",
     url: BASE,
+  },
+  hyatlas: {
+    title: "Tuan — HyAtlas, long-term memory for AI agents",
+    description: "Long-term memory for AI agents. My flagship product.",
+    url: `${BASE}?world=hyatlas`,
   },
   hospitality: {
     title: "Tuan \u2014 Hospitality Web Design",
