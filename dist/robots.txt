@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://tuancookiez-hub.github.io/tuandev-portfolio/sitemap.xml
