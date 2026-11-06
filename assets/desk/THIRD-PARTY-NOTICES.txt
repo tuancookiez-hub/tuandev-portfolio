@@ -360,7 +360,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 PORTFOLIO AUDIO — OCEAN AMBIENCE
 ================================================================================
 
-File: /assets/gallery/ocean.ogg
+File: /assets/gallery/ocean.wav
 
 Source: "Ocean Waves on a Tropical Beach" by Jarrod Stanley
   https://commons.wikimedia.org/wiki/File:Ocean_Waves_on_a_Tropical_Beach.ogg
@@ -371,12 +371,33 @@ Wikimedia Commons API (LicenseShortName: CC0). No attribution is required;
 this notice is provided voluntarily. The source is a real field recording,
 not AI-generated.
 
-Changes: a 14-second window was selected from the 6m24s original, high-passed
-at 70 Hz, low-passed at 3 kHz, normalized to -26 LUFS, and given a 30 ms
-gain-matched crossfade so it loops seamlessly. Delivered as Ogg Vorbis,
-44.1 kHz stereo, 13.97 s, 203,242 bytes, loopcheck verdict "seamless".
+Changes: the entire 6m24s original was high-passed at 70 Hz, low-passed at
+3 kHz and linearly normalized to about -28 LUFS before any cutting, so no
+filter edge lands on the loop boundary. A 30-second window was then built with
+a 3-second equal-power crossfade: the loop's tail blends into the audio that
+immediately precedes its head, so the last sample is adjacent to the first in
+the original recording. The splice point was chosen by scanning the filtered
+recording in 0.5 s steps for the smallest circular RMS level step; the winning
+window starts at 327.5 s. Delivered as uncompressed PCM WAV, 11.025 kHz mono,
+16-bit, 30.0 s, 661,578 bytes, SHA-256
+692528f15697c2bf8237980d0b1bf050586a7d3881eaa49c4f45cc5553358c47.
+WAV has no encoder pre-skip/padding, so the browser's loop wraps
+sample-accurately; Ogg/MP3 can add a small edge artifact.
 
-A second CC0 candidate ("Gentle Lapping Ocean Waves 53", SFXMint) was measured
-and rejected for sharper wave peaks and more high-frequency energy. Full
-measurements and the processing script are kept outside the repository under
-the concept folder's audio/ directory. No credits were spent on this asset.
+Verification (browser decodeAudioData of the served file, and offline PCM):
+  - circular 20 ms RMS step at the wrap: 0.13 dB (previously 3.8 dB on the
+    first 30 s attempt, 3.27 dB on the shipped 14 s Ogg)
+  - no leading silence, 3 trailing samples of padding
+  - sfx_tool.py loopcheck: verdict "seamless"; seam_jump 0.0016 vs
+    typical_step_p99 0.007; edge_level_difference_db 0.0; seam_dip_db -4.5
+  - the old /assets/gallery/ocean.ogg measured edge_level_difference_db 4.6
+    and loopcheck still called it "seamless" because its click threshold is
+    6 dB. That 4.6 dB level jump every 14 s was the audible "cut".
+  - the -4.5 dB dip is a 2 ms window vs a 400 ms average, i.e. a naturally
+    quiet instant inside the wave, not a dropout (loopcheck flags those below
+    -20 dB).
+Two purpose-made CC0 loops (SFXMint "Prepared loop" 53/54) were decoded,
+measured and rejected: sharper wave peaks (crest ~22 dB vs 13.9), larger
+near-seam dips (3.4-5.4 dB) and bigger transient steps. Full measurements and
+the processing scripts are kept outside the repository under the concept
+folder's audio/ directory. No credits were spent on this asset.
